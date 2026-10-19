@@ -214,7 +214,9 @@ Behavior priority, highest first:
 | Emergency exit | Shortcut. Some are blocked, and some lead past extra danger. |
 | Bathroom stall, supply closet | Hiding spot (see [Hiding](#hiding)) |
 | Gate seating | Blocks egg projectiles |
-| Flight information display, PA system | Story, jokes, and hints |
+| Flight information display, PA system | Story, jokes, and hints. The Arrivals departure board lists chicken-punned flights (Henver, Cluckland, Eggseter) whose statuses flicker and flip. |
+| Potted plants | Solid floor props. The player, carts, and chickens go around them; chickens path around them like walls. |
+| Welcome banner, windows | Set dressing. The banner names the city, "Welcome to Bawkston!" (Proposed); the windows look out on the tarmac and a parked plane. |
 
 ---
 
