@@ -733,6 +733,9 @@ func _tap(action: String) -> void:
 	event.action = action
 	event.pressed = true
 	Input.parse_input_event(event)
+	# Handle it now; otherwise it waits for a later frame, and a check right
+	# after the tap can run before the game has seen it.
+	Input.flush_buffered_events()
 
 
 func _wait(seconds: float) -> void:
