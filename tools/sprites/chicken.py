@@ -72,6 +72,9 @@ def chicken_side_walk(base):
         if head_forward:
             for r in range(1, 8):
                 put(g, r, 8, "." + g[r][8:15])
+                # Fill the gap the shift leaves at the back of the neck.
+                if g[r][7] != "." and g[r][9] != ".":
+                    put(g, r, 8, "C")
         if raise_body:
             g = g[1:] + ["." * 16]
         g = g[:16 - len(legs)] + legs
