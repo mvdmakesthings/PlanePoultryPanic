@@ -1,22 +1,24 @@
 class_name ExtinguisherSpray
 extends Node2D
 ## One blast of the fire extinguisher: a short cone of foam, plus a burst
-## right around the player. On the first frame it freezes every chicken in
-## the cone or the burst and destroys any mushroom patch in the cone, then
-## the foam drifts out and fades. Place it at the player's feet.
+## right around the player. For as long as the foam hangs in the air it
+## freezes every chicken in the cone or the burst, including ones that run
+## into it, and destroys any mushroom patch in the cone. Place it at the
+## player's feet.
 
 const FOAM := [Color("ffffff"), Color("c0cbdc"), Color("8b9bb4")]
 
-@export var length := 44.0
+@export var length := 60.0
 ## Half the cone's opening angle, in degrees.
-@export var half_angle := 32.0
+@export var half_angle := 38.0
 @export var freeze_time := 4.0
 ## Chickens this close to the player's feet freeze whichever way the player
 ## faces, so a chicken pecking from the side or behind can still be stopped.
-@export var point_blank_radius := 14.0
+@export var point_blank_radius := 20.0
 ## Foam is drawn from the nozzle at waist height, slightly ahead of the feet.
 const NOZZLE_HEIGHT := 4.0
-@export var lifetime := 0.4
+## How long the foam hangs in the air, still freezing chickens that enter it.
+@export var lifetime := 0.5
 
 var direction := Vector2.DOWN
 
@@ -36,6 +38,10 @@ func _ready() -> void:
 		# Flattened ring, since the floor is seen at an angle.
 		var around := Vector2.from_angle(i * TAU / 10.0) * point_blank_radius * 0.7
 		_burst.append(Vector2(around.x, around.y * 0.5))
+
+
+func _physics_process(_delta: float) -> void:
+	_apply()
 
 
 func _process(delta: float) -> void:
@@ -63,6 +69,8 @@ func in_burst(pos: Vector2) -> bool:
 func _apply() -> void:
 	for node in get_tree().get_nodes_in_group("chickens"):
 		var chicken := node as Chicken
+		if chicken.state == Chicken.State.FROZEN:
+			continue
 		if in_cone(chicken.global_position) or in_burst(chicken.global_position):
 			chicken.freeze(freeze_time)
 	for node in get_tree().get_nodes_in_group("mushroom_patches"):

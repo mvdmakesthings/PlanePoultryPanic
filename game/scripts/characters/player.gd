@@ -23,6 +23,9 @@ const FRAME_SIZE := Vector2i(16, 32)
 ## suitcase; an egg costs a single unit, a quarter of one.
 const SUITCASE := 4
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
+## The extinguisher swings toward the nearest unfrozen chicken this close,
+## whichever way the player is facing, so it works mid-chase.
+const SPRAY_AIM_RANGE := 64.0
 
 @export var walk_speed := 100.0
 @export var run_speed := 150.0
@@ -208,10 +211,24 @@ func spray() -> void:
 	if index < 0:
 		return
 	inventory.take_from(index)
+	facing = _spray_aim()
 	var foam := SPRAY_SCENE.instantiate() as ExtinguisherSpray
 	foam.direction = facing
 	foam.position = position
 	get_parent().add_child(foam)
+
+
+## Aim at the nearest threatening chicken in range, or straight ahead.
+func _spray_aim() -> Vector2:
+	var best := SPRAY_AIM_RANGE
+	var aim := facing
+	for node in get_tree().get_nodes_in_group("chickens"):
+		var chicken := node as Chicken
+		var distance := global_position.distance_to(chicken.global_position)
+		if chicken.state != Chicken.State.FROZEN and distance < best and distance > 0.5:
+			best = distance
+			aim = global_position.direction_to(chicken.global_position)
+	return aim
 
 
 ## Drops the whole selected slot on the floor just ahead, to make room.

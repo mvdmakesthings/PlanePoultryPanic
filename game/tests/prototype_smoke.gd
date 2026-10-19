@@ -105,6 +105,7 @@ func _ready() -> void:
 	await _recoil_test()
 	await _inventory_tests()
 	await _hiding_tests()
+	await _spray_under_attack_tests()
 
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
@@ -489,6 +490,35 @@ func _hiding_tests() -> void:
 	_check(not player.is_hidden and is_instance_valid(chicken) and chicken.state != Chicken.State.PURSUE,
 		"the player comes out safely once it's gone")
 	room.queue_free()
+
+
+## Spraying in the heat of a fight: the player flees, gets pecked from
+## behind, and sprays right away, still facing the way they were running.
+func _spray_under_attack_tests() -> void:
+	for delay: float in [0.0, 0.3, 0.6]:
+		var setup := await _fresh_room(Vector2(200, 230), Vector2(240, 230))
+		var chicken: Chicken = setup[1]
+		var player: Player = setup[2]
+		chicken.power_up("rage")  # fast enough to catch a walking player
+		player.give_extinguisher(3)
+		Input.action_press("move_right")
+		var pecked := false
+		for i in 120:
+			await get_tree().physics_frame
+			if player.health < player.max_health:
+				pecked = true
+				break
+		Input.action_release("move_right")
+		await _wait(delay)
+		var distance := chicken.global_position.distance_to(player.global_position)
+		_tap("use_item")
+		await get_tree().physics_frame
+		await _wait(0.4)
+		print("sprayed %.1fs after a peck, chicken %.0f px away, facing %s: state %d" % [
+			delay, distance, player.facing, chicken.state])
+		_check(pecked and chicken.state == Chicken.State.FROZEN,
+			"spraying %.1fs after being pecked from behind freezes the attacker" % delay)
+		setup[0].queue_free()
 
 
 ## Walking up through the gate's open doors wins the round.
