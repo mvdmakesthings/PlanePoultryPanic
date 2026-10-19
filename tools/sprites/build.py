@@ -15,6 +15,7 @@ from PIL import Image
 
 import chicken
 import player
+import tiles
 from palette import to_image
 
 REPO = Path(__file__).resolve().parents[2]
@@ -31,6 +32,12 @@ SHEETS = [
     ("chicken_flight_walk.png", chicken.powered_walk("flight"), 16, 16, 8),
     ("chicken_rage_walk.png", chicken.powered_walk("rage"), 16, 16, 10),
     ("chicken_egg_walk.png", chicken.powered_walk("egg"), 16, 16, 8),
+]
+
+# Sheets that aren't organized by direction: (file name, image builder).
+# Tile and object layouts are documented in docs/art-style-guide.md.
+IMAGES = [
+    ("tiles_arrivals.png", tiles.sheet),
 ]
 
 
@@ -90,8 +97,15 @@ def main():
     for name, anims, w, h, _ in SHEETS:
         make_sheet(anims, w, h).save(SPRITES / name)
         print(f"wrote {(SPRITES / name).relative_to(REPO)}")
+    for name, build in IMAGES:
+        build().save(SPRITES / name)
+        print(f"wrote {(SPRITES / name).relative_to(REPO)}")
     if args.preview:
         write_previews(args.preview)
+        for name, build in IMAGES:
+            img = build()
+            img.resize((img.width * 8, img.height * 8), Image.NEAREST).save(
+                args.preview / name.replace(".png", "_8x.png"))
         print(f"wrote previews to {args.preview}")
 
 

@@ -36,6 +36,11 @@ PALETTE = {
     # mushroom caps and effects
     "F": "fee761",  # light yellow
     "q": "2ce8f5",  # supernatural teal glow
+    # environment
+    "a": "e4a672",  # honey wood
+    "n": "b86f50",  # wood grain
+    "m": "733e39",  # wood seam
+    "v": "3e2731",  # deepest brown
 }
 
 

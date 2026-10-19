@@ -217,6 +217,26 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 
 Powered chickens skip the side-view body bob so their caps fit inside the 16x16 frame. The cap is drawn in code over the comb, so any new chicken animation gets caps automatically.
 
+### Tilesets and Objects
+Sheets that aren't animations use their own layouts.
+
+**`tiles_arrivals.png`**: 16x16 tiles, 8 per row, read left to right then top to bottom. Atlas coordinates are (column, row).
+
+| Atlas | Tile | Use |
+|---|---|---|
+| (0,0) (1,0) | `carpet_a`, `carpet_b` | Gray speckled carpet; mix both to hide repetition |
+| (2,0) (3,0) | `tile_a`, `tile_b` | Light terminal floor tile with grout lines |
+| (4,0) (5,0) | `wood_a`, `wood_b` | Honey wood planks |
+| (6,0) (7,0) (0,1) | `carpet_shadow`, `tile_shadow`, `wood_shadow` | First floor row under a wall; top rows darkened by the wall's shadow |
+| (1,1) | `wall_top` | Top of a wall, seen from above |
+| (2,1) | `wall_lip` | Front edge of the wall top, directly above the face |
+| (3,1) | `wall_face_upper` | Upper wall panel with the blue accent stripe |
+| (4,1) | `wall_face_lower` | Lower wall panel with the baseboard |
+| (5,1) (6,1) | `wall_edge_right`, `wall_edge_left` | Side walls; the outline faces the room |
+| (7,1) | `wall_edge_bottom` | Bottom wall; the outline faces the room above |
+
+A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall_face_upper`, `wall_face_lower`, then a shadow floor tile.
+
 ### Import Settings (Godot)
 - Texture filter: Nearest
 - No mipmaps
