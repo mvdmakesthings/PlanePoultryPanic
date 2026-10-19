@@ -584,7 +584,7 @@ func _check_hit() -> void:
 	if state in [State.EATING, State.FEEDING, State.FROZEN, State.RECOIL] or _is_hopping():
 		return
 	for body in _hitbox.get_overlapping_bodies():
-		if body is Player and (body as Player).take_damage(Player.SUITCASE, global_position):
+		if body is Player and (body as Player).take_damage(Player.PECK, global_position):
 			# Bounce back off the player and stay dazed for a moment.
 			state = State.RECOIL
 			_timer = daze_time

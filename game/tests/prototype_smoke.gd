@@ -448,7 +448,7 @@ func _recoil_test() -> void:
 	await _wait(0.5)
 	var distance := chicken.global_position.distance_to(player.global_position)
 	print("chicken bounced back to %.0f px after pecking" % distance)
-	_check(player.health == player.max_health - Player.SUITCASE, "the chicken lands one peck")
+	_check(player.health == player.max_health - Player.PECK, "the chicken lands one peck")
 	_check(distance >= 24.0, "a chicken bounces back after pecking")
 	await _wait(0.8)
 	_check(chicken.state == Chicken.State.PURSUE, "a dazed chicken resumes the chase")

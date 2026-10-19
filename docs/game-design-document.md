@@ -115,7 +115,7 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 | Inventory | 6 slots |
 
 ### Damage
-- Chicken pecks and environmental hazards cost a whole suitcase. Eggs only sting: a quarter of a suitcase each, shown as a partly emptied icon.
+- Chicken pecks cost half a suitcase, so it takes 10 pecks to lose all 5. Environmental hazards cost a whole suitcase. Eggs only sting: a quarter of a suitcase each. A partly lost suitcase is shown as a partly emptied icon.
 - After a hit, the player is briefly knocked back and is invincible for 1.5 seconds (the sprite blinks).
 - A chicken that lands a peck bounces back about two tiles and is dazed for a moment before chasing again, so the player has a chance to run.
 
@@ -461,6 +461,7 @@ game/
 | 2026-10-19 | Health is tracked in quarter suitcases so eggs can deal a quarter of a peck's damage | You |
 | 2026-10-19 | Chickens besieging a hiding spot give up and leave, rather than breaking the door, so hiding is a safe escape | You |
 | 2026-10-19 | The player has 5 suitcases of health instead of 3 | You |
+| 2026-10-19 | A chicken peck costs half a suitcase instead of a whole one, so the player survives 10 pecks | You |
 | 2026-10-19 | Rolling suitcases can be carried overhead and thrown; a hit defeats the chicken | You |
 | 2026-10-19 | A suitcase bursts open when it defeats a chicken (one defeat each), but a missed throw can be picked up again; carrying it slows the player and blocks running, items, and hiding | Proposed |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |

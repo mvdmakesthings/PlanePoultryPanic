@@ -20,9 +20,10 @@ const IDLE_SHEET := preload("res://assets/sprites/player_idle.png")
 const WALK_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_walk_extinguisher.png")
 const IDLE_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_idle_extinguisher.png")
 const FRAME_SIZE := Vector2i(16, 32)
-## Health units in one suitcase on the HUD. A chicken peck costs a whole
-## suitcase; an egg costs a single unit, a quarter of one.
+## Health units in one suitcase on the HUD. A chicken peck costs half a
+## suitcase (PECK); an egg costs a single unit, a quarter of one.
 const SUITCASE := 4
+const PECK := SUITCASE / 2
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 ## The extinguisher swings toward the nearest unfrozen chicken this close,
 ## whichever way the player is facing, so it works mid-chase.
