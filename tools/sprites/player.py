@@ -230,6 +230,112 @@ def idle_cycle():
     }
 
 
+# ---------- running ----------
+# Run frames: push off (legs wide, body low), flight (both feet off the
+# floor), push off with the other leg, flight. Longer stride than the walk,
+# knees driven high, arms pumping, and the backpack bouncing a beat behind.
+
+
+def _lowered(grid, rows=1):
+    """The whole frame drops by rows pixels (the body lands)."""
+    return ["." * 16 for _ in range(rows)] + grid[:len(grid) - rows]
+
+
+def _draw_leg(g, points, near):
+    """A 2px-wide leg along points (hip to ankle), then a boot at the ankle.
+    The near leg gets a lit edge; the far leg is all shadow."""
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        steps = max(abs(x1 - x0), abs(y1 - y0), 1)
+        for i in range(steps + 1):
+            x = round(x0 + (x1 - x0) * i / steps)
+            y = round(y0 + (y1 - y0) * i / steps)
+            put(g, y, x, "P")
+            put(g, y, x + 1, "p" if near else "P")
+            if abs(x1 - x0) > abs(y1 - y0):
+                # A mostly flat stretch (a foot kicked back) needs height too.
+                put(g, y + 1, x, "P")
+                put(g, y + 1, x + 1, "P")
+    ax, ay = points[-1]
+    put(g, ay + 1, ax, "GNN")
+    put(g, ay + 2, ax - 1, "NNNN")
+
+
+def _outline_below(g, top):
+    """Outline the legs: transparent pixels from row top down that touch them."""
+    out = list(g)
+    for y in range(top, len(g)):
+        for x in range(16):
+            if g[y][x] != ".":
+                continue
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < 16 and top <= ny < len(g) and g[ny][nx] not in ".O":
+                    put(out, y, x, "O")
+                    break
+    return out
+
+
+# Side-view leg poses as (far leg points, near leg points), hip to ankle,
+# for a body whose hips sit on row 22.
+SIDE_RUN_LEGS = {
+    # Push off: near leg reaching forward, far leg pushing back.
+    "near_front": ([(6, 22), (4, 25), (2, 27)], [(7, 22), (9, 25), (11, 27)]),
+    "near_back": ([(7, 22), (9, 25), (11, 27)], [(6, 22), (4, 25), (2, 27)]),
+    # Flight: one knee driven up in front, the other foot kicked up behind.
+    "flight_near_up": ([(6, 22), (5, 25), (2, 24)], [(7, 22), (10, 23), (9, 26)]),
+    "flight_far_up": ([(7, 22), (10, 23), (9, 26)], [(6, 22), (5, 25), (2, 24)]),
+}
+
+
+def _side_run_frame(legs, landing):
+    g = list(SIDE[:22]) + blank_rows(10)
+    far, near = SIDE_RUN_LEGS[legs]
+    _draw_leg(g, far, near=False)
+    _draw_leg(g, near, near=True)
+    g = _outline_below(g, 22)
+    if landing:
+        g = _lowered(g)
+        # The backpack lags the landing by another pixel.
+        pack = [g[r][0:5] for r in range(12, 22)]
+        for i, text in enumerate(pack):
+            put(g, 13 + i, 0, text)
+    return g
+
+
+def side_run():
+    return [
+        _side_run_frame("near_front", True),
+        _side_run_frame("flight_near_up", False),
+        _side_run_frame("near_back", True),
+        _side_run_frame("flight_far_up", False),
+    ]
+
+
+def very_short_leg(leg):
+    # Knee driven high: two shin rows gone, foot two rows up.
+    return leg[:2] + leg[4:] + [".....", "....."]
+
+
+def front_back_run(base):
+    left, right = leg_columns(base)
+    pump = lambda grid, cols: swing_arm(swing_arm(grid, cols), cols)
+    push_a = _lowered(pump(with_legs(base, long_leg(left), very_short_leg(right)), (12, 15)))
+    push_b = _lowered(pump(with_legs(base, very_short_leg(left), long_leg(right)), (1, 4)))
+    flight = with_legs(base, short_leg(left), short_leg(right))
+    return [push_a, flight, push_b, flight]
+
+
+def run_cycle():
+    """Run frames keyed by direction: down, up, right, left."""
+    right = side_run()
+    return {
+        "down": front_back_run(FRONT),
+        "up": front_back_run(BACK),
+        "right": right,
+        "left": [mirror(f) for f in right],
+    }
+
+
 # ---------- holding the fire extinguisher ----------
 
 # A small extinguisher carried by its handle: 5x8.
@@ -283,6 +389,10 @@ def walk_cycle_extinguisher():
 
 def idle_cycle_extinguisher():
     return _with_extinguisher(idle_cycle())
+
+
+def run_cycle_extinguisher():
+    return _with_extinguisher(run_cycle())
 
 
 # ---------- knocked out ----------

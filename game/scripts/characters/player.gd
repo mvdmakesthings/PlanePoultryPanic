@@ -19,6 +19,8 @@ const WALK_SHEET := preload("res://assets/sprites/player_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/player_idle.png")
 const WALK_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_walk_extinguisher.png")
 const IDLE_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_idle_extinguisher.png")
+const RUN_SHEET := preload("res://assets/sprites/player_run.png")
+const RUN_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_run_extinguisher.png")
 const KO_SHEET := preload("res://assets/sprites/player_ko.png")
 const FRAME_SIZE := Vector2i(16, 32)
 ## The knocked-out pose lies flat, so its frames are wide and short.
@@ -95,6 +97,8 @@ func _ready() -> void:
 	SpriteSheets.add_directional(frames, "idle", IDLE_SHEET, FRAME_SIZE, 2.0)
 	SpriteSheets.add_directional(frames, "walk_ext", WALK_EXTINGUISHER_SHEET, FRAME_SIZE, 8.0)
 	SpriteSheets.add_directional(frames, "idle_ext", IDLE_EXTINGUISHER_SHEET, FRAME_SIZE, 2.0)
+	SpriteSheets.add_directional(frames, "run", RUN_SHEET, FRAME_SIZE, 12.0)
+	SpriteSheets.add_directional(frames, "run_ext", RUN_EXTINGUISHER_SHEET, FRAME_SIZE, 12.0)
 	frames.add_animation("ko")
 	frames.set_animation_speed("ko", 3.0)
 	for column in KO_SHEET.get_width() / KO_FRAME_SIZE.x:
@@ -366,14 +370,19 @@ func _update_stamina(running: bool, delta: float) -> void:
 
 func _update_animation(input: Vector2, running: bool) -> void:
 	var direction := SpriteSheets.direction_name(facing)
-	var animation := "walk" if input != Vector2.ZERO else "idle"
+	var animation := "idle"
+	if input != Vector2.ZERO:
+		animation = "run" if running else "walk"
 	# Carry the extinguisher in hand while it's the selected item.
 	if inventory.selected_item() == "extinguisher" and carrying == null:
 		animation += "_ext"
 	animation += "_" + direction
 	if _sprite.animation != animation:
+		# Switching between walking and running keeps the stride going.
+		var frame := _sprite.frame
 		_sprite.play(animation)
-	_sprite.speed_scale = 1.6 if running else 1.0
+		if input != Vector2.ZERO:
+			_sprite.frame = frame
 
 
 func _update_invincibility(delta: float) -> void:
