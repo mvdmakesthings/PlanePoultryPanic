@@ -211,3 +211,61 @@ ICE = [
 
 def ice():
     return to_image(ICE)
+
+
+# Rolling suitcase: two 14x16 frames, closed then burst open. A green hard
+# shell with a telescoping handle, a yellow tag, and two small wheels.
+SUITCASE_SIZE = (14, 16)
+
+
+def suitcase_frame(burst):
+    w, h = SUITCASE_SIZE
+    g = ["." * w for _ in range(h)]
+    if not burst:
+        # Handle grip and its two posts.
+        _box(g, 4, 0, 9, 2, "w")
+        _px(g, 5, 3, "w")
+        _px(g, 8, 3, "w")
+        # Shell with a shaded right side and bottom, and two ribs.
+        _box(g, 0, 4, 13, 14, "g")
+        for y in range(5, 14):
+            _px(g, 12, y, "j")
+            _px(g, 4, y, "j")
+            _px(g, 9, y, "j")
+        for x in range(1, 13):
+            _px(g, x, 13, "j")
+        _px(g, 2, 6, "L")
+        _px(g, 2, 7, "L")
+        # Luggage tag hanging off the side.
+        _px(g, 11, 6, "Y")
+        _px(g, 11, 7, "y")
+        # Wheels.
+        for x in (2, 3, 10, 11):
+            _px(g, x, 15, "O")
+        return g
+    # Burst: the lid flies up, clothes spill out of the open bottom shell.
+    _box(g, 1, 0, 12, 3, "g")
+    for x in range(2, 12):
+        _px(g, x, 2, "j")
+    _box(g, 0, 10, 13, 15, "g")
+    for x in range(1, 13):
+        _px(g, x, 14, "j")
+    # A red shirt, a blue sock, a yellow sock, and a white tee mid-air.
+    for x, y, key in [
+        (2, 6, "R"), (3, 6, "R"), (4, 6, "R"), (3, 7, "r"),
+        (8, 5, "b"), (9, 5, "b"), (9, 6, "B"),
+        (11, 8, "Y"), (12, 8, "y"),
+        (5, 9, "W"), (6, 9, "W"), (7, 9, "W"), (6, 8, "W"),
+        (1, 9, "F"), (10, 10, "R"),
+    ]:
+        _px(g, x, y, key)
+    for x in range(2, 12):
+        _px(g, x, 11, "W" if x % 3 else "R")
+    return g
+
+
+def suitcase():
+    out = Image.new("RGBA", (SUITCASE_SIZE[0] * 2, SUITCASE_SIZE[1]), (0, 0, 0, 0))
+    for i in range(2):
+        out.alpha_composite(to_image(suitcase_frame(i == 1)), (i * SUITCASE_SIZE[0], 0))
+    return out

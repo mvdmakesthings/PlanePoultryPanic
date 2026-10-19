@@ -52,6 +52,7 @@ IMAGES = [
     ("hud_luggage.png", items.luggage),
     ("egg.png", items.egg),
     ("luggage_cart.png", items.cart),
+    ("suitcase.png", items.suitcase),
     ("item_extinguisher.png", items.extinguisher),
     ("extinguisher_cabinet.png", items.cabinet),
     ("ice_block.png", items.ice),
