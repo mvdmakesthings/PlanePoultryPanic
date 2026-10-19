@@ -283,3 +283,50 @@ def walk_cycle_extinguisher():
 
 def idle_cycle_extinguisher():
     return _with_extinguisher(idle_cycle())
+
+
+# ---------- knocked out ----------
+
+# The game-over pose: 32x20 frames, the player flat on their back with
+# X eyes, head to the left, and stars circling above the head.
+KO_SIZE = (32, 20)
+# Centers of the plus-shaped stars in each frame, so they seem to circle.
+KO_STARS = [((2, 2), (10, 1)), ((6, 1), (13, 2))]
+
+
+def _x_eyes(grid):
+    g = list(grid)
+    for cx in (5, 10):
+        for dx, dy in ((-1, -1), (1, -1), (0, 0), (-1, 1), (1, 1)):
+            put(g, 7 + dy, cx + dx, "O")
+        put(g, 7, cx - 1, "S")
+        put(g, 7, cx + 1, "S")
+    return g
+
+
+def _lying(grid):
+    """Rotate a 16x32 standing pose a quarter turn so the head is at the left."""
+    w = len(grid[0])
+    return ["".join(grid[c][w - 1 - r] for c in range(len(grid))) for r in range(w)]
+
+
+def ko_frame(frame):
+    w, h = KO_SIZE
+    body = _lying(_x_eyes(FRONT))
+    g = ["." * w for _ in range(h - len(body))] + body
+    for cx, cy in KO_STARS[frame]:
+        put(g, cy, cx, "L")
+        for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            if 0 <= cy + dy < h:
+                put(g, cy + dy, cx + dx, "F")
+    return g
+
+
+def ko_sheet():
+    """Two 32x20 frames side by side; loop slowly (about 3 FPS)."""
+    from PIL import Image
+    from palette import to_image
+    out = Image.new("RGBA", (KO_SIZE[0] * 2, KO_SIZE[1]), (0, 0, 0, 0))
+    for i in range(2):
+        out.alpha_composite(to_image(ko_frame(i)), (i * KO_SIZE[0], 0))
+    return out
