@@ -235,6 +235,21 @@ func _cart_tests() -> void:
 	_check(player.health == player.max_health, "eggs splat on a cart the player hides behind")
 	setup[0].queue_free()
 
+	# Thrown snacks can be picked back up, but not the instant they land.
+	setup = await _fresh_room(Vector2(400, 290), Vector2(200, 260))
+	setup[1].queue_free()
+	player = setup[2]
+	var count := player.snacks
+	player.facing = Vector2.RIGHT
+	player.throw_snack()
+	await _wait(0.6)
+	_check(player.snacks == count - 1, "throwing a snack takes it out of the bag")
+	var lure: ThrownSnack = get_tree().get_nodes_in_group("snack_lures")[0]
+	player.global_position = lure.global_position
+	await _wait(0.2)
+	_check(player.snacks == count and not is_instance_valid(lure), "walking over a thrown snack picks it back up")
+	setup[0].queue_free()
+
 
 ## Returns [room, the one chicken left, player]. Patches other than the rage
 ## patch are removed, and the chicken is set chasing if it can see the player.

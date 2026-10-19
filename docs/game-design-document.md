@@ -135,7 +135,7 @@ Bathroom stalls and supply closets are hiding spots. While hidden, chickens lose
 ### Usable Items
 | Item | Use | Notes |
 |---|---|---|
-| Snack | Eat to heal 1, or throw as a distraction | Found in the food court, vending machines, and abandoned bags |
+| Snack | Eat to heal 1, or throw as a distraction. A thrown snack nobody has eaten can be picked back up. | Found in the food court, vending machines, and abandoned bags |
 | Fire extinguisher | Spray to freeze chickens in a cone for 4 seconds | 3 charges, then it's empty. Found at emergency stations. |
 
 More usable items may come out of prototyping, but every new item has to earn its slot. Fewer items that each do a lot fits the game better than many small ones.
