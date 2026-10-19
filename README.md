@@ -48,3 +48,4 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 - [Roadmap](docs/roadmap.md): milestones from prototype to Steam
 - [Art style guide](docs/art-style-guide.md): palette, sprite rules, sheet layouts
 - [Storyline](docs/storyline.md): world and tone
+- [Store page](docs/store-page.md): itch.io tagline, description, tags, and metadata
