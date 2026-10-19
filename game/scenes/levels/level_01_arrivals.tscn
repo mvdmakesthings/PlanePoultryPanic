@@ -17,6 +17,8 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/welcome_banner.png" id="15_banner"]
 [ext_resource type="Texture2D" path="res://assets/sprites/gate_door.png" id="16_gate"]
 [ext_resource type="Texture2D" path="res://assets/sprites/signs.png" id="17_signs"]
+[ext_resource type="PackedScene" path="res://scenes/objects/seating.tscn" id="18_seating"]
+[ext_resource type="Texture2D" path="res://assets/sprites/floor_litter.png" id="19_litter"]
 
 [node name="Level01Arrivals" type="Node2D"]
 script = ExtResource("1_level")
@@ -89,7 +91,7 @@ frame = 2
 position = Vector2(576, 36)
 texture = ExtResource("17_signs")
 centered = false
-hframes = 4
+hframes = 5
 
 [node name="BaggageBoard" type="Sprite2D" parent="WallDecor"]
 position = Vector2(296, 225)
@@ -102,8 +104,88 @@ script = ExtResource("12_flipbook")
 position = Vector2(72, 418)
 texture = ExtResource("17_signs")
 centered = false
+hframes = 5
+frame = 2
+
+[node name="LostFoundSign" type="Sprite2D" parent="WallDecor"]
+position = Vector2(828, 228)
+texture = ExtResource("17_signs")
+centered = false
+hframes = 5
+frame = 4
+
+[node name="FloorLitter" type="Node2D" parent="."]
+
+[node name="Litter1" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(120, 150)
+texture = ExtResource("19_litter")
+hframes = 4
+
+[node name="Litter2" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(470, 100)
+texture = ExtResource("19_litter")
+hframes = 4
+
+[node name="Litter3" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(420, 180)
+texture = ExtResource("19_litter")
+hframes = 4
+frame = 3
+
+[node name="Litter4" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(600, 290)
+texture = ExtResource("19_litter")
+hframes = 4
+
+[node name="Litter5" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(330, 480)
+texture = ExtResource("19_litter")
+hframes = 4
+frame = 1
+
+[node name="Litter6" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(520, 300)
+texture = ExtResource("19_litter")
 hframes = 4
 frame = 2
+
+[node name="Litter7" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(250, 520)
+texture = ExtResource("19_litter")
+hframes = 4
+frame = 3
+
+[node name="Litter8" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(760, 420)
+texture = ExtResource("19_litter")
+hframes = 4
+
+[node name="Litter9" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(860, 470)
+texture = ExtResource("19_litter")
+hframes = 4
+frame = 1
+
+[node name="Litter10" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(150, 300)
+texture = ExtResource("19_litter")
+hframes = 4
+
+[node name="Litter11" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(64, 520)
+texture = ExtResource("19_litter")
+hframes = 4
+
+[node name="Litter12" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(780, 90)
+texture = ExtResource("19_litter")
+hframes = 4
+frame = 2
+
+[node name="Litter13" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(900, 170)
+texture = ExtResource("19_litter")
+hframes = 4
 
 [node name="SecurityDoor" parent="." instance=ExtResource("7_door")]
 position = Vector2(688, 224)
@@ -204,6 +286,27 @@ position = Vector2(700, 80)
 
 [node name="MaintenanceCart" parent="Entities" instance=ExtResource("11_janitor")]
 position = Vector2(76, 474)
+
+[node name="LoungeSeats1" parent="Entities" instance=ExtResource("18_seating")]
+position = Vector2(120, 100)
+
+[node name="LoungeSeats2" parent="Entities" instance=ExtResource("18_seating")]
+position = Vector2(184, 100)
+
+[node name="HallSeats" parent="Entities" instance=ExtResource("18_seating")]
+position = Vector2(420, 96)
+
+[node name="WaitingSeats1" parent="Entities" instance=ExtResource("18_seating")]
+position = Vector2(80, 300)
+
+[node name="WaitingSeats2" parent="Entities" instance=ExtResource("18_seating")]
+position = Vector2(160, 300)
+
+[node name="WaitingSeats3" parent="Entities" instance=ExtResource("18_seating")]
+position = Vector2(80, 350)
+
+[node name="WaitingSeats4" parent="Entities" instance=ExtResource("18_seating")]
+position = Vector2(160, 350)
 
 [node name="UI" type="CanvasLayer" parent="."]
 
