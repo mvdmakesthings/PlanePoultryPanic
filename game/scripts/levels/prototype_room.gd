@@ -33,10 +33,6 @@ const CAROUSEL_RECT := Rect2i(3, 9, 8, 4)
 const CHUTE_COLUMN := 4
 ## Blocks only the player (physics layer 4), so chickens can fall through.
 const PLAYER_BLOCKER_LAYER := 8
-## The departure gate the player must reach, in tiles.
-const EXIT_RECT := Rect2i(25, 4, 3, 2)
-const GATE_COLOR := Color("63c74d")
-const GATE_OUTLINE := Color("181425")
 ## Walls and furniture join this group so the navigation mesh routes around them.
 const NAV_OBSTACLES := "nav_obstacles"
 ## Clearance kept between chicken paths and obstacles.
@@ -46,7 +42,7 @@ var _round_over := false
 
 @onready var _floor: TileMapLayer = $Floor
 @onready var _props: TileMapLayer = $Props
-@onready var _exit_marker: Node2D = $ExitMarker
+@onready var _gate: GateDoor = $Gate
 @onready var _player: Player = $Entities/Player
 @onready var _hud: Hud = $UI/HUD
 
@@ -59,7 +55,7 @@ func _ready() -> void:
 	_paint_carousel()
 	_build_collision()
 	_build_navigation()
-	_build_exit()
+	_gate.player_entered.connect(_on_gate_entered)
 
 	var camera: Camera2D = _player.get_node("Camera2D")
 	camera.limit_left = 0
@@ -139,7 +135,12 @@ func _paint_carousel() -> void:
 
 func _build_collision() -> void:
 	var room_px := Vector2(ROOM * TILE)
-	_add_wall(Rect2(0, 0, room_px.x, WALL_ROWS * TILE))
+	# The north wall, with a gap the player can walk up into at the gate.
+	var wall_bottom := WALL_ROWS * TILE
+	var doorway := _gate.doorway_rect()
+	_add_wall(Rect2(0, 0, doorway.position.x, wall_bottom))
+	_add_wall(Rect2(doorway.end.x, 0, room_px.x - doorway.end.x, wall_bottom))
+	_add_wall(Rect2(doorway.position.x, 0, doorway.size.x, doorway.position.y))
 	_add_wall(Rect2(0, room_px.y - TILE, room_px.x, TILE))
 	_add_wall(Rect2(0, 0, TILE, room_px.y))
 	_add_wall(Rect2(room_px.x - TILE, 0, TILE, room_px.y))
@@ -197,35 +198,8 @@ func _build_navigation() -> void:
 	region.bake_navigation_polygon(false)
 
 
-func _build_exit() -> void:
-	var rect := Rect2(EXIT_RECT.position * TILE, EXIT_RECT.size * TILE)
-	var area := Area2D.new()
-	area.collision_layer = 0
-	area.collision_mask = 2
-	var shape := CollisionShape2D.new()
-	var box := RectangleShape2D.new()
-	box.size = rect.size
-	shape.shape = box
-	shape.position = rect.get_center()
-	area.add_child(shape)
-	add_child(area)
-	area.body_entered.connect(_on_exit_entered)
-	_exit_marker.draw.connect(_draw_exit.bind(rect))
-	_exit_marker.queue_redraw()
-
-
-func _draw_exit(rect: Rect2) -> void:
-	# Placeholder gate marker until gate art exists.
-	_exit_marker.draw_rect(rect, Color(GATE_COLOR, 0.35))
-	_exit_marker.draw_rect(rect, GATE_COLOR, false, 2.0)
-	var font := ThemeDB.fallback_font
-	var pos := rect.position + Vector2(0, rect.size.y / 2.0 + 3.0)
-	_exit_marker.draw_string_outline(font, pos, "GATE", HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 8, 2, GATE_OUTLINE)
-	_exit_marker.draw_string(font, pos, "GATE", HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 8)
-
-
-func _on_exit_entered(body: Node2D) -> void:
-	if body is Player and not _round_over:
+func _on_gate_entered() -> void:
+	if not _round_over:
 		_round_over = true
 		_player.freeze()
 		_hud.show_message("YOU MADE YOUR FLIGHT!\nPress R to play again")

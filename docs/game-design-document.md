@@ -208,6 +208,7 @@ Behavior priority, highest first:
 |---|---|
 | Luggage cart | Shove it with Interact and it rolls about 4 tiles. A chicken it hits while rolling fast is defeated. Eggs splat against the whole cart, luggage included, so the player can hide behind one. |
 | Vending machine | Opened with a maintenance key. Drops 2-3 snacks. |
+| Boarding gate | A door set into the back wall with a lit gate sign. Its glass doors slide open as the player approaches; walking into the doorway reaches the gate. |
 | Emergency exit | Shortcut. Some are blocked, and some lead past extra danger. |
 | Bathroom stall, supply closet | Hiding spot (see [Hiding](#hiding)) |
 | Gate seating | Blocks egg projectiles |

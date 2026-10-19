@@ -98,6 +98,7 @@ func _ready() -> void:
 	await _power_tests()
 	await _carousel_tests()
 	await _cart_tests()
+	await _gate_test()
 
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
@@ -249,6 +250,18 @@ func _cart_tests() -> void:
 	await _wait(0.2)
 	_check(player.snacks == count and not is_instance_valid(lure), "walking over a thrown snack picks it back up")
 	setup[0].queue_free()
+
+
+## Walking up through the gate's open doors wins the round.
+func _gate_test() -> void:
+	# Park the spare chicken well away from the player's start, so its
+	# hitbox can't overlap the player for a frame before it's removed.
+	var setup := await _fresh_room(Vector2(200, 120), Vector2(424, 96))
+	setup[1].queue_free()
+	var room: Node = setup[0]
+	await _hold(["move_up"], 1.0)
+	_check(room._round_over, "walking into the gate doorway wins")
+	room.queue_free()
 
 
 ## Returns [room, the one chicken left, player]. Patches other than the rage
