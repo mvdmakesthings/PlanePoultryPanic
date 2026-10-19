@@ -316,6 +316,18 @@ func _extinguisher_tests() -> void:
 	_check(player.extinguisher_charges == 0, "an empty extinguisher does nothing")
 	room.queue_free()
 
+	# Holding the extinguisher shows it in the player's hand.
+	setup = await _fresh_room(Vector2(40, 290), Vector2(232, 200))
+	setup[1].queue_free()
+	player = setup[2]
+	player.give_extinguisher(1)
+	await get_tree().physics_frame
+	_check(player._sprite.animation.contains("_ext"), "the player is drawn holding the extinguisher")
+	player.spray()
+	await get_tree().physics_frame
+	_check(not player._sprite.animation.contains("_ext"), "an empty extinguisher is put away")
+	setup[0].queue_free()
+
 	# A frozen chicken on the belt rides into the chute.
 	setup = await _fresh_room(Vector2(84, 151), Vector2(400, 290))
 	chicken = setup[1]

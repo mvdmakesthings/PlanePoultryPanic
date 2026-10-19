@@ -32,6 +32,8 @@ PREVIEW_BG = (38, 43, 68, 255)
 SHEETS = [
     ("player_walk.png", player.walk_cycle(), 16, 32, 8),
     ("player_idle.png", player.idle_cycle(), 16, 32, 2),
+    ("player_walk_extinguisher.png", player.walk_cycle_extinguisher(), 16, 32, 8),
+    ("player_idle_extinguisher.png", player.idle_cycle_extinguisher(), 16, 32, 2),
     ("chicken_walk.png", chicken.walk_cycle(), 16, 16, 8),
     ("chicken_idle.png", chicken.idle_cycle(), 16, 16, 4),
     ("chicken_flight_walk.png", chicken.powered_walk("flight"), 16, 16, 8),

@@ -14,6 +14,8 @@ const THROWN_SNACK_SCENE := preload("res://scenes/objects/thrown_snack.tscn")
 const SPRAY_SCENE := preload("res://scenes/objects/extinguisher_spray.tscn")
 const WALK_SHEET := preload("res://assets/sprites/player_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/player_idle.png")
+const WALK_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_walk_extinguisher.png")
+const IDLE_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_idle_extinguisher.png")
 const FRAME_SIZE := Vector2i(16, 32)
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 
@@ -56,6 +58,8 @@ func _ready() -> void:
 	frames.remove_animation("default")
 	SpriteSheets.add_directional(frames, "walk", WALK_SHEET, FRAME_SIZE, 8.0)
 	SpriteSheets.add_directional(frames, "idle", IDLE_SHEET, FRAME_SIZE, 2.0)
+	SpriteSheets.add_directional(frames, "walk_ext", WALK_EXTINGUISHER_SHEET, FRAME_SIZE, 8.0)
+	SpriteSheets.add_directional(frames, "idle_ext", IDLE_EXTINGUISHER_SHEET, FRAME_SIZE, 2.0)
 	_sprite.sprite_frames = frames
 	_sprite.play("idle_down")
 	# Deferred so listeners that connect in the level's _ready get initial values.
@@ -188,7 +192,11 @@ func _update_stamina(running: bool, delta: float) -> void:
 
 func _update_animation(input: Vector2, running: bool) -> void:
 	var direction := SpriteSheets.direction_name(facing)
-	var animation := ("walk_" if input != Vector2.ZERO else "idle_") + direction
+	var animation := "walk" if input != Vector2.ZERO else "idle"
+	# Carry the extinguisher in hand while it has charges left.
+	if extinguisher_charges > 0:
+		animation += "_ext"
+	animation += "_" + direction
 	if _sprite.animation != animation:
 		_sprite.play(animation)
 	_sprite.speed_scale = 1.6 if running else 1.0
