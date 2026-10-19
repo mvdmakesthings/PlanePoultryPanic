@@ -66,7 +66,7 @@ One room built with the style-test art (the art came first, by choice). Goal: fi
 
 Still mostly gray-box. Each item should be playable in the prototype room.
 
-- [ ] Chicken pathfinding around furniture (NavigationAgent2D)
+- [x] Chicken pathfinding around furniture (NavigationAgent2D)
 - [ ] Mushroom patches and the three powered modes (flight, rage, egg shooter)
 - [ ] Fire extinguisher (freeze cone, charges)
 - [ ] Baggage carousel that carries and defeats chickens

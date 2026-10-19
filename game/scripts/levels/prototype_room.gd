@@ -33,6 +33,10 @@ const CAROUSEL_RECT := Rect2i(3, 9, 8, 4)
 const EXIT_RECT := Rect2i(25, 4, 3, 2)
 const GATE_COLOR := Color("63c74d")
 const GATE_OUTLINE := Color("181425")
+## Walls and furniture join this group so the navigation mesh routes around them.
+const NAV_OBSTACLES := "nav_obstacles"
+## Clearance kept between chicken paths and obstacles.
+const NAV_AGENT_RADIUS := 6.0
 
 var _round_over := false
 
@@ -50,6 +54,7 @@ func _ready() -> void:
 	_paint_floor_and_walls()
 	_paint_carousel()
 	_build_collision()
+	_build_navigation()
 	_build_exit()
 
 	var camera: Camera2D = _player.get_node("Camera2D")
@@ -147,7 +152,26 @@ func _add_wall(rect: Rect2) -> void:
 	shape.shape = box
 	shape.position = rect.get_center()
 	body.add_child(shape)
+	body.add_to_group(NAV_OBSTACLES)
 	add_child(body)
+
+
+func _build_navigation() -> void:
+	var walkable := NavigationPolygon.new()
+	walkable.agent_radius = NAV_AGENT_RADIUS
+	walkable.parsed_geometry_type = NavigationPolygon.PARSED_GEOMETRY_STATIC_COLLIDERS
+	walkable.parsed_collision_mask = 1
+	walkable.source_geometry_mode = NavigationPolygon.SOURCE_GEOMETRY_GROUPS_WITH_CHILDREN
+	walkable.source_geometry_group_name = NAV_OBSTACLES
+	var room_px := Vector2(ROOM * TILE)
+	walkable.add_outline(PackedVector2Array([
+		Vector2.ZERO, Vector2(room_px.x, 0), room_px, Vector2(0, room_px.y),
+	]))
+	var region := NavigationRegion2D.new()
+	region.navigation_polygon = walkable
+	add_child(region)
+	# Bake synchronously so chickens have paths from their first frame.
+	region.bake_navigation_polygon(false)
 
 
 func _build_exit() -> void:

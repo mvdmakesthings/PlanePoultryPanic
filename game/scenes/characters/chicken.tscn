@@ -41,3 +41,8 @@ theme_override_colors/font_outline_color = Color(0.094, 0.078, 0.145, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 8
 text = "!"
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 4.0
+target_desired_distance = 4.0
+radius = 6.0

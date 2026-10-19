@@ -35,6 +35,7 @@ var _facing := Vector2.DOWN
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var _hitbox: Area2D = $Hitbox
 @onready var _alert_label: Label = $AlertLabel
+@onready var _agent: NavigationAgent2D = $NavigationAgent2D
 
 
 func _ready() -> void:
@@ -97,7 +98,7 @@ func _pursue(delta: float) -> void:
 			state = State.WANDER
 			_pick_wander()
 			return
-	velocity = global_position.direction_to(_player.global_position) * pursue_speed
+	velocity = _direction_toward(_player.global_position) * pursue_speed
 
 
 func _investigate() -> void:
@@ -114,7 +115,7 @@ func _investigate() -> void:
 		else:
 			state = State.WANDER
 		return
-	velocity = to_snack.normalized() * investigate_speed
+	velocity = _direction_toward(_target_snack.global_position) * investigate_speed
 
 
 func _eat() -> void:
@@ -122,6 +123,16 @@ func _eat() -> void:
 	if _timer <= 0.0:
 		state = State.WANDER
 		_pick_wander()
+
+
+## Next step along the navigation path, so chickens route around furniture.
+## Falls back to a straight line before the navigation map is ready.
+func _direction_toward(target: Vector2) -> Vector2:
+	_agent.target_position = target
+	var next := _agent.get_next_path_position()
+	if next.distance_to(global_position) < 0.5:
+		return global_position.direction_to(target)
+	return global_position.direction_to(next)
 
 
 func _pick_wander() -> void:

@@ -71,6 +71,25 @@ func _ready() -> void:
 		print("snack thrown at the carousel landed at %s" % landed)
 		_check(landed.y >= 208.0, "snack thrown at the carousel stays outside it")
 
+	# Pathfinding: a chicken north of the carousel must walk around it to
+	# reach a snack directly south of it.
+	for lure in get_tree().get_nodes_in_group("snack_lures"):
+		lure.queue_free()
+	var chickens := get_tree().get_nodes_in_group("chickens")
+	for i in range(1, chickens.size()):
+		chickens[i].queue_free()
+	var runner: Chicken = chickens[0]
+	runner.global_position = Vector2(112, 136)
+	runner.state = Chicken.State.WANDER
+	runner.set_physics_process(true)
+	player.global_position = Vector2(440, 290)
+	var bait: ThrownSnack = preload("res://scenes/objects/thrown_snack.tscn").instantiate()
+	bait.direction = Vector2.ZERO
+	bait.position = Vector2(112, 230)
+	room.get_node("Entities").add_child(bait)
+	await _wait(4.0)
+	_check(runner.state == Chicken.State.EATING, "chicken paths around the carousel to a snack")
+
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
 		get_tree().quit(0)
