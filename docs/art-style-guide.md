@@ -182,19 +182,37 @@ Until the run cycle exists, running plays the walk cycle faster with small dust 
 
 ## How Sprites Get Made
 
-1. **Draft**: Claude writes each sprite as a grid of palette colors in a source file under `game/assets/sprites/src/`.
-2. **Build**: A script turns the sources into PNG sprite sheets in `game/assets/sprites/`. Source and output are both committed.
-3. **Check**: Claude renders sheets and in-game screenshots to review them at 1x and 4x.
-4. **Review**: You see screenshots or play the build and give feedback.
-5. **Touch-ups**: You can open any PNG in Aseprite or LibreSprite and paint over it. Edited PNGs are then treated as the source.
+1. **Draft**: Claude writes each sprite as a grid of palette keys in Python files under `tools/sprites/` (`palette.py`, `player.py`, `chicken.py`). Walk cycles and other animations are built from the base poses in code.
+2. **Build**: `tools/sprites/build.py` turns the grids into PNG sprite sheets in `game/assets/sprites/`. Source and output are both committed.
+3. **Check**: Claude renders enlarged previews and animated GIFs to review at 1x and 4x.
+4. **Review**: You see the previews or play the build and give feedback.
+5. **Touch-ups and final art**: You can open any PNG in Aseprite or LibreSprite and paint over it. Once a sheet is edited by hand, the PNG becomes its source: remove it from `build.py`'s `SHEETS` list so a rebuild doesn't overwrite your work.
+
+### Building the Sheets
+Needs Python 3 and Pillow (`pip install -r tools/sprites/requirements.txt`). From the repo root:
+
+```bash
+python3 tools/sprites/build.py --preview /tmp/sprite-previews
+```
+
+`--preview` is optional; it writes enlarged frame grids and an animated walk GIF to the folder you name.
+
+### Sheet Layout
+- One PNG per animation: `<thing>_<animation>.png`, for example `player_walk.png`, `chicken_walk.png`, `tiles_arrivals.png`
+- **Rows** are directions in this order: down, up, right, left
+- **Columns** are frames, read left to right
+- Frames sit on a regular grid with no padding: 16x32 for the player, 16x16 for chickens
+- Keep this layout when redrawing a sheet so it drops into the game unchanged
+
+### Current Sheets
+| Sheet | Frame size | Frames | Notes |
+|---|---|---|---|
+| `player_walk.png` | 16x32 | 4 per direction | Contact, passing, contact, passing. The second (passing) frame doubles as the standing pose until idle frames exist. |
+| `chicken_walk.png` | 16x16 | 4 per direction | Head bobs forward on side-view contact frames; front and back views waddle. |
 
 ### Import Settings (Godot)
 - Texture filter: Nearest
 - No mipmaps
-- Sprite sheets on a regular grid with no padding, frames read left to right
-
-### Naming
-`<thing>_<state>_<direction>.png`, for example `chicken_walk_down.png`, `player_idle_left.png`, `tiles_arrivals.png`.
 
 ---
 
