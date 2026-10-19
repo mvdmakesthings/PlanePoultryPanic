@@ -1,6 +1,10 @@
 # Plane Poultry Panic
 
+![Plane Poultry Panic cover: the player sprints through Arrivals with a flock of chickens behind them while the last flight takes off](cover-photo.png)
+
 A 16-bit top-down action game: get through a chicken-overrun airport and catch the last flight out. Built with Godot 4.
+
+![The player's walk cycle in all four directions](docs/images/player_walk.gif)
 
 ## Play the prototype
 
@@ -41,6 +45,8 @@ Sprites are generated from Python sources in `tools/sprites/` (needs Pillow):
 ```bash
 python3 tools/sprites/build.py --preview /tmp/sprite-previews
 ```
+
+The walk GIF above is `player_walk.gif` from that preview folder, copied to `docs/images/`.
 
 ## Docs
 
