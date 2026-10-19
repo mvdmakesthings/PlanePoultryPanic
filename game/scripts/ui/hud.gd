@@ -30,6 +30,8 @@ var _icons := {}
 func _ready() -> void:
 	for item: String in Inventory.ITEMS:
 		_icons[item] = load(Inventory.ITEMS[item]["icon"])
+	for item: String in Inventory.KEY_ITEMS:
+		_icons[item] = load(Inventory.KEY_ITEMS[item]["icon"])
 
 
 func bind_player(player: Player) -> void:
@@ -115,8 +117,12 @@ func _draw_inventory(font: Font) -> void:
 	# Key items sit to the right of the slots and never take one up.
 	var x := origin.x + Inventory.SLOT_COUNT * (SLOT_SIZE + SLOT_GAP) + 4
 	for item: String in inventory.key_items:
-		_draw_text(font, Vector2(x, size.y - 5), "%s x%d" % [item, inventory.key_items[item]], HORIZONTAL_ALIGNMENT_LEFT, -1)
-		x += 48
+		var icon: Texture2D = _icons[item]
+		draw_texture(icon, Vector2(x, origin.y + roundf((SLOT_SIZE - icon.get_height()) / 2.0)))
+		var count: int = inventory.key_items[item]
+		if count > 1:
+			_draw_text(font, Vector2(x + icon.get_width() - 2, size.y - 2), str(count), HORIZONTAL_ALIGNMENT_LEFT, -1)
+		x += icon.get_width() + 4
 
 
 func _draw_text(font: Font, pos: Vector2, text: String, align: HorizontalAlignment, width: float) -> void:

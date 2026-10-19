@@ -6,7 +6,7 @@ extends Area2D
 
 const ARM_DISTANCE := 14.0
 
-@export_enum("snack", "extinguisher") var item := "snack"
+@export_enum("snack", "extinguisher", "maintenance_key") var item := "snack"
 ## How many (snacks), or charges left (extinguisher).
 @export var count := 1
 ## Set when the player drops this; it then waits until they step away.
@@ -18,7 +18,8 @@ var _bob_time := randf() * TAU
 
 
 func _ready() -> void:
-	_sprite.texture = load(Inventory.ITEMS[item]["icon"])
+	var info: Dictionary = Inventory.KEY_ITEMS.get(item, Inventory.ITEMS.get(item))
+	_sprite.texture = load(info["icon"])
 
 
 func _physics_process(delta: float) -> void:

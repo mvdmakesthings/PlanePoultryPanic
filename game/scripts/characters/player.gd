@@ -180,6 +180,10 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 func pick_up(item: String, count: int) -> int:
 	if is_dead or is_hidden:
 		return count
+	if Inventory.KEY_ITEMS.has(item):
+		inventory.add_key_item(item, count)
+		FloatText.spawn(self, "Got it!")
+		return 0
 	if Inventory.ITEMS[item]["stack"] > 1:
 		return count - inventory.add_stackable(item, count)
 	if not inventory.add_single(item, count):
