@@ -41,7 +41,7 @@ func _ready() -> void:
 	# out any invincibility from earlier pecks.
 	for chicken: Chicken in get_tree().get_nodes_in_group("chickens"):
 		chicken.set_physics_process(false)
-	await _wait(1.2)
+	await _wait(player.invincibility_time + 0.1)
 	var health_before := player.health
 	print("health before the damage check: %d/%d" % [health_before, player.max_health])
 	player.take_damage(1, player.global_position + Vector2.LEFT)
