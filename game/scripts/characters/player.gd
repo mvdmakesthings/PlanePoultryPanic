@@ -159,8 +159,7 @@ func spray() -> void:
 	extinguisher_changed.emit(extinguisher_charges)
 	var foam := SPRAY_SCENE.instantiate() as ExtinguisherSpray
 	foam.direction = facing
-	# Spray from the nozzle at waist height, slightly ahead of the feet.
-	foam.position = position + facing * 4.0 + Vector2(0, -4)
+	foam.position = position
 	get_parent().add_child(foam)
 
 

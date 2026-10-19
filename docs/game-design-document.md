@@ -116,7 +116,7 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 
 ### Damage
 - Chicken pecks and environmental hazards cost a whole suitcase. Eggs only sting: a quarter of a suitcase each, shown as a partly emptied icon.
-- After a hit, the player is briefly knocked back and is invincible for 1 second (the sprite blinks).
+- After a hit, the player is briefly knocked back and is invincible for 1.5 seconds (the sprite blinks).
 
 ### Healing
 Eating a snack restores one whole suitcase. Snacks are the only way to heal, so every snack is a choice between healing now and distracting chickens later.
@@ -137,7 +137,7 @@ Bathroom stalls and supply closets are hiding spots. While hidden, chickens lose
 | Item | Use | Notes |
 |---|---|---|
 | Snack | Eat to heal a whole suitcase, or throw as a distraction. A thrown snack nobody has eaten can be picked back up. | Found in the food court, vending machines, and abandoned bags |
-| Fire extinguisher | Spray a short cone of foam: chickens in it freeze in a block of ice for 4 seconds, and a mushroom patch in it is destroyed for good | 3 charges, then it's empty. Taken from red emergency cabinets on the walls. Frozen chickens can't peck, but the carousel still carries them and carts still flatten them. A frozen chicken is a block of ice: shove it with Interact and it slides further than a cart, flattening any chicken it crashes into. The player is drawn carrying the extinguisher while it has charges. |
+| Fire extinguisher | Spray a short cone of foam, plus a burst right around the player's feet so a chicken pecking from the side or behind is caught too: chickens in it freeze in a block of ice for 4 seconds, and a mushroom patch in it is destroyed for good | 3 charges, then it's empty. Taken from red emergency cabinets on the walls. Frozen chickens can't peck, but the carousel still carries them and carts still flatten them. A frozen chicken is a block of ice: shove it with Interact and it slides further than a cart, flattening any chicken it crashes into. The player is drawn carrying the extinguisher while it has charges. |
 
 More usable items may come out of prototyping, but every new item has to earn its slot. Fewer items that each do a lot fits the game better than many small ones.
 

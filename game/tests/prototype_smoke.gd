@@ -318,6 +318,20 @@ func _extinguisher_tests() -> void:
 	_check(player.extinguisher_charges == 0, "an empty extinguisher does nothing")
 	room.queue_free()
 
+	# Point blank: chickens pecking at the player's feet or from the side
+	# freeze too, whichever way the player faces.
+	for offset: Vector2 in [Vector2.ZERO, Vector2(-8, 0), Vector2(0, 7), Vector2(9, -4)]:
+		setup = await _fresh_room(Vector2(232, 200) + offset, Vector2(232, 200))
+		chicken = setup[1]
+		player = setup[2]
+		player.give_extinguisher(1)
+		player.facing = Vector2.UP
+		player.spray()
+		await get_tree().physics_frame
+		_check(chicken.state == Chicken.State.FROZEN,
+			"spraying freezes a chicken right next to the player (offset %s)" % offset)
+		setup[0].queue_free()
+
 	# Holding the extinguisher shows it in the player's hand.
 	setup = await _fresh_room(Vector2(40, 290), Vector2(232, 200))
 	setup[1].queue_free()
