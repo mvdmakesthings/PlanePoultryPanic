@@ -354,7 +354,7 @@ Commissioned from a chiptune composer. Placeholder music is used until then.
 
 Plus short stings for game over, checkpoint, and item fanfares.
 
-Until the composer's tracks arrive, two generated chiptune loops stand in: Arrivals (E Phrygian at 144 BPM, a pumping bass and stabbing lead) and the main theme for the menu (`tools/audio/music.py`).
+For now the game has no music; it waits for the composer. Generated placeholder loops exist in `tools/audio/music.py` (two takes on Arrivals in E Phrygian, one driving and one sparse, with tuned chicken clucks as an instrument, and a menu theme) but aren't used.
 
 **Composer brief and timing**: Engage the composer once the vertical slice is playable, so they can hear and see the game. Ask for loopable tracks, stems if affordable, and a license covering the Steam release, trailers, and a possible soundtrack release.
 
@@ -471,4 +471,4 @@ game/
 | 2026-10-19 | A suitcase bursts open when it defeats a chicken (one defeat each), but a missed throw can be picked up again; carrying it slows the player and blocks running, items, and hiding | Proposed |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |
 | 2026-10-19 | The player's hair gets messier as her health drops | You |
-| 2026-10-19 | Arrivals music is driving and tense (post-apocalyptic, dystopian) rather than calm and sad | You |
+| 2026-10-19 | Arrivals music should be energetic and dystopian, not slow and sad; until the composer's tracks arrive, the game plays no music | You |

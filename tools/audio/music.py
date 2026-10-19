@@ -5,6 +5,7 @@ Each track is a few channels of note lists, like a tiny tracker:
   bass   - a triangle wave bass line
   chords - a quiet thin square, arpeggiating the chord
   drums  - "k" kick, "s" snare, "h" hat, "." rest, one per step
+  clucks - optional: short chicken "bok"s, each tuned to its note
 
 Notes are written like "A4" or "C#5"; "-" holds the previous note and "."
 is a rest. Every list is in steps: eighth notes, unless the track sets
@@ -43,6 +44,24 @@ def _voice(kind, f, length, rate, volume, duty=0.5):
         # Lead notes fade a little as they're held, like a plucked chip voice.
         if kind == "square":
             env *= 0.75 + 0.25 * math.exp(-t * 4)
+        out.append(s * env * volume)
+    return out
+
+
+def _cluck(f, rate, volume):
+    """A short tuned "bok": a nasal square chirp that drops in pitch, with a
+    scratchy start, like the cluck sound effect but on a note."""
+    rnd = random.Random(int(f))
+    n = int(0.09 * rate)
+    out = []
+    phase = 0.0
+    for i in range(n):
+        t = i / rate
+        phase += f * 2 ** (-t * 7) * (1 + 0.06 * math.sin(math.tau * 35 * t)) / rate
+        s = 1.0 if phase % 1.0 < 0.3 else -1.0
+        if t < 0.006:
+            s = s * 0.5 + rnd.uniform(-1, 1) * 0.5
+        env = min(1.0, t / 0.003) * (1 - i / n) ** 1.5
         out.append(s * env * volume)
     return out
 
@@ -98,6 +117,15 @@ def render(track, rate):
             if start + k < total:
                 drums[start + k] += s
     channels.append(drums)
+    clucks = [0.0] * total
+    for i, note in enumerate(track.get("clucks", [])):
+        if note in ".-":
+            continue
+        start = int(i * step_len * rate)
+        for k, s in enumerate(_cluck(freq(note), rate, 0.22)):
+            if start + k < total:
+                clucks[start + k] += s
+    channels.append(clucks)
     return [sum(c[i] for c in channels) for i in range(total)]
 
 
@@ -165,6 +193,56 @@ ARRIVALS = {
     "bass": _pump_bass(ARRIVAL_BARS),
     "chords": _arp([ARRIVAL_CHORDS[c] for c in ARRIVAL_BARS], steps_per_chord=16),
     "drums": _drums(len(ARRIVAL_BARS)),
+    # The flock chimes in on every fill bar.
+    "clucks": _seq(" ".join(
+        ". " * 12 + ("B4 B4 . E5" if bar % 8 == 3 else "E5 . E5 B4") if bar % 4 == 3 else ". " * 16
+        for bar in range(len(ARRIVAL_BARS)))),
+}
+
+# Arrivals, sparser take: the same dark E Phrygian, but at 126 BPM in
+# eighths with room to breathe: a gapped bass pulse, a slow chord walk, a
+# half-time backbeat, and a lead that calls with held notes and answers.
+SPARSE_BARS = "E E F F E E D D C C D D E E B B".split()
+
+
+def _pulse_bass(roots):
+    """Eighth-note bass with gaps: root, rest, root, root, rest, root, octave, rest."""
+    out = []
+    for root in roots:
+        low, high = root + "2", root + "3"
+        out += [low, ".", low, low, ".", low, high, "."]
+    return out
+
+
+def _chord_walk(names):
+    """Quarter notes up and down the chord, one bar per chord."""
+    out = []
+    for name in names:
+        a, b, c = ARRIVAL_CHORDS[name].split("/")
+        out += [a, "-", b, "-", c, "-", b, "-"]
+    return out
+
+
+ARRIVALS_SPARSE = {
+    "bpm": 126,
+    "lead": _seq("""
+        E5 - - - - - . . | G5 - F5 - E5 - - - | F5 - - - - - . . | A5 - G5 - F5 - - - |
+        B5 - - - - - . . | A5 - G5 - F5 - E5 - | D5 - - - - - - - | . . . . F#5 - A5 - |
+        C6 - - - - - . . | B5 - G5 - E5 - - - | D6 - - - - - . . | C6 - A5 - F#5 - - - |
+        E5 - - - G5 - B5 - | E6 - - - - - . . | D#6 - - - - - - - | . . . . B5 - - - |
+    """),
+    "bass": _pulse_bass(SPARSE_BARS),
+    "chords": _chord_walk(SPARSE_BARS),
+    "drums": list("".join("k.h.s.ss" if bar % 8 == 7 else ("k.h.skh." if bar % 2 else "k.h.s.h.")
+                          for bar in range(len(SPARSE_BARS)))),
+    # The chickens answer the lead in its gaps: "bok bok" at the end of a
+    # held note, and a little riff in the breaks.
+    "clucks": _seq("""
+        . . . . . . E5 E5 | . . . . . . . . | . . . . . . F5 F5 | . . . . . . . . |
+        . . . . . . B4 B4 | . . . . . . . . | . . . . . . . . | D5 . D5 F#5 . . . . |
+        . . . . . . E5 E5 | . . . . . . . . | . . . . . . D5 D5 | . . . . . . . . |
+        . . . . . . . . | . . . . . . B4 E5 | . . . . . . . . | B4 . B4 D#5 . . . . |
+    """),
 }
 
 # Main menu: upbeat and adventurous with a comic edge. C major, bouncy
@@ -193,7 +271,8 @@ MENU = {
 
 def tracks(rate):
     """Track name -> samples, one loop each."""
-    for name, track in (("arrivals", ARRIVALS), ("menu", MENU)):
-        lengths = {len(track[k]) for k in ("lead", "bass", "chords", "drums")}
+    chosen = {"arrivals": ARRIVALS, "arrivals_sparse": ARRIVALS_SPARSE, "menu": MENU}
+    for name, track in chosen.items():
+        lengths = {len(track[k]) for k in ("lead", "bass", "chords", "drums", "clucks") if k in track}
         assert len(lengths) == 1, f"{name}: channels differ in length {lengths}"
-    return {"arrivals": render(ARRIVALS, rate), "menu": render(MENU, rate)}
+    return {name: render(track, rate) for name, track in chosen.items()}

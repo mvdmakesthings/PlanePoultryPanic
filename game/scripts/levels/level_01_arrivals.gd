@@ -114,7 +114,6 @@ func _ready() -> void:
 	_door.interacted_locked.connect(func() -> void: _show_event_hint(LOCKED_HINT))
 	for i in HINT_ZONES.size():
 		_hint_time_left.append(HINT_TIME)
-	AudioManager.play_music("arrivals")
 
 
 func _physics_process(delta: float) -> void:

@@ -40,7 +40,6 @@ func _ready() -> void:
 
 	_hud.bind_player(_player)
 	_player.died.connect(_on_player_died)
-	AudioManager.play_music("arrivals")
 
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -32,7 +32,6 @@ func _layout_tests() -> void:
 	_check(player.snacks == 0, "the player arrives with no snacks")
 	for bus in AudioManager.BUSES:
 		_check(AudioServer.get_bus_index(bus) >= 0, "the %s audio bus exists" % bus)
-	_check(AudioManager.music_playing() == "arrivals", "Level 1 plays the Arrivals music")
 	var hums := AudioManager.playing_loops()
 	_check(hums.size() == 1 and hums[0].bus == "Ambience", "the carousel hums on the Ambience bus")
 	for sound in ["step", "pickup", "key", "throw", "eat", "hurt", "peck", "splat", "poof",

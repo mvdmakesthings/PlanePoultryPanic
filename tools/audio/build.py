@@ -1,10 +1,11 @@
 """Generate the game's sound effects and placeholder music.
 
 Usage (from the repo root, needs only Python 3):
-    python3 tools/audio/build.py
+    python3 tools/audio/build.py            # sound effects
+    python3 tools/audio/build.py --music    # also the placeholder music
 
-Writes 16-bit mono WAV files to game/assets/audio/sfx/ and
-game/assets/audio/music/. Every sound is synthesized "sfxr style": a
+Writes 16-bit mono WAV files to game/assets/audio/sfx/ (and, with
+--music, game/assets/audio/music/). Every sound is synthesized "sfxr style": a
 simple wave (square, saw, triangle, sine or noise) shaped by a volume
 envelope, with optional pitch slides, vibrato, an arpeggio jump and a
 low-pass filter. Each sound is a short recipe in SOUNDS below, so a sound
@@ -12,8 +13,10 @@ can be tuned by editing numbers and rebuilding. The output is the same
 every run (random noise uses fixed seeds).
 
 The music is a placeholder until the commissioned tracks arrive: short
-chiptune loops written as note lists in music.py.
+chiptune loops written as note lists in music.py. The game plays no music
+for now, so it's only built when asked for.
 """
+import argparse
 import math
 import random
 import struct
@@ -219,10 +222,15 @@ def carousel_hum():
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--music", action="store_true", help="also build the placeholder music")
+    args = parser.parse_args()
     for name, make in SOUNDS.items():
         path = SFX_DIR / f"{name}.wav"
         write_wav(path, make())
         print(f"wrote {path.relative_to(REPO)}")
+    if not args.music:
+        return
     for name, samples in music.tracks(RATE).items():
         path = MUSIC_DIR / f"{name}.wav"
         write_wav(path, samples)
