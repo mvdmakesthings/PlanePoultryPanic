@@ -171,7 +171,7 @@ Chickens that eat from a mushroom patch power up for 30-60 seconds, then return 
 |---|---|---|
 | Flight | Short hops over furniture and low obstacles | Glowing teal mushroom cap, glowing wings, particle trail |
 | Rage | Faster than the player's walk, relentless chase | Red spotted mushroom cap, flames, puffed-up pose |
-| Egg Shooter | Stops and fires egg projectiles at range | Purple spotted mushroom cap, bulging throat, wind-up before each shot |
+| Egg Shooter | Hangs back at range, winds up, and fires eggs; sees as far as it can shoot | Purple spotted mushroom cap, bulging throat, wind-up before each shot |
 
 Chickens head for mushroom patches when they can. Watching a patch and timing a route while the chickens around it are still normal is a core tactic.
 
@@ -201,7 +201,7 @@ Behavior priority, highest first:
 | Baggage carousel | Carries anything on it along its loop. Chickens dumped into the chute are defeated. |
 | Moving walkway | Speeds up or slows down anything on it. At full speed it can fling chickens into hazards. |
 | Security scanner and gates | Barriers to route around. Some gates can be closed with a switch. |
-| Mushroom patch | Powers up chickens that eat there. Spraying it with the fire extinguisher (one charge) kills the patch for good. |
+| Mushroom patch | Powers up chickens that eat there, then regrows after 15 seconds. Spraying it with the fire extinguisher (one charge) kills the patch for good. |
 
 ### Interactive Objects
 | Element | Effect |

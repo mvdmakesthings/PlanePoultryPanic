@@ -1,17 +1,31 @@
 class_name Chicken
 extends CharacterBody2D
-## A normal chicken: wanders and pecks until it spots the player, then
-## chases and alerts nearby chickens. Thrown snacks beat everything else:
-## a chicken drops what it's doing to go eat one.
+## A chicken: wanders and pecks until it spots the player, then chases and
+## alerts nearby chickens. Thrown snacks beat everything else: a chicken
+## drops what it's doing to go eat one. Chickens also seek out mushroom
+## patches, and eating one powers them up for a while:
+##   flight: hops over furniture and walls of chickens while chasing
+##   rage:   chases faster than the player walks, sees further, gives up later
+##   egg:    stops at range and fires eggs at the player
 
-enum State { WANDER, PURSUE, INVESTIGATE, EATING }
+enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP }
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
+const POWER_SHEETS := {
+	"flight": preload("res://assets/sprites/chicken_flight_walk.png"),
+	"rage": preload("res://assets/sprites/chicken_rage_walk.png"),
+	"egg": preload("res://assets/sprites/chicken_egg_walk.png"),
+}
+const EGG_SCENE := preload("res://scenes/objects/egg_projectile.tscn")
 const FRAME_SIZE := Vector2i(16, 16)
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const WORLD_LAYER := 1
+const CHICKEN_LAYER := 4
+## Seconds before a power wears off when the chicken starts flickering.
+const POWER_WARNING_TIME := 3.0
 
+@export_group("Normal")
 @export var wander_speed := 30.0
 ## Slower than the player's walk, so one normal chicken can always be escaped.
 @export var pursue_speed := 70.0
@@ -23,16 +37,52 @@ const WORLD_LAYER := 1
 @export var snack_notice_range := 100.0
 @export var eat_time := 2.5
 
+@export_group("Mushrooms")
+@export var mushroom_notice_range := 112.0
+@export var feed_time := 1.5
+@export var power_duration_min := 30.0
+@export var power_duration_max := 60.0
+
+@export_group("Rage")
+## Faster than the player's walk (100), slower than their run (150).
+@export var rage_speed := 115.0
+@export var rage_sight_bonus := 32.0
+@export var rage_give_up_time := 4.0
+
+@export_group("Flight")
+@export var hop_speed := 110.0
+@export var hop_duration := 0.7
+@export var hop_cooldown := 1.6
+@export var hop_height := 10.0
+
+@export_group("Egg Shooter")
+@export var egg_range := 112.0
+@export var egg_windup := 0.5
+@export var egg_cooldown := 1.8
+## Egg shooters hang back at about this distance instead of closing in.
+@export var egg_keep_distance := 72.0
+
 var state := State.WANDER
+## Active power ("flight", "rage", "egg"), or "" when normal.
+var power := ""
 
 var _player: Player
 var _target_snack: ThrownSnack
+var _target_patch: MushroomPatch
 var _wander_dir := Vector2.ZERO
 var _timer := 0.0
 var _lost_sight_time := 0.0
 var _facing := Vector2.DOWN
+var _power_timer := 0.0
+var _hop_time := 0.0
+var _hop_elapsed := 0.0
+var _hop_dir := Vector2.ZERO
+var _hop_start := Vector2.ZERO
+var _hop_ready_in := 0.0
+var _egg_ready_in := 0.0
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var _body_shape: CollisionShape2D = $CollisionShape2D
 @onready var _hitbox: Area2D = $Hitbox
 @onready var _alert_label: Label = $AlertLabel
 @onready var _agent: NavigationAgent2D = $NavigationAgent2D
@@ -44,6 +94,8 @@ func _ready() -> void:
 	frames.remove_animation("default")
 	SpriteSheets.add_directional(frames, "walk", WALK_SHEET, FRAME_SIZE, 8.0)
 	SpriteSheets.add_directional(frames, "idle", IDLE_SHEET, FRAME_SIZE, 3.0)
+	for mode: String in POWER_SHEETS:
+		SpriteSheets.add_directional(frames, mode + "_walk", POWER_SHEETS[mode], FRAME_SIZE, 8.0)
 	_sprite.sprite_frames = frames
 	# Desync chickens so they don't all peck in unison.
 	_sprite.play("idle_down")
@@ -53,15 +105,26 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_timer -= delta
-	match state:
-		State.WANDER:
-			_wander()
-		State.PURSUE:
-			_pursue(delta)
-		State.INVESTIGATE:
-			_investigate()
-		State.EATING:
-			_eat()
+	_egg_ready_in -= delta
+	_hop_ready_in -= delta
+	_update_power(delta)
+
+	if _is_hopping():
+		_update_hop(delta)
+	else:
+		match state:
+			State.WANDER:
+				_wander()
+			State.PURSUE:
+				_pursue(delta)
+			State.INVESTIGATE:
+				_investigate()
+			State.EATING, State.FEEDING:
+				_eat()
+			State.SEEK_MUSHROOM:
+				_seek_mushroom()
+			State.WINDUP:
+				_windup()
 	move_and_slide()
 	if state == State.WANDER and get_slide_collision_count() > 0:
 		_pick_wander()
@@ -73,18 +136,28 @@ func _physics_process(delta: float) -> void:
 
 ## Called by a nearby chicken that spotted the player.
 func alert() -> void:
-	if state == State.WANDER:
+	if state in [State.WANDER, State.SEEK_MUSHROOM]:
 		_start_pursuit(false)
 
+
+## Powers the chicken up immediately. Also used by tests and debugging.
+func power_up(mode: String) -> void:
+	power = mode
+	_power_timer = randf_range(power_duration_min, power_duration_max)
+
+
+# ---------- states ----------
 
 func _wander() -> void:
 	if _timer <= 0.0:
 		_pick_wander()
-	velocity = _wander_dir * wander_speed
+	velocity = _wander_dir * wander_speed * (1.5 if power == "rage" else 1.0)
 	if _try_investigate():
 		return
 	if _can_see_player():
 		_start_pursuit(true)
+		return
+	_try_seek_mushroom()
 
 
 func _pursue(delta: float) -> void:
@@ -94,11 +167,31 @@ func _pursue(delta: float) -> void:
 		_lost_sight_time = 0.0
 	else:
 		_lost_sight_time += delta
-		if _lost_sight_time >= give_up_time or _player.is_dead:
+		var patience := rage_give_up_time if power == "rage" else give_up_time
+		if _lost_sight_time >= patience or _player.is_dead:
 			state = State.WANDER
 			_pick_wander()
 			return
-	velocity = _direction_toward(_player.global_position) * pursue_speed
+
+	var distance := global_position.distance_to(_player.global_position)
+	match power:
+		"rage":
+			velocity = _direction_toward(_player.global_position) * rage_speed
+		"flight":
+			velocity = _direction_toward(_player.global_position) * pursue_speed
+			if _hop_ready_in <= 0.0 and distance > 24.0:
+				_start_hop()
+		"egg":
+			if distance < egg_range and _egg_ready_in <= 0.0 and _can_see_player():
+				state = State.WINDUP
+				_timer = egg_windup
+				velocity = Vector2.ZERO
+				return
+			# Hang back at range rather than walking into the player.
+			var away := 1.0 if distance > egg_keep_distance else -0.6
+			velocity = _direction_toward(_player.global_position) * pursue_speed * away
+		_:
+			velocity = _direction_toward(_player.global_position) * pursue_speed
 
 
 func _investigate() -> void:
@@ -106,8 +199,7 @@ func _investigate() -> void:
 		state = State.WANDER
 		_pick_wander()
 		return
-	var to_snack := _target_snack.global_position - global_position
-	if to_snack.length() < 4.0:
+	if global_position.distance_to(_target_snack.global_position) < 4.0:
 		velocity = Vector2.ZERO
 		if _target_snack.consume():
 			state = State.EATING
@@ -120,10 +212,100 @@ func _investigate() -> void:
 
 func _eat() -> void:
 	velocity = Vector2.ZERO
-	if _timer <= 0.0:
+	if _timer > 0.0:
+		return
+	if state == State.FEEDING and is_instance_valid(_target_patch):
+		power_up(_target_patch.variety)
+	state = State.WANDER
+	_pick_wander()
+
+
+func _seek_mushroom() -> void:
+	if not is_instance_valid(_target_patch) or not _target_patch.is_ripe:
 		state = State.WANDER
 		_pick_wander()
+		return
+	if _try_investigate():
+		return
+	if _can_see_player():
+		_start_pursuit(true)
+		return
+	if global_position.distance_to(_target_patch.global_position) < 6.0:
+		velocity = Vector2.ZERO
+		if _target_patch.eat():
+			state = State.FEEDING
+			_timer = feed_time
+		else:
+			state = State.WANDER
+		return
+	velocity = _direction_toward(_target_patch.global_position) * investigate_speed
 
+
+func _windup() -> void:
+	velocity = Vector2.ZERO
+	_facing = global_position.direction_to(_player.global_position)
+	if _timer > 0.0:
+		return
+	var egg := EGG_SCENE.instantiate() as EggProjectile
+	egg.direction = global_position.direction_to(_player.global_position)
+	egg.position = position + egg.direction * 6.0
+	get_parent().add_child(egg)
+	_egg_ready_in = egg_cooldown
+	state = State.PURSUE
+
+
+# ---------- powers ----------
+
+func _update_power(delta: float) -> void:
+	if power == "":
+		return
+	_power_timer -= delta
+	if _power_timer <= 0.0 and not _is_hopping():
+		power = ""
+
+
+func _is_hopping() -> bool:
+	return _hop_time > 0.0
+
+
+func _start_hop() -> void:
+	_hop_time = hop_duration
+	_hop_elapsed = 0.0
+	_hop_dir = global_position.direction_to(_player.global_position)
+	_hop_start = global_position
+	# Airborne: ignore furniture and other chickens until landing. The
+	# landing check in _update_hop keeps it from touching down inside anything.
+	collision_mask = 0
+
+
+func _update_hop(delta: float) -> void:
+	_hop_time -= delta
+	_hop_elapsed += delta
+	velocity = _hop_dir * hop_speed
+	if _hop_time > 0.0:
+		return
+	if _overlaps_world():
+		# Can't land inside furniture: keep flying, and turn back toward the
+		# take-off point if the far side is taking too long to reach.
+		_hop_time = 0.05
+		if _hop_elapsed > hop_duration * 2.5:
+			_hop_dir = global_position.direction_to(_hop_start)
+		return
+	_hop_time = 0.0
+	_hop_ready_in = hop_cooldown
+	collision_mask = WORLD_LAYER | CHICKEN_LAYER
+	_sprite.position.y = 0.0
+
+
+func _overlaps_world() -> bool:
+	var params := PhysicsShapeQueryParameters2D.new()
+	params.shape = _body_shape.shape
+	params.transform = _body_shape.global_transform
+	params.collision_mask = WORLD_LAYER
+	return not get_world_2d().direct_space_state.intersect_shape(params, 1).is_empty()
+
+
+# ---------- senses and helpers ----------
 
 ## Next step along the navigation path, so chickens route around furniture.
 ## Falls back to a straight line before the navigation map is ready.
@@ -139,10 +321,9 @@ func _pick_wander() -> void:
 	# Half the time stand and peck; otherwise stroll somewhere.
 	if randf() < 0.5:
 		_wander_dir = Vector2.ZERO
-		_timer = randf_range(1.0, 2.5)
 	else:
 		_wander_dir = Vector2.from_angle(randf() * TAU)
-		_timer = randf_range(1.0, 2.5)
+	_timer = randf_range(1.0, 2.5)
 
 
 func _try_investigate() -> bool:
@@ -161,10 +342,29 @@ func _try_investigate() -> bool:
 	return true
 
 
+func _try_seek_mushroom() -> void:
+	if power != "":
+		return
+	var best := mushroom_notice_range
+	for node in get_tree().get_nodes_in_group("mushroom_patches"):
+		var patch := node as MushroomPatch
+		var distance := global_position.distance_to(patch.global_position)
+		if patch.is_ripe and distance < best:
+			best = distance
+			_target_patch = patch
+			state = State.SEEK_MUSHROOM
+
+
 func _can_see_player() -> bool:
 	if _player == null or _player.is_dead:
 		return false
-	if global_position.distance_to(_player.global_position) > sight_range:
+	var reach := sight_range
+	if power == "rage":
+		reach += rage_sight_bonus
+	elif power == "egg":
+		# Egg shooters need to see as far as they can shoot.
+		reach = maxf(sight_range, egg_range)
+	if global_position.distance_to(_player.global_position) > reach:
 		return false
 	var query := PhysicsRayQueryParameters2D.create(global_position, _player.global_position, WORLD_LAYER)
 	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
@@ -182,7 +382,7 @@ func _start_pursuit(alert_others: bool) -> void:
 
 
 func _check_hit() -> void:
-	if state == State.EATING:
+	if state in [State.EATING, State.FEEDING] or _is_hopping():
 		return
 	for body in _hitbox.get_overlapping_bodies():
 		if body is Player:
@@ -192,11 +392,34 @@ func _check_hit() -> void:
 func _update_visuals() -> void:
 	var direction := SpriteSheets.direction_name(_facing)
 	var moving := velocity.length() > 1.0
-	var animation := ("walk_" if moving else "idle_") + direction
+	# Flicker back to normal just before a power wears off, as a warning.
+	var show_power := power != "" and (
+		_power_timer > POWER_WARNING_TIME or int(_power_timer * 4.0) % 2 == 0)
+	var animation: String
+	if show_power:
+		animation = power + "_walk_" + direction
+	else:
+		animation = ("walk_" if moving else "idle_") + direction
 	if _sprite.animation != animation:
 		_sprite.play(animation)
+	if show_power and not moving:
+		# Powered sheets only have walk cycles; stand on the passing frame.
+		_sprite.pause()
+		_sprite.frame = 1
+	elif not _sprite.is_playing():
+		_sprite.play(animation)
+
 	_sprite.speed_scale = 1.5 if state == State.PURSUE else 1.0
-	_alert_label.visible = state == State.PURSUE
+	if state == State.WINDUP:
+		# Squash during the wind-up so the shot can be dodged.
+		_sprite.scale = Vector2(1.15, 0.85) if int(_timer * 12.0) % 2 == 0 else Vector2.ONE
+	else:
+		_sprite.scale = Vector2.ONE
+	if _is_hopping():
+		var t := clampf(_hop_elapsed / hop_duration, 0.0, 1.0)
+		_sprite.position.y = -roundf(sin(t * PI) * hop_height) if t < 1.0 else -hop_height
+	_alert_label.visible = state in [State.PURSUE, State.WINDUP]
+	_alert_label.position.y = _sprite.position.y - 26.0
 
 
 func _draw() -> void:

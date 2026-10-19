@@ -90,6 +90,9 @@ func _ready() -> void:
 	await _wait(4.0)
 	_check(runner.state == Chicken.State.EATING, "chicken paths around the carousel to a snack")
 
+	room.queue_free()
+	await _power_tests()
+
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
 		get_tree().quit(0)
@@ -97,6 +100,71 @@ func _ready() -> void:
 		for failure in _failures:
 			printerr("FAILED: " + failure)
 		get_tree().quit(1)
+
+
+## Mushroom power-ups, each in a fresh room with a single chicken.
+func _power_tests() -> void:
+	# Eating a patch powers the chicken up in the patch's mode.
+	var setup := await _fresh_room(Vector2(232, 120), Vector2(40, 296))
+	var chicken: Chicken = setup[1]
+	chicken.state = Chicken.State.WANDER
+	await _wait(4.0)
+	_check(chicken.power == "rage", "chicken eats a rage patch and powers up")
+	setup[0].queue_free()
+
+	# Rage chickens chase faster than the player walks.
+	setup = await _fresh_room(Vector2(200, 260), Vector2(250, 260))
+	chicken = setup[1]
+	chicken.power_up("rage")
+	await _wait(0.3)
+	print("rage chase speed: %.0f" % chicken.velocity.length())
+	_check(chicken.velocity.length() > 100.0, "rage chickens outpace a walking player")
+	setup[0].queue_free()
+
+	# Egg shooters hit the player from range.
+	setup = await _fresh_room(Vector2(200, 260), Vector2(280, 260))
+	chicken = setup[1]
+	var player: Player = setup[2]
+	chicken.power_up("egg")
+	await _wait(2.5)
+	print("egg shooter distance: %.0f, player health %d" % [
+		chicken.global_position.distance_to(player.global_position), player.health])
+	_check(player.health < player.max_health, "egg shooter hits the player from range")
+	setup[0].queue_free()
+
+	# Flight chickens hop over the carousel instead of walking around it.
+	setup = await _fresh_room(Vector2(112, 136), Vector2(112, 236))
+	chicken = setup[1]
+	chicken.power_up("flight")
+	await _wait(2.0)
+	print("flight chicken ended at %s" % chicken.global_position)
+	_check(chicken.global_position.y > 208.0 and chicken.global_position.x < 180.0,
+		"flight chicken hops straight over the carousel")
+	setup[0].queue_free()
+
+
+## Returns [room, the one chicken left, player]. Patches other than the rage
+## patch are removed, and the chicken is set chasing if it can see the player.
+func _fresh_room(chicken_at: Vector2, player_at: Vector2) -> Array:
+	# Let the previous room finish freeing, or new chickens would find its player.
+	await get_tree().process_frame
+	var room := ROOM.instantiate()
+	add_child(room)
+	await get_tree().physics_frame
+	var player: Player = room.get_node("Entities/Player")
+	player.global_position = player_at
+	var chickens := get_tree().get_nodes_in_group("chickens").filter(
+		func(c: Node) -> bool: return room.is_ancestor_of(c))
+	for i in range(1, chickens.size()):
+		chickens[i].queue_free()
+	for patch in get_tree().get_nodes_in_group("mushroom_patches"):
+		if room.is_ancestor_of(patch) and patch.variety != "rage":
+			patch.queue_free()
+	var chicken: Chicken = chickens[0]
+	chicken.global_position = chicken_at
+	chicken.state = Chicken.State.PURSUE
+	await get_tree().physics_frame
+	return [room, chicken, player]
 
 
 func _check(condition: bool, label: String) -> void:

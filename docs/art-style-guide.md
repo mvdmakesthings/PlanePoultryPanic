@@ -243,6 +243,8 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`hud_luggage.png`**: two 12x10 health icons side by side: full, then empty.
 
+**`egg.png`**: two 10x7 frames side by side: an egg in flight, then its splat.
+
 **`carousel.png`**: modular baggage carousel, 16x16 tiles. Rows are pieces; columns are 4 animation frames of the belt moving clockwise (play at about 8 FPS so the slats creep along).
 
 | Row | Piece |
