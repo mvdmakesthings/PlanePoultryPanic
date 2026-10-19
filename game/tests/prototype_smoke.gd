@@ -98,6 +98,7 @@ func _ready() -> void:
 	await _power_tests()
 	await _carousel_tests()
 	await _cart_tests()
+	await _cornered_cart_test()
 	await _gate_test()
 
 	if _failures.is_empty():
@@ -249,6 +250,25 @@ func _cart_tests() -> void:
 	player.global_position = lure.global_position
 	await _wait(0.2)
 	_check(player.snacks == count and not is_instance_valid(lure), "walking over a thrown snack picks it back up")
+	setup[0].queue_free()
+
+
+## A cart jammed into a corner slides out along the wall when shoved
+## into it, instead of being stuck for good.
+func _cornered_cart_test() -> void:
+	var setup := await _fresh_room(Vector2(300, 120), Vector2(32, 290))
+	setup[1].queue_free()
+	var player: Player = setup[2]
+	var cart: LuggageCart = preload("res://scenes/objects/luggage_cart.tscn").instantiate()
+	cart.position = Vector2(29, 303)
+	setup[0].get_node("Entities").add_child(cart)
+	await get_tree().physics_frame
+	var start := cart.global_position
+	player.facing = Vector2.DOWN
+	_tap("interact")
+	await _wait(1.0)
+	print("cornered cart moved from %s to %s" % [start, cart.global_position])
+	_check(cart.global_position.distance_to(start) > 20.0, "a cart shoved into a corner slides out along the wall")
 	setup[0].queue_free()
 
 

@@ -206,7 +206,7 @@ Behavior priority, highest first:
 ### Interactive Objects
 | Element | Effect |
 |---|---|
-| Luggage cart | Shove it with Interact and it rolls about 4 tiles. A chicken it hits while rolling fast is defeated. Eggs splat against the whole cart, luggage included, so the player can hide behind one. |
+| Luggage cart | Shove it with Interact and it rolls about 4 tiles. A chicken it hits while rolling fast is defeated. Eggs splat against the whole cart, luggage included, so the player can hide behind one. A cart shoved into a wall slides along it instead, so it can never get stuck in a corner. |
 | Vending machine | Opened with a maintenance key. Drops 2-3 snacks. |
 | Boarding gate | A door set into the back wall with a lit gate sign. Its glass doors slide open as the player approaches; walking into the doorway reaches the gate. |
 | Emergency exit | Shortcut. Some are blocked, and some lead past extra danger. |

@@ -7,6 +7,8 @@ extends CharacterBody2D
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const PROMPT_COLOR := Color("ffffff")
 const PROMPT_OUTLINE := Color("181425")
+const PROMPT := "F push"
+const PROMPT_WIDTH := 48.0
 
 ## Speed right after a shove, in pixels per second.
 @export var shove_speed := 190.0
@@ -67,11 +69,24 @@ func interact(player: Player) -> void:
 	# from them, so a shove always moves the cart somewhere sensible.
 	if player.facing.dot(direction) > 0.3:
 		direction = player.facing
-	velocity = direction.normalized() * shove_speed
+	direction = _free_direction(direction.normalized())
+	if direction == Vector2.ZERO:
+		return
+	velocity = direction * shove_speed
 	if absf(direction.x) > 0.1:
 		_sprite.flip_h = direction.x < 0.0
 	_show_prompt = false
 	queue_redraw()
+
+
+## The shove direction, or the nearest open one if a wall is in the way:
+## sideways along the wall first, then straight back. This way a cart
+## jammed into a corner can always be worked back out.
+func _free_direction(wanted: Vector2) -> Vector2:
+	for option: Vector2 in [wanted, wanted.orthogonal(), -wanted.orthogonal(), -wanted]:
+		if not test_move(global_transform, option * 12.0):
+			return option
+	return Vector2.ZERO
 
 
 func _draw() -> void:
@@ -80,6 +95,7 @@ func _draw() -> void:
 	draw_set_transform(Vector2.ZERO)
 	if _show_prompt:
 		var font := ThemeDB.fallback_font
-		var pos := Vector2(-12, -24)
-		draw_string_outline(font, pos, "F push", HORIZONTAL_ALIGNMENT_CENTER, 24, 8, 2, PROMPT_OUTLINE)
-		draw_string(font, pos, "F push", HORIZONTAL_ALIGNMENT_CENTER, 24, 8, PROMPT_COLOR)
+		# Centered in a box wide enough for the whole prompt.
+		var pos := Vector2(-PROMPT_WIDTH / 2.0, -24)
+		draw_string_outline(font, pos, PROMPT, HORIZONTAL_ALIGNMENT_CENTER, PROMPT_WIDTH, 8, 2, PROMPT_OUTLINE)
+		draw_string(font, pos, PROMPT, HORIZONTAL_ALIGNMENT_CENTER, PROMPT_WIDTH, 8, PROMPT_COLOR)
