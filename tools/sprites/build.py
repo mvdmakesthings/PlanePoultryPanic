@@ -21,6 +21,7 @@ import gate
 import items
 import mushrooms
 import player
+import roost
 import tiles
 from palette import to_image
 
@@ -58,6 +59,7 @@ IMAGES = [
     ("feather_poof.png", effects.poof),
     ("gate_door.png", gate.sheet),
     ("closet_door.png", closet.sheet),
+    ("roost.png", roost.sheet),
 ]
 
 

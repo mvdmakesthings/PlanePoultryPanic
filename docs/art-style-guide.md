@@ -258,6 +258,8 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`closet_door.png`**: two 16x30 frames of the supply closet door on the wall face: closed, then open with a mop inside.
 
+**`roost.png`**: one 24x14 straw nest with a lost luggage tag and a feather, drawn flat on the floor. Totems themselves are built in code from `chicken_idle.png` frames stacked 10 px apart, with a `chicken_rage_walk.png` frame (the red spotted cap) on top.
+
 **`feather_poof.png`**: six 24x24 frames of a defeated chicken bursting into feathers. Play once at 12 FPS.
 
 **`carousel.png`**: modular baggage carousel, 16x16 tiles. Rows are pieces; columns are 4 animation frames of the belt moving clockwise (play at about 8 FPS so the slats creep along).

@@ -178,10 +178,10 @@ Chickens that eat from a mushroom patch power up for 30-60 seconds, then return 
 Chickens head for mushroom patches when they can. Watching a patch and timing a route while the chickens around it are still normal is a core tactic.
 
 ### Chicken Totems (Bosses)
-- **Formation**: Totems form at designer-placed "roost" spots when 4 or more chickens gather there. Placing roosts by hand keeps totems feeling emergent while staying under level-design control.
-- **Buildup**: Stacking takes 2 seconds with clear sound and visual cues, so an alert player can break it up early with a thrown snack.
-- **Abilities**: Sustained flight, area-of-effect rage stomps, rapid egg barrages, and commanding nearby chickens
-- **Toppling**: Freeze the base chicken with the extinguisher, lure the totem onto machinery, or scatter it with a big enough distraction (several snacks at once). A toppled totem defeats the chickens it lands on and scatters the rest.
+- **Formation**: Totems form at designer-placed roosts (straw nests) when 4 chickens settle there. Wandering chickens within about 7 tiles head for a roost; once settled they ignore the player. Placing roosts by hand keeps totems feeling emergent while staying under level-design control.
+- **Buildup**: Stacking takes 2 seconds, with the settled chickens hopping and a flashing "!!" over the nest, so an alert player can break it up early with a thrown snack.
+- **Abilities**: Lumbers after the player (slower than a walk); a ground stomp around itself after a shaking wind-up with a "!"; 3-egg barrages from range; and calling nearby chickens into the chase when it spots the player. Sustained flight is deferred: flight chickens already cover hopping over furniture.
+- **Toppling**: Freeze its base with the extinguisher, ram it with a luggage cart, or lure it onto the carousel belt. It falls away from the hit, flattening any chicken where its members land; its own chickens land dazed along the fall line. Three snacks lying beside it break it apart instead, with no defeats. The roost then rests for 20 seconds.
 
 ### AI States
 Wander → Patrol → Investigate (snack or noise) → Pursue → Powered → Forming (totem)

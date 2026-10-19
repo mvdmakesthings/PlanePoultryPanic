@@ -11,7 +11,7 @@ extends CharacterBody2D
 ## Emitted just before a defeated chicken is removed.
 signal defeated
 
-enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL, BESIEGE }
+enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL, BESIEGE, SEEK_ROOST, ROOSTING }
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
@@ -117,6 +117,8 @@ var _siege_time := 0.0
 var _retreat_left := 0.0
 var _retreat_target := Vector2.ZERO
 var _uninterested_left := 0.0
+var _roost: Roost = null
+var _roost_index := 0
 var _show_prompt := false
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -173,7 +175,15 @@ func _physics_process(delta: float) -> void:
 				_recoil()
 			State.BESIEGE:
 				_besiege()
+			State.SEEK_ROOST, State.ROOSTING:
+				_roosting()
 		velocity += Carousel.push_for(get_tree(), global_position)
+		# Chickens heading into a roost pass through each other: they're
+		# about to stack up anyway, and the nest is too small otherwise.
+		# (A hop that just started this frame manages its own collisions.)
+		if not _is_hopping():
+			var roosting := state in [State.SEEK_ROOST, State.ROOSTING]
+			collision_mask = WORLD_LAYER if roosting else WORLD_LAYER | CHICKEN_LAYER
 	move_and_slide()
 	if not _is_hopping() and Carousel.in_any_chute(get_tree(), global_position):
 		defeat()
@@ -192,6 +202,20 @@ func _physics_process(delta: float) -> void:
 func alert() -> void:
 	if state in [State.WANDER, State.SEEK_MUSHROOM]:
 		_start_pursuit(false)
+
+
+## Knocked silly (for example, tumbling off a toppled totem): no moving or
+## pecking for a moment, then back to the chase.
+func stun(seconds: float) -> void:
+	state = State.RECOIL
+	_timer = seconds
+	_recoil_velocity = Vector2.ZERO
+
+
+## True while settled in a roost's nest, ready to stack into a totem.
+func is_roosting_at(roost: Roost) -> bool:
+	return state == State.ROOSTING and _roost == roost \
+		and global_position.distance_to(roost.spot_for(_roost_index)) < 5.0
 
 
 ## The player hid in a closet. A chicken that was chasing them saw it, and
@@ -267,6 +291,8 @@ func _wander() -> void:
 		_start_pursuit(true)
 		return
 	_try_seek_mushroom()
+	if state == State.WANDER:
+		_try_seek_roost()
 
 
 func _pursue(delta: float) -> void:
@@ -372,6 +398,37 @@ func _check_ice_hits() -> void:
 		else:
 			_slide_velocity = Vector2.ZERO
 			return
+
+
+func _try_seek_roost() -> void:
+	for node in get_tree().get_nodes_in_group("roosts"):
+		var roost := node as Roost
+		if roost.is_open() and global_position.distance_to(roost.global_position) < roost.call_radius:
+			_roost = roost
+			_roost_index = roost.claim_spot()
+			state = State.SEEK_ROOST
+			return
+
+
+## Heading to a roost, then settled in it. A snack still draws a chicken
+## away (breaking up a forming totem); once settled it ignores the player.
+func _roosting() -> void:
+	if not is_instance_valid(_roost) or not _roost.is_open():
+		state = State.WANDER
+		_pick_wander()
+		return
+	if _try_investigate():
+		return
+	if state == State.SEEK_ROOST and _can_see_player():
+		_start_pursuit(true)
+		return
+	var spot := _roost.spot_for(_roost_index)
+	if global_position.distance_to(spot) < 3.0:
+		state = State.ROOSTING
+		velocity = Vector2.ZERO
+		_facing = Vector2.DOWN
+		return
+	velocity = _direction_toward(spot) * investigate_speed
 
 
 func _besiege() -> void:
@@ -622,6 +679,11 @@ func _update_visuals() -> void:
 		var t := clampf(_hop_elapsed / hop_duration, 0.0, 1.0)
 		_sprite.position.y = -roundf(sin(t * PI) * hop_height) if t < 1.0 else -hop_height
 	_alert_label.visible = state in [State.PURSUE, State.WINDUP]
+	if state == State.ROOSTING and is_instance_valid(_roost) and _roost.is_forming():
+		# Hop in place while the stack goes up.
+		_sprite.position.y = -roundf(absf(sin(Time.get_ticks_msec() / 90.0)) * 3.0)
+	elif not _is_hopping():
+		_sprite.position.y = 0.0
 	var frozen := state == State.FROZEN
 	var prompt := _player != null and _player.interact_target == self
 	if prompt != _show_prompt:

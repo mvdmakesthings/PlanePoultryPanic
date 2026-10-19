@@ -1,0 +1,265 @@
+class_name Totem
+extends CharacterBody2D
+## A tower of chickens stacked on each other's backs. Lumbers after the
+## player, stomps the ground when close, fires egg barrages from range, and
+## calls nearby chickens into the chase.
+##
+## Ways to beat it: freeze its base with the extinguisher, ram it with a
+## luggage cart, or lure it onto the carousel belt, and it topples, defeating
+## any chicken it lands on while its own chickens scatter, dazed. Three
+## snacks dropped beside it break it apart without any defeats.
+
+enum State { IDLE, STALK, STOMP_WINDUP, TOPPLING }
+
+const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
+const RAGE_SHEET := preload("res://assets/sprites/chicken_rage_walk.png")
+const CHICKEN_SCENE := preload("res://scenes/characters/chicken.tscn")
+const EGG_SCENE := preload("res://scenes/objects/egg_projectile.tscn")
+const POOF_SCENE := preload("res://scenes/objects/feather_poof.tscn")
+const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.45)
+const SHOCKWAVE_COLOR := Color("ffffff")
+const WORLD_LAYER := 1
+## Pixels between stacked chickens.
+const LAYER_HEIGHT := 10.0
+
+## How many chickens are in the stack.
+var members := 4
+## The roost this totem formed at, which rests after it falls.
+var home: Roost = null
+var state := State.IDLE
+
+@export var speed := 45.0
+@export var sight_range := 110.0
+@export var command_radius := 96.0
+@export_group("Stomp")
+@export var stomp_trigger := 34.0
+@export var stomp_radius := 44.0
+@export var stomp_windup := 0.8
+@export var stomp_cooldown := 2.0
+@export_group("Egg barrage")
+@export var barrage_min_range := 50.0
+@export var barrage_max_range := 120.0
+@export var barrage_cooldown := 3.0
+## Angles of the eggs in one barrage, in degrees from straight at the player.
+@export var barrage_spread: Array[float] = [-14.0, 0.0, 14.0]
+@export_group("Toppling")
+@export var topple_time := 0.6
+## Distance between where each falling chicken lands.
+@export var fall_spacing := 12.0
+## Chickens within this distance of a landing spot are flattened.
+@export var crush_radius := 10.0
+@export var scatter_daze := 2.0
+## Snacks lying within this distance that break the totem apart.
+@export var snack_scatter_radius := 40.0
+@export var snacks_to_scatter := 3
+
+var _player: Player
+var _layers: Array[Sprite2D] = []
+var _timer := 0.0
+var _stomp_ready_in := 1.0
+var _barrage_ready_in := 1.5
+var _shockwave := 0.0
+var _topple_dir := Vector2.RIGHT
+var _time := 0.0
+
+@onready var _agent: NavigationAgent2D = $NavigationAgent2D
+@onready var _hitbox: Area2D = $Hitbox
+
+
+func _ready() -> void:
+	add_to_group("totems")
+	_player = get_tree().get_first_node_in_group("player") as Player
+	for i in members:
+		var layer := Sprite2D.new()
+		var atlas := AtlasTexture.new()
+		# The top chicken wears a red spotted cap; the rest face forward.
+		atlas.atlas = RAGE_SHEET if i == members - 1 else IDLE_SHEET
+		atlas.region = Rect2(16 if i == members - 1 else 0, 0, 16, 16)
+		layer.texture = atlas
+		layer.offset = Vector2(0, -8)
+		add_child(layer)
+		_layers.append(layer)
+
+
+func _physics_process(delta: float) -> void:
+	_time += delta
+	_timer -= delta
+	_stomp_ready_in -= delta
+	_barrage_ready_in -= delta
+	_shockwave -= delta
+
+	match state:
+		State.IDLE, State.STALK:
+			_stalk()
+		State.STOMP_WINDUP:
+			velocity = Vector2.ZERO
+			if _timer <= 0.0:
+				_stomp()
+		State.TOPPLING:
+			velocity = Vector2.ZERO
+			if _timer <= 0.0:
+				_finish_topple()
+				return
+	if state != State.TOPPLING:
+		velocity += Carousel.push_for(get_tree(), global_position)
+		move_and_slide()
+		# Machinery: a totem lured onto the carousel belt loses its footing.
+		var belt := Carousel.push_for(get_tree(), global_position)
+		if belt != Vector2.ZERO:
+			topple(belt.normalized())
+			return
+		_check_snack_scatter()
+		_check_contact()
+	_update_layers()
+	queue_redraw()
+
+
+## Knocks the totem over in a direction. Safe to call more than once.
+func topple(direction: Vector2) -> void:
+	if state == State.TOPPLING:
+		return
+	state = State.TOPPLING
+	_timer = topple_time
+	_topple_dir = direction.normalized() if direction != Vector2.ZERO else Vector2.RIGHT
+
+
+## The extinguisher froze the base chicken: the whole stack tips over,
+## away from whoever sprayed it.
+func hit_by_foam(from: Vector2) -> void:
+	topple(from.direction_to(global_position))
+
+
+func _stalk() -> void:
+	velocity = Vector2.ZERO
+	if not _can_see_player():
+		state = State.IDLE
+		return
+	if state == State.IDLE:
+		_command_chickens()
+	state = State.STALK
+	var distance := global_position.distance_to(_player.global_position)
+	if distance < stomp_trigger and _stomp_ready_in <= 0.0:
+		state = State.STOMP_WINDUP
+		_timer = stomp_windup
+		return
+	if distance >= barrage_min_range and distance <= barrage_max_range and _barrage_ready_in <= 0.0:
+		_barrage()
+	_agent.target_position = _player.global_position
+	var next := _agent.get_next_path_position()
+	var target := next if next.distance_to(global_position) > 0.5 else _player.global_position
+	velocity = global_position.direction_to(target) * speed
+
+
+func _stomp() -> void:
+	state = State.STALK
+	_stomp_ready_in = stomp_cooldown
+	_shockwave = 0.3
+	if _player and global_position.distance_to(_player.global_position) <= stomp_radius:
+		_player.take_damage(Player.SUITCASE, global_position)
+
+
+func _barrage() -> void:
+	_barrage_ready_in = barrage_cooldown
+	var aim := global_position.direction_to(_player.global_position)
+	for degrees in barrage_spread:
+		var egg := EGG_SCENE.instantiate() as EggProjectile
+		egg.direction = aim.rotated(deg_to_rad(degrees))
+		egg.position = position + egg.direction * 10.0
+		get_parent().add_child(egg)
+
+
+## Chickens nearby join the chase when the totem spots the player.
+func _command_chickens() -> void:
+	for node in get_tree().get_nodes_in_group("chickens"):
+		var chicken := node as Chicken
+		if global_position.distance_to(chicken.global_position) <= command_radius:
+			chicken.alert()
+
+
+func _check_contact() -> void:
+	for body in _hitbox.get_overlapping_bodies():
+		if body is Player:
+			(body as Player).take_damage(Player.SUITCASE, global_position)
+
+
+func _check_snack_scatter() -> void:
+	var nearby := 0
+	for node in get_tree().get_nodes_in_group("snack_lures"):
+		if global_position.distance_to((node as Node2D).global_position) <= snack_scatter_radius:
+			nearby += 1
+	if nearby >= snacks_to_scatter:
+		_break_apart(false)
+
+
+func _finish_topple() -> void:
+	# Each chicken in the stack lands further along the fall; anything
+	# under a landing spot is flattened.
+	for i in members:
+		var spot := global_position + _topple_dir * fall_spacing * (i + 1)
+		for node in get_tree().get_nodes_in_group("chickens"):
+			var chicken := node as Chicken
+			if chicken.global_position.distance_to(spot) <= crush_radius:
+				chicken.defeat()
+	_break_apart(true)
+
+
+## The stack comes apart into its chickens. After a topple they land along
+## the fall line, dazed; when scattered by snacks they hop down beside it.
+func _break_apart(fell: bool) -> void:
+	for i in members:
+		var chicken := CHICKEN_SCENE.instantiate() as Chicken
+		if fell:
+			chicken.position = position + _topple_dir * fall_spacing * (i + 1)
+		else:
+			chicken.position = position + Vector2.from_angle(i * TAU / members) * 12.0
+		get_parent().add_child(chicken)
+		if fell:
+			chicken.stun(scatter_daze)
+	var poof := POOF_SCENE.instantiate() as Node2D
+	poof.position = position
+	get_parent().add_child(poof)
+	if is_instance_valid(home):
+		home.start_cooldown()
+	queue_free()
+
+
+func _can_see_player() -> bool:
+	if _player == null or _player.is_dead or _player.is_hidden:
+		return false
+	if global_position.distance_to(_player.global_position) > sight_range:
+		return false
+	var query := PhysicsRayQueryParameters2D.create(global_position, _player.global_position, WORLD_LAYER)
+	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
+
+
+func _update_layers() -> void:
+	for i in _layers.size():
+		var layer := _layers[i]
+		if state == State.TOPPLING:
+			# Each chicken swings out along the fall, higher ones further.
+			var t := 1.0 - _timer / topple_time
+			var landing := _topple_dir * fall_spacing * (i + 1)
+			var standing := Vector2(0, -i * LAYER_HEIGHT)
+			layer.position = standing.lerp(landing, t).round()
+		else:
+			# A visible wobble, worse further up; the base looks strained.
+			var sway := sin(_time * 3.0 + i * 0.8) * (i * 0.6)
+			var shake := (randi() % 3 - 1) if state == State.STOMP_WINDUP else 0
+			layer.position = Vector2(roundf(sway) + shake, -i * LAYER_HEIGHT)
+			layer.scale = Vector2(1.1, 0.9) if i == 0 and members > 1 else Vector2.ONE
+		layer.flip_h = _player != null and _player.global_position.x < global_position.x
+
+
+func _draw() -> void:
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, 0.4))
+	draw_circle(Vector2.ZERO, 7.0, SHADOW_COLOR)
+	if _shockwave > 0.0:
+		# Stomp shockwave: a ring spreading across the floor.
+		var r := stomp_radius * (1.0 - _shockwave / 0.3)
+		draw_arc(Vector2.ZERO, r, 0.0, TAU, 24, SHOCKWAVE_COLOR, 2.0)
+	draw_set_transform(Vector2.ZERO)
+	if state == State.STOMP_WINDUP and int(_timer * 10.0) % 2 == 0:
+		var font := ThemeDB.fallback_font
+		var top := -members * LAYER_HEIGHT - 12.0
+		draw_string_outline(font, Vector2(-10, top), "!", HORIZONTAL_ALIGNMENT_CENTER, 20, 8, 2, Color("181425"))
+		draw_string(font, Vector2(-10, top), "!", HORIZONTAL_ALIGNMENT_CENTER, 20, 8, Color("e43b44"))
