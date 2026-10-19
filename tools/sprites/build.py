@@ -22,6 +22,7 @@ import items
 import mushrooms
 import player
 import roost
+import security_door
 import set_dressing
 import tiles
 from palette import to_image
@@ -67,6 +68,10 @@ IMAGES = [
     ("window.png", set_dressing.window_sheet),
     ("potted_plant.png", set_dressing.potted_plant_sheet),
     ("welcome_banner.png", set_dressing.welcome_banner_sheet),
+    ("item_maintenance_key.png", items.maintenance_key),
+    ("security_door.png", security_door.sheet),
+    ("signs.png", set_dressing.signs_sheet),
+    ("maintenance_cart.png", set_dressing.maintenance_cart_sheet),
 ]
 
 

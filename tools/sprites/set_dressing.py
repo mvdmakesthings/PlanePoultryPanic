@@ -6,6 +6,8 @@
   3 frames: plain tarmac, a parked plane's nose, the same plane's tail.
 - potted_plant.png: 16x24 floor planters, 2 frames: leafy ficus, snake plant.
 - welcome_banner.png: a 48x18 hanging banner, "WELCOME TO BAWKSTON".
+- signs.png: 64x11 wayfinding signs for the wall face, one per frame.
+- maintenance_cart.png: a 24x24 janitor's cart, a floor prop.
 """
 import math
 
@@ -44,6 +46,10 @@ FONT = {
     "!": [".#.", ".#.", ".#.", "...", ".#."],
     "#": ["#.#", "###", "#.#", "###", "#.#"],
     " ": ["...", "...", "...", "...", "..."],
+    # Arrows for wayfinding signs.
+    "<": ["..#", ".##", "###", ".##", "..#"],
+    ">": ["#..", "##.", "###", "##.", "#.."],
+    "v": ["...", "###", "###", ".#.", "..."],
 }
 
 
@@ -357,6 +363,80 @@ def welcome_banner():
 
 def welcome_banner_sheet():
     return to_image(welcome_banner())
+
+
+# --- Wayfinding signs ----------------------------------------------------
+
+SIGN_W, SIGN_H = 64, 11
+# (text, panel color, text color, accent for arrows), one per frame. Airport
+# wayfinding is yellow on charcoal; staff areas are white on red.
+SIGNS = [
+    ("BAGGAGE CLAIM v", "k", "F", "F"),
+    ("< SECURITY", "k", "F", "F"),
+    ("STAFF ONLY", "r", "C", "C"),
+    ("ARRIVALS >", "k", "F", "F"),
+]
+
+
+def sign(frame):
+    text, panel, ink, _ = SIGNS[frame]
+    g = _blank(SIGN_W, SIGN_H)
+    _rect(g, 0, 0, SIGN_W - 1, SIGN_H - 1, "O")
+    _rect(g, 1, 1, SIGN_W - 2, SIGN_H - 2, panel)
+    # Lit top edge, shaded bottom edge.
+    _rect(g, 1, 1, SIGN_W - 2, 1, "p" if panel == "k" else "R")
+    _rect(g, 1, SIGN_H - 2, SIGN_W - 2, SIGN_H - 2, "O" if panel == "k" else "v")
+    _text(g, (SIGN_W - _text_width(text)) // 2, 3, text, ink)
+    return g
+
+
+def signs_sheet():
+    return _strip([sign(f) for f in range(len(SIGNS))], SIGN_W, SIGN_H)
+
+
+# --- Maintenance cart -----------------------------------------------------
+
+CART_W, CART_H = 24, 24
+
+
+def maintenance_cart():
+    """A janitor's cart seen from the front-left: a gray frame with a
+    yellow mop bucket on the left, a mop leaning up out of it, and a dark
+    trash bag hanging on the right. Its base (about 22x6) is the solid part."""
+    g = _blank(CART_W, CART_H)
+    # Mop handle leaning up and to the left, with its head in the bucket.
+    for i in range(10):
+        put(g, 2 + i, 3 + i // 3, "n")
+    put(g, 2, 3, "a")
+    # Yellow bucket with a wringer on top.
+    _rect(g, 1, 11, 10, 20, "Y")
+    _rect(g, 1, 11, 10, 11, "F")
+    _rect(g, 9, 12, 10, 20, "y")
+    _rect(g, 2, 13, 8, 13, "y")
+    _rect(g, 3, 9, 8, 10, "T")
+    put(g, 9, 3, "w")
+    # Cart body: a gray shelf unit with a spray bottle on top.
+    _rect(g, 11, 6, 22, 20, "w")
+    _rect(g, 11, 6, 22, 6, "W")
+    _rect(g, 11, 13, 22, 13, "T")
+    _rect(g, 21, 7, 22, 20, "T")
+    _rect(g, 13, 2, 15, 5, "b")
+    _rect(g, 13, 2, 15, 2, "C")
+    put(g, 1, 14, "C")
+    # Trash bag hanging off the side.
+    _rect(g, 16, 8, 21, 12, "O")
+    _rect(g, 17, 9, 20, 11, "k")
+    put(g, 9, 17, "p")
+    # Bottom tray and wheels.
+    _rect(g, 1, 20, 22, 21, "T")
+    _rect(g, 1, 20, 22, 20, "w")
+    for x in (3, 19):
+        _rect(g, x, 22, x + 1, 22, "O")
+    return _outline(g)
+
+
+def maintenance_cart_sheet():
+    return to_image(maintenance_cart())
 
 
 # --- Preview --------------------------------------------------------------

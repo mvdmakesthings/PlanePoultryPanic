@@ -269,3 +269,21 @@ def suitcase():
     for i in range(2):
         out.alpha_composite(to_image(suitcase_frame(i == 1)), (i * SUITCASE_SIZE[0], 0))
     return out
+
+
+# Maintenance key HUD icon and pickup: 12x8. A brass key with a round bow
+# (the hole shows through), lit on the top left, with two teeth.
+MAINTENANCE_KEY = [
+    ".OOOO.......",
+    "OFFYyO......",
+    "OF..yOOOOOOO",
+    "OY..yFFFFFFO",
+    "OYyyyYyyyyyO",
+    ".OOOOOOyOyOO",
+    "......OyOyO.",
+    "......OOOOO.",
+]
+
+
+def maintenance_key():
+    return to_image(MAINTENANCE_KEY)
