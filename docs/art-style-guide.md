@@ -248,6 +248,8 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`luggage_cart.png`**: two 24x20 frames of a baggage cart facing right (wheels turning). Flip it for left.
 
+**`suitcase.png`**: two 14x16 frames of a rolling suitcase standing upright, handle up: closed, then burst open with clothes flying out. The player carries the closed frame overhead.
+
 **`gate_door.png`**: four 48x32 frames of the boarding gate (closed, opening, mostly open, open). It sits on the wall face, 3 tiles wide and covering both face rows, with its sign in the top 10 rows.
 
 **`item_extinguisher.png`**: one 8x12 fire extinguisher for the HUD.

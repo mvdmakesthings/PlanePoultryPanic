@@ -86,8 +86,8 @@ When health reaches zero, the player restarts from the last checkpoint with thei
 |---|---|---|
 | Move (8 directions) | WASD or arrow keys | Left stick or D-pad |
 | Run (uses stamina) | Shift | Right shoulder (RB/R1) |
-| Use selected item (throw a snack, spray the extinguisher) | Space | A / Cross |
-| Interact (shove, take, open, hide) | F | B / Circle |
+| Use selected item (throw a snack, spray the extinguisher), or throw a carried suitcase | Space | A / Cross |
+| Interact (shove, take, pick up or put down a suitcase, open, hide) | F | B / Circle |
 | Eat a snack (quick heal, from any slot) | E | X / Square |
 | Previous / next slot | Q / R, or mouse wheel | LB / Y (Triangle) |
 | Drop the selected slot | G | Back / Share |
@@ -154,7 +154,7 @@ More usable items may come out of prototyping, but every new item has to earn it
 ## Chickens
 
 ### How Chickens Are Defeated
-The player can't attack directly. A chicken is defeated when it's caught by airport machinery (the baggage carousel's chute, moving walkways at speed, closing security gates), flattened by a luggage cart the player shoves, or crushed when a totem collapses on top of it. A defeated chicken bursts into a comic puff of feathers, squawks, and is gone. No blood or gore, ever.
+The player can't attack directly. A chicken is defeated when it's caught by airport machinery (the baggage carousel's chute, moving walkways at speed, closing security gates), flattened by a luggage cart the player shoves, hit by a suitcase the player throws, or crushed when a totem collapses on top of it. A defeated chicken bursts into a comic puff of feathers, squawks, and is gone. No blood or gore, ever.
 
 Fire extinguisher spray and distractions don't defeat chickens. They control them. That's what keeps the **Pacifist** run possible: get through without defeating a single chicken.
 
@@ -209,6 +209,7 @@ Behavior priority, highest first:
 | Element | Effect |
 |---|---|
 | Luggage cart | Shove it with Interact and it rolls about 4 tiles. A chicken it hits while rolling fast is defeated. Eggs splat against the whole cart, luggage included, so the player can hide behind one. A cart shoved into a wall slides along it instead, so it can never get stuck in a corner. |
+| Rolling suitcase | Abandoned luggage lying around the terminal. Pick it up with Interact and the player holds it overhead in both hands, so it doesn't use an inventory slot. While carrying it they walk a little slower, can't run, and can't use, eat, or drop items or hide. Use throws it about 5 tiles the way the player is facing; Interact puts it down. A chicken it hits while it's still moving fast is defeated, and the suitcase bursts open in a shower of clothes and is gone, so each suitcase defeats one chicken at most. A throw that misses lands and can be picked up again. Taking a hit while carrying it drops it at the player's feet. |
 | Vending machine | Opened with a maintenance key. Drops 2-3 snacks. |
 | Boarding gate | A door set into the back wall with a lit gate sign. Its glass doors slide open as the player approaches; walking into the doorway reaches the gate. |
 | Emergency exit | Shortcut. Some are blocked, and some lead past extra danger. |
@@ -459,4 +460,6 @@ game/
 | 2026-10-19 | The carousel belt is walkable and carries everything; only chickens fit through the chute | Proposed |
 | 2026-10-19 | Health is tracked in quarter suitcases so eggs can deal a quarter of a peck's damage | You |
 | 2026-10-19 | Chickens besieging a hiding spot give up and leave, rather than breaking the door, so hiding is a safe escape | You |
+| 2026-10-19 | Rolling suitcases can be carried overhead and thrown; a hit defeats the chicken | You |
+| 2026-10-19 | A suitcase bursts open when it defeats a chicken (one defeat each), but a missed throw can be picked up again; carrying it slows the player and blocks running, items, and hiding | Proposed |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |

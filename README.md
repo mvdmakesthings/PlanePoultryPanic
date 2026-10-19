@@ -21,11 +21,11 @@ Or open `game/project.godot` in the Godot editor and press F5.
 |---|---|---|
 | Move | WASD or arrow keys | Left stick or D-pad |
 | Run (uses stamina) | Shift | Right shoulder |
-| Use the selected item (throw a snack, spray the extinguisher) | Space | A |
+| Use the selected item (throw a snack, spray the extinguisher), or throw a carried suitcase | Space | A |
 | Switch inventory slot | Q / R, or mouse wheel | LB / Y |
 | Drop the selected slot | G | Back |
 | Eat a snack (heal) | E | X |
-| Push a cart, take an extinguisher | F | B |
+| Push a cart, take an extinguisher, pick up or put down a suitcase | F | B |
 | Restart (after winning or losing) | R | Start |
 
 Reach the green **GATE** without losing all three suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
