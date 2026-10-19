@@ -7,9 +7,9 @@ Each track is a few channels of note lists, like a tiny tracker:
   drums  - "k" kick, "s" snare, "h" hat, "." rest, one per step
 
 Notes are written like "A4" or "C#5"; "-" holds the previous note and "."
-is a rest. Every list is in steps (eighth notes unless STEPS_PER_BEAT says
-otherwise), and the loop length is a whole number of bars, so tracks loop
-without a gap.
+is a rest. Every list is in steps: eighth notes, unless the track sets
+"steps_per_beat" (4 makes them sixteenths). The loop length is a whole
+number of bars, so tracks loop without a gap.
 """
 import math
 import random
@@ -80,7 +80,7 @@ def _render_channel(steps, kind, step_len, rate, total, volume, duty=0.5):
 
 
 def render(track, rate):
-    step_len = 60.0 / track["bpm"] / STEPS_PER_BEAT
+    step_len = 60.0 / track["bpm"] / track.get("steps_per_beat", STEPS_PER_BEAT)
     steps = len(track["lead"])
     total = int(round(steps * step_len * rate))
     channels = [
@@ -116,25 +116,55 @@ def _arp(chords, steps_per_chord=8):
     return out
 
 
-# Arrivals: calm, with creeping unease. A minor, unhurried; the melody keeps
-# leaning on the odd note (D#, G#) like something isn't quite right.
+# Arrivals: driving and tense, for an airport after the end of the world.
+# E Phrygian (the flat second, F against E, gives it menace) at 144 BPM in
+# sixteenths: a pumping octave bass, fast arpeggios, a stabbing lead riff
+# that climbs over E-F-E-D, then a second half that soars and ends on a
+# tense B major chord that pulls back to the top of the loop.
+ARRIVAL_CHORDS = {
+    "E": "E3/G3/B3", "F": "F3/A3/C4", "D": "D3/F#3/A3", "G": "G3/B3/D4",
+    "C": "C3/E3/G3", "B": "B2/D#3/F#3",
+}
+ARRIVAL_BARS = "E F E D E F G B E F E D C C B B".split()
+
+
+def _pump_bass(roots):
+    """Sixteenth-note bass: root, root, octave, root, four times a bar."""
+    out = []
+    for root in roots:
+        out += [root + "2", root + "2", root + "3", root + "2"] * 4
+    return out
+
+
+def _drums(bars):
+    main = "k.hhs.hkk.hhs.hh"
+    fill = "k.hhs.hkk.s.ssss"
+    lift = "k.hks.hkk.hks.hk"
+    out = ""
+    for bar in range(bars):
+        if bar % 4 == 3:
+            out += fill
+        else:
+            out += lift if bar >= 8 else main
+    return list(out)
+
+
 ARRIVALS = {
-    "bpm": 92,
+    "bpm": 144,
+    "steps_per_beat": 4,
     "lead": _seq("""
-        E5 - - - C5 - B4 - | A4 - - - - - . . | F5 - - - E5 - D5 - | C5 - - - - - . . |
-        D5 - - - C5 - A4 - | D#5 - - - - - . . | E5 - - - B4 - - - | G#4 - - - - - . . |
-        E5 - - - C5 - B4 - | A4 - - - E5 - A5 - | F5 - - - E5 - D5 - | C5 - D5 - C5 - . . |
-        A4 - - - C5 - F5 - | D#5 - - - D5 - - - | E5 - - - - - - - | . . . . G#4 - B4 - |
+        E5 - . E5 . E5 F5 - E5 - D5 - B4 - - - | F5 - . F5 . F5 G5 - F5 - E5 - C5 - - - |
+        E5 - . E5 . E5 F5 - E5 - D5 - B4 - - - | D5 - . D5 . D5 E5 - D5 - C5 - A4 - - - |
+        E5 - . E5 . E5 F5 - E5 - D5 - B4 - - - | F5 - . F5 . F5 G5 - F5 - E5 - C5 - - - |
+        G5 - . G5 . G5 A5 - B5 - - - D6 - - - | B5 - - - A#5 - - - B5 - . B4 B4 - . . |
+        B5 - - - - - - - A5 - G5 - F5 - E5 - | F5 - - - - - - - C6 - - - A5 - - - |
+        G5 - - - F5 - E5 - D5 - E5 - F5 - G5 - | A5 - - - - - - - F#5 - - - D5 - - - |
+        E5 - G5 - C6 - - - B5 - G5 - E5 - - - | C6 - - - B5 - - - G5 - - - E5 - - - |
+        D#5 - F#5 - B5 - - - A5 - F#5 - D#5 - - - | B4 - - - D#5 - - - F#5 - - - A5 - B5 - |
     """),
-    "bass": _seq("""
-        A2 - . A2 . . E2 . | A2 - . A2 . . E2 . | F2 - . F2 . . C3 . | F2 - . F2 . . C3 . |
-        D2 - . D2 . . A2 . | D2 - . D2 . . A2 . | E2 - . E2 . . B2 . | E2 - . E2 . . G#2 . |
-        A2 - . A2 . . E2 . | A2 - . A2 . . E2 . | F2 - . F2 . . C3 . | F2 - . F2 . . C3 . |
-        D2 - . D2 . . A2 . | D2 - . D2 . . A2 . | E2 - . E2 . . B2 . | E2 - . E2 . . G#2 . |
-    """),
-    "chords": _arp(["A3/C4/E4", "A3/C4/E4", "F3/A3/C4", "F3/A3/C4",
-                    "D3/F3/A3", "D3/F3/A3", "E3/G#3/B3", "E3/G#3/B3"] * 2),
-    "drums": list("k...h...s...h..." * 16)[:128],
+    "bass": _pump_bass(ARRIVAL_BARS),
+    "chords": _arp([ARRIVAL_CHORDS[c] for c in ARRIVAL_BARS], steps_per_chord=16),
+    "drums": _drums(len(ARRIVAL_BARS)),
 }
 
 # Main menu: upbeat and adventurous with a comic edge. C major, bouncy
