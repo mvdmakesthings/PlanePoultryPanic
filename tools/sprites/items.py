@@ -3,16 +3,21 @@ from PIL import Image
 
 from palette import to_image
 
-# A bag of airport pretzels: 8x8.
+# A bag of chips: 10x12. Wide silver crimped seals pinch in to a puffy red
+# bag with a yellow brand stripe, a shine on the left, and a chip on the front.
 SNACK = [
-    ".OOOOOO.",
-    "OYFFFFYO",
-    "OyRRRRyO",
-    "ORFYYFRO",
-    "ORYyyYRO",
-    "ORFYYFRO",
-    "OrRRRRrO",
-    ".OOOOOO.",
+    "OOOOOOOOOO",
+    "OWwWwWwWwO",
+    ".ORRRRRRO.",
+    "ORCRRRRRrO",
+    "OYFYYYYYyO",
+    "ORCRRRRRrO",
+    "ORRRFFRRrO",
+    "ORRFYYyRrO",
+    "ORRRYyRRrO",
+    ".ORRRRRrO.",
+    "OWwWwWwWwO",
+    "OOOOOOOOOO",
 ]
 
 # Health luggage: 12x10, full and empty.

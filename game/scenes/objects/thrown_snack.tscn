@@ -7,5 +7,5 @@
 script = ExtResource("1_snack")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(0, -4)
+position = Vector2(0, -6)
 texture = ExtResource("2_texture")

@@ -239,7 +239,7 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`mushroom_patch.png`**: 16x16 frames. Rows are varieties (flight, rage, egg shooter); columns are 3 frames (resting, spores rising, spores drifting higher). Loop slowly, about 3 FPS.
 
-**`item_snack.png`**: one 8x8 snack (a bag of airport pretzels), used for pickups, thrown snacks, and the HUD.
+**`item_snack.png`**: one 10x12 bag of chips, used for pickups, thrown snacks, and the HUD.
 
 **`hud_luggage.png`**: two 12x10 health icons side by side: full, then empty.
 

@@ -63,8 +63,8 @@ func _draw() -> void:
 	var fill_color := STAMINA_FILL if _stamina_ratio > 0.3 else STAMINA_TIRED
 	draw_rect(Rect2(bar.position, Vector2(roundf(bar.size.x * _stamina_ratio), bar.size.y)), fill_color)
 
-	draw_texture(SNACK, Vector2(4, size.y - 12))
-	_draw_text(font, Vector2(15, size.y - 5), "x%d" % _snacks, HORIZONTAL_ALIGNMENT_LEFT, -1)
+	draw_texture(SNACK, Vector2(4, size.y - 14))
+	_draw_text(font, Vector2(17, size.y - 5), "x%d" % _snacks, HORIZONTAL_ALIGNMENT_LEFT, -1)
 	_draw_text(font, Vector2(0, size.y - 5), CONTROLS_HINT, HORIZONTAL_ALIGNMENT_RIGHT, size.x - 4)
 
 	if _message != "":
