@@ -15,6 +15,7 @@ from PIL import Image
 
 import carousel
 import chicken
+import effects
 import items
 import mushrooms
 import player
@@ -46,6 +47,7 @@ IMAGES = [
     ("item_snack.png", items.snack),
     ("hud_luggage.png", items.luggage),
     ("egg.png", items.egg),
+    ("feather_poof.png", effects.poof),
 ]
 
 

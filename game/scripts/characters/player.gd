@@ -68,6 +68,7 @@ func _physics_process(delta: float) -> void:
 
 	_knockback = _knockback.move_toward(Vector2.ZERO, knockback_decay * delta)
 	velocity = input * (run_speed if running else walk_speed) + _knockback
+	velocity += Carousel.push_for(get_tree(), global_position)
 	move_and_slide()
 
 	_update_animation(input, running)

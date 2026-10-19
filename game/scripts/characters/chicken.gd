@@ -8,6 +8,9 @@ extends CharacterBody2D
 ##   rage:   chases faster than the player walks, sees further, gives up later
 ##   egg:    stops at range and fires eggs at the player
 
+## Emitted just before a defeated chicken is removed.
+signal defeated
+
 enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP }
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
@@ -18,6 +21,7 @@ const POWER_SHEETS := {
 	"egg": preload("res://assets/sprites/chicken_egg_walk.png"),
 }
 const EGG_SCENE := preload("res://scenes/objects/egg_projectile.tscn")
+const POOF_SCENE := preload("res://scenes/objects/feather_poof.tscn")
 const FRAME_SIZE := Vector2i(16, 16)
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const WORLD_LAYER := 1
@@ -125,7 +129,11 @@ func _physics_process(delta: float) -> void:
 				_seek_mushroom()
 			State.WINDUP:
 				_windup()
+		velocity += Carousel.push_for(get_tree(), global_position)
 	move_and_slide()
+	if not _is_hopping() and Carousel.in_any_chute(get_tree(), global_position):
+		defeat()
+		return
 	if state == State.WANDER and get_slide_collision_count() > 0:
 		_pick_wander()
 	if velocity.length() > 1.0:
@@ -138,6 +146,15 @@ func _physics_process(delta: float) -> void:
 func alert() -> void:
 	if state in [State.WANDER, State.SEEK_MUSHROOM]:
 		_start_pursuit(false)
+
+
+## Bursts into feathers and leaves the game.
+func defeat() -> void:
+	var poof := POOF_SCENE.instantiate() as Node2D
+	poof.position = position
+	get_parent().add_child(poof)
+	defeated.emit()
+	queue_free()
 
 
 ## Powers the chicken up immediately. Also used by tests and debugging.

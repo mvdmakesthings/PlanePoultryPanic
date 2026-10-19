@@ -25,10 +25,14 @@ const ATLAS := {
 const CAROUSEL_ROWS := {
 	"top_left": 0, "top": 1, "top_right": 2,
 	"left": 3, "island": 4, "right": 5,
-	"bottom_left": 6, "bottom": 7, "bottom_right": 8,
+	"bottom_left": 6, "bottom": 7, "bottom_right": 8, "chute": 9,
 }
 ## Carousel position and size in tiles.
 const CAROUSEL_RECT := Rect2i(3, 9, 8, 4)
+## Which tile column of the carousel's back belt holds the chute.
+const CHUTE_COLUMN := 4
+## Blocks only the player (physics layer 4), so chickens can fall through.
+const PLAYER_BLOCKER_LAYER := 8
 ## The departure gate the player must reach, in tiles.
 const EXIT_RECT := Rect2i(25, 4, 3, 2)
 const GATE_COLOR := Color("63c74d")
@@ -128,6 +132,8 @@ func _paint_carousel() -> void:
 				piece = vertical + "_" + horizontal
 			elif vertical != "" or horizontal != "":
 				piece = vertical + horizontal
+			if piece == "top" and x == r.position.x + CHUTE_COLUMN:
+				piece = "chute"
 			_props.set_cell(Vector2i(x, y), 1, Vector2i(0, CAROUSEL_ROWS[piece]))
 
 
@@ -137,14 +143,29 @@ func _build_collision() -> void:
 	_add_wall(Rect2(0, room_px.y - TILE, room_px.x, TILE))
 	_add_wall(Rect2(0, 0, TILE, room_px.y))
 	_add_wall(Rect2(room_px.x - TILE, 0, TILE, room_px.y))
-	# The carousel's transparent margin (2px at the top and sides) stays walkable.
+	_build_carousel()
+
+
+## The belt ring is walkable; only the raised island is solid. Pixel
+## offsets match the carousel tile art (see tools/sprites/carousel.py).
+func _build_carousel() -> void:
 	var c := Rect2(CAROUSEL_RECT.position * TILE, CAROUSEL_RECT.size * TILE)
-	_add_wall(Rect2(c.position + Vector2(2, 4), c.size - Vector2(4, 4)))
+	var outer := Rect2(c.position + Vector2(2, 2), c.size - Vector2(4, 3))
+	var island := Rect2(c.position + Vector2(12, 12), c.size - Vector2(24, 23))
+	var chute_x := c.position.x + CHUTE_COLUMN * TILE
+	var chute := Rect2(chute_x + 2, c.position.y + 2, TILE - 4, 10)
+	_add_wall(island)
+	# The player bumps into the chute instead of riding into it.
+	_add_wall(chute.grow(1), PLAYER_BLOCKER_LAYER)
+
+	var carousel := Carousel.new()
+	carousel.setup(outer, island, chute)
+	add_child(carousel)
 
 
-func _add_wall(rect: Rect2) -> void:
+func _add_wall(rect: Rect2, layer := 1) -> void:
 	var body := StaticBody2D.new()
-	body.collision_layer = 1
+	body.collision_layer = layer
 	body.collision_mask = 0
 	var shape := CollisionShape2D.new()
 	var box := RectangleShape2D.new()
@@ -160,7 +181,9 @@ func _build_navigation() -> void:
 	var walkable := NavigationPolygon.new()
 	walkable.agent_radius = NAV_AGENT_RADIUS
 	walkable.parsed_geometry_type = NavigationPolygon.PARSED_GEOMETRY_STATIC_COLLIDERS
-	walkable.parsed_collision_mask = 1
+	# Include the chute, so chickens never choose to walk into it. They only
+	# fall in when the belt carries them there.
+	walkable.parsed_collision_mask = 1 | PLAYER_BLOCKER_LAYER
 	walkable.source_geometry_mode = NavigationPolygon.SOURCE_GEOMETRY_GROUPS_WITH_CHILDREN
 	walkable.source_geometry_group_name = NAV_OBSTACLES
 	var room_px := Vector2(ROOM * TILE)

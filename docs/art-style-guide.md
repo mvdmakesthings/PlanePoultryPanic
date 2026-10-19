@@ -245,6 +245,8 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`egg.png`**: two 10x7 frames side by side: an egg in flight, then its splat.
 
+**`feather_poof.png`**: six 24x24 frames of a defeated chicken bursting into feathers. Play once at 12 FPS.
+
 **`carousel.png`**: modular baggage carousel, 16x16 tiles. Rows are pieces; columns are 4 animation frames of the belt moving clockwise (play at about 8 FPS so the slats creep along).
 
 | Row | Piece |
@@ -252,6 +254,7 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 | 0-2 | `top_left`, `top`, `top_right` |
 | 3-5 | `left`, `island`, `right` |
 | 6-8 | `bottom_left`, `bottom`, `bottom_right` |
+| 9 | `chute`: a `top` piece with the baggage chute opening and rubber flaps |
 
 Build any size of carousel (at least 2x2 tiles) as a rectangle: corners at the corners, `top` and `bottom` along the long edges, `left` and `right` along the short edges, and `island` filling the middle. The bottom pieces include the front skirt, so the carousel looks raised off the floor. Draw the carousel on a tile layer above the floor, since the outside of each corner is transparent.
 

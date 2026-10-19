@@ -24,7 +24,28 @@ TOP_BANDS = [".", ".", "O", "C", "W", "w", "n*", "m*", "m*", "m*", "m*", "v", "O
 BOTTOM_BANDS = ["w", "w", "T", "p", "O", "n*", "m*", "m*", "m*", "v", "C", "W", "w", "T", "T", "O"]
 
 PIECES = ("top_left", "top", "top_right", "left", "island", "right",
-          "bottom_left", "bottom", "bottom_right")
+          "bottom_left", "bottom", "bottom_right", "chute")
+
+# The baggage chute: a dark opening in the back rim with rubber flaps,
+# drawn over a "top" piece. "." keeps the belt underneath.
+CHUTE = [
+    "..OOOOOOOOOOOO..",
+    ".OWOOOOOOOOOOWO.",
+    ".OwOkkkkkkkkOwO.",
+    ".OwOpkpkpkpkOwO.",
+    ".OwOpkpkpkpkOwO.",
+    ".OwOpkpkpkpkOwO.",
+    ".OwOpkpkpkpkOwO.",
+    ".OwOpkpkpkpkOwO.",
+    ".OwOp.p.p.p.OwO.",
+    ".OwOp...p...OwO.",
+    ".OTO........OTO.",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+]
 
 
 def band(bands, idx, s, frame, direction):
@@ -93,6 +114,9 @@ def piece_grid(piece, frame):
         for x in range(16):
             if piece == "island":
                 row += island(x, y)
+            elif piece == "chute":
+                over = CHUTE[y][x]
+                row += over if over != "." else straight("top", x, y, frame)
             elif piece in ("top", "bottom", "left", "right"):
                 row += straight(piece, x, y, frame)
             else:

@@ -54,8 +54,8 @@ func _ready() -> void:
 		await get_tree().physics_frame
 		_check(player.health == hurt_health + 1, "eating a snack heals 1")
 
-	# A snack thrown into the carousel must land outside it, or chickens
-	# would push against the carousel forever trying to reach it.
+	# A snack thrown at the carousel must not land on the solid island, or
+	# chickens would push against it forever trying to reach the snack.
 	for lure in get_tree().get_nodes_in_group("snack_lures"):
 		lure.queue_free()
 	player.global_position = Vector2(140, 214)
@@ -69,29 +69,34 @@ func _ready() -> void:
 	if lures.size() == 1:
 		var landed: Vector2 = lures[0].global_position
 		print("snack thrown at the carousel landed at %s" % landed)
-		_check(landed.y >= 208.0, "snack thrown at the carousel stays outside it")
+		_check(landed.y >= 197.0, "snack thrown at the carousel stops short of the island")
 
-	# Pathfinding: a chicken north of the carousel must walk around it to
-	# reach a snack directly south of it.
+	# Pathfinding: a chicken west of the carousel must route around the
+	# solid island to reach a snack directly east of it.
 	for lure in get_tree().get_nodes_in_group("snack_lures"):
 		lure.queue_free()
 	var chickens := get_tree().get_nodes_in_group("chickens")
 	for i in range(1, chickens.size()):
 		chickens[i].queue_free()
 	var runner: Chicken = chickens[0]
-	runner.global_position = Vector2(112, 136)
+	runner.global_position = Vector2(28, 176)
+	runner.snack_notice_range = 200.0  # this test is about routing, not senses
 	runner.state = Chicken.State.WANDER
 	runner.set_physics_process(true)
 	player.global_position = Vector2(440, 290)
 	var bait: ThrownSnack = preload("res://scenes/objects/thrown_snack.tscn").instantiate()
 	bait.direction = Vector2.ZERO
-	bait.position = Vector2(112, 230)
+	bait.position = Vector2(196, 176)
 	room.get_node("Entities").add_child(bait)
-	await _wait(4.0)
-	_check(runner.state == Chicken.State.EATING, "chicken paths around the carousel to a snack")
+	await _wait(6.0)
+	if is_instance_valid(runner):
+		print("pathfinding chicken at %s, state %d" % [runner.global_position, runner.state])
+	_check(is_instance_valid(runner) and not is_instance_valid(bait),
+		"chicken paths around the carousel island and eats the snack")
 
 	room.queue_free()
 	await _power_tests()
+	await _carousel_tests()
 
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
@@ -140,6 +145,56 @@ func _power_tests() -> void:
 	print("flight chicken ended at %s" % chicken.global_position)
 	_check(chicken.global_position.y > 208.0 and chicken.global_position.x < 180.0,
 		"flight chicken hops straight over the carousel")
+	setup[0].queue_free()
+
+
+## The carousel belt and its chute. The chute is on the back belt at x 114-126.
+func _carousel_tests() -> void:
+	# A chicken busy eating on the back belt rides it into the chute.
+	var setup := await _fresh_room(Vector2(84, 151), Vector2(400, 290))
+	var chicken: Chicken = setup[1]
+	var defeated := [false]
+	chicken.defeated.connect(func() -> void: defeated[0] = true)
+	chicken.state = Chicken.State.EATING
+	chicken._timer = 5.0
+	await _wait(2.0)
+	_check(defeated[0] and not is_instance_valid(chicken), "belt carries a chicken into the chute")
+	setup[0].queue_free()
+
+	# The player rides the belt but is stopped at the chute.
+	setup = await _fresh_room(Vector2(400, 290), Vector2(96, 151))
+	setup[1].queue_free()
+	var player: Player = setup[2]
+	await _wait(1.5)
+	print("player on the belt ended at %s" % player.global_position)
+	_check(player.global_position.x < 114.0 and player.global_position.x > 100.0,
+		"belt carries the player but the chute stops them")
+	setup[0].queue_free()
+
+	# A snack lying on the belt rides into the chute and is gone.
+	setup = await _fresh_room(Vector2(400, 290), Vector2(400, 260))
+	setup[1].queue_free()
+	var bait: ThrownSnack = preload("res://scenes/objects/thrown_snack.tscn").instantiate()
+	bait.direction = Vector2.ZERO
+	bait.position = Vector2(100, 151)
+	setup[0].get_node("Entities").add_child(bait)
+	await _wait(1.0)
+	_check(not is_instance_valid(bait), "snack on the belt goes down the chute")
+	setup[0].queue_free()
+
+	# A snack on the front belt rides the whole loop (left, up, right) to the
+	# chute instead of falling off at a corner.
+	setup = await _fresh_room(Vector2(400, 290), Vector2(400, 260))
+	setup[1].queue_free()
+	bait = preload("res://scenes/objects/thrown_snack.tscn").instantiate()
+	bait.direction = Vector2.ZERO
+	bait.lifetime = 30.0
+	bait.position = Vector2(150, 202)
+	setup[0].get_node("Entities").add_child(bait)
+	await _wait(7.0)
+	if is_instance_valid(bait):
+		print("looping snack stuck at %s" % bait.global_position)
+	_check(not is_instance_valid(bait), "snack rides the full belt loop around the corners")
 	setup[0].queue_free()
 
 

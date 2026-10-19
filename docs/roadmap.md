@@ -69,7 +69,7 @@ Still mostly gray-box. Each item should be playable in the prototype room.
 - [x] Chicken pathfinding around furniture (NavigationAgent2D)
 - [x] Mushroom patches and the three powered modes (flight, rage, egg shooter)
 - [ ] Fire extinguisher (freeze cone, charges)
-- [ ] Baggage carousel that carries and defeats chickens
+- [x] Baggage carousel that carries and defeats chickens
 - [ ] Totem formation at a roost, its attacks, and toppling it
 - [ ] Hiding spots
 - [ ] 6-slot inventory with stacking, cycling, dropping, and key items

@@ -22,6 +22,11 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	if _landed:
+		# Snacks lying on a carousel ride the belt, and vanish down the chute.
+		position += Carousel.push_for(get_tree(), global_position) * delta
+		if Carousel.in_any_chute(get_tree(), global_position):
+			queue_free()
+			return
 		lifetime -= delta
 		# Blink during the last two seconds so the player knows it's going stale.
 		visible = lifetime > 2.0 or int(lifetime * 8.0) % 2 == 0
