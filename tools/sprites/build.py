@@ -171,7 +171,7 @@ def main():
     for name, build in IMAGES:
         build().save(SPRITES / name)
         print(f"wrote {(SPRITES / name).relative_to(REPO)}")
-    to_image(chicken.SIDE).resize((ICON_SIZE, ICON_SIZE), Image.NEAREST).save(ICON)
+    to_image(chicken.add_cap(chicken.SIDE, "rage")).resize((ICON_SIZE, ICON_SIZE), Image.NEAREST).save(ICON)
     print(f"wrote {ICON.relative_to(REPO)}")
     if args.preview:
         write_previews(args.preview)

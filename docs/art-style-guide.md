@@ -197,7 +197,7 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 
 `--preview` is optional; it writes enlarged frame grids and an animated walk GIF to the folder you name.
 
-The same run writes the game icon, `game/icon.png`: the side-view chicken scaled up to 512x512 with nearest-neighbor so the pixels stay sharp. `project.godot` points `config/icon` at it, so it shows in the window, taskbar, and dock.
+The same run writes the game icon, `game/icon.png`: the side-view chicken wearing the red rage mushroom cap, scaled up to 512x512 with nearest-neighbor so the pixels stay sharp. `project.godot` points `config/icon` at it, so it shows in the window, taskbar, and dock.
 
 ### Sheet Layout
 - One PNG per animation: `<thing>_<animation>.png`, for example `player_walk.png`, `chicken_walk.png`, `tiles_arrivals.png`
