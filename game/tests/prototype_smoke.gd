@@ -624,6 +624,42 @@ func _totem_tests() -> void:
 	_check(eggs.size() >= 2, "a totem fires an egg barrage from range")
 	room.queue_free()
 
+	# Sustained flight: it flies straight over the carousel at the player
+	# and slams down beside them.
+	setup = await _fresh_room(Vector2(60, 290), Vector2(112, 224))
+	room = setup[0]
+	setup[1].queue_free()
+	player = setup[2]
+	totem = _spawn_totem(room, Vector2(112, 120))
+	totem._flight_ready_in = 0.0
+	totem.flight_min_range = 0.0
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_check(totem.state == Totem.State.FLYING, "a totem takes off toward a distant player")
+	await _wait(totem.flight_time + 0.5)
+	print("flying totem landed at %s; player health %d/%d" % [totem.global_position, player.health, player.max_health])
+	_check(is_instance_valid(totem) and totem.global_position.y > 200.0, "a flying totem crosses the carousel")
+	_check(player.health < player.max_health, "a landing totem slams the player")
+	room.queue_free()
+
+	# Its landing spot is fixed once marked: stepping out of it is safe.
+	setup = await _fresh_room(Vector2(60, 290), Vector2(112, 224))
+	room = setup[0]
+	setup[1].queue_free()
+	player = setup[2]
+	totem = _spawn_totem(room, Vector2(112, 120))
+	totem._flight_ready_in = 0.0
+	totem.flight_min_range = 0.0
+	await _wait(totem.flight_time - totem.landing_warning + 0.1)
+	Input.action_press("run")
+	Input.action_press("move_right")
+	await _wait(0.6)
+	Input.action_release("move_right")
+	Input.action_release("run")
+	await _wait(0.4)
+	_check(player.health == player.max_health, "stepping out of the marked landing spot dodges the slam")
+	room.queue_free()
+
 
 func _spawn_totem(room: Node, at: Vector2) -> Totem:
 	var totem: Totem = preload("res://scenes/characters/totem.tscn").instantiate()

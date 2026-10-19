@@ -2,14 +2,16 @@ class_name Totem
 extends CharacterBody2D
 ## A tower of chickens stacked on each other's backs. Lumbers after the
 ## player, stomps the ground when close, fires egg barrages from range, and
-## calls nearby chickens into the chase.
+## calls nearby chickens into the chase. Every so often it takes off and
+## flies straight at the player over furniture, its shadow marking where it
+## will land, and slams down with a stomp.
 ##
 ## Ways to beat it: freeze its base with the extinguisher, ram it with a
 ## luggage cart, or lure it onto the carousel belt, and it topples, defeating
 ## any chicken it lands on while its own chickens scatter, dazed. Three
 ## snacks dropped beside it break it apart without any defeats.
 
-enum State { IDLE, STALK, STOMP_WINDUP, TOPPLING }
+enum State { IDLE, STALK, STOMP_WINDUP, TOPPLING, FLYING }
 
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
 const RAGE_SHEET := preload("res://assets/sprites/chicken_rage_walk.png")
@@ -18,6 +20,9 @@ const EGG_SCENE := preload("res://scenes/objects/egg_projectile.tscn")
 const POOF_SCENE := preload("res://scenes/objects/feather_poof.tscn")
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.45)
 const SHOCKWAVE_COLOR := Color("ffffff")
+const LANDING_WARNING_COLOR := Color(0.894, 0.231, 0.267, 0.45)
+const GLOW_COLOR := Color("2ce8f5")
+const CHICKEN_LAYER := 4
 const WORLD_LAYER := 1
 ## Pixels between stacked chickens.
 const LAYER_HEIGHT := 10.0
@@ -42,6 +47,16 @@ var state := State.IDLE
 @export var barrage_cooldown := 3.0
 ## Angles of the eggs in one barrage, in degrees from straight at the player.
 @export var barrage_spread: Array[float] = [-14.0, 0.0, 14.0]
+@export_group("Sustained flight")
+## Seconds between flights; the first comes a little sooner.
+@export var flight_interval := 7.0
+@export var flight_time := 2.5
+@export var flight_speed := 60.0
+@export var flight_height := 10.0
+## Only takes off when the player is at least this far away.
+@export var flight_min_range := 40.0
+## The landing area is marked this long before touching down.
+@export var landing_warning := 0.7
 @export_group("Toppling")
 @export var topple_time := 0.6
 ## Distance between where each falling chicken lands.
@@ -61,6 +76,8 @@ var _barrage_ready_in := 1.5
 var _shockwave := 0.0
 var _topple_dir := Vector2.RIGHT
 var _time := 0.0
+var _flight_ready_in := 4.0
+var _flight_elapsed := 0.0
 
 @onready var _agent: NavigationAgent2D = $NavigationAgent2D
 @onready var _hitbox: Area2D = $Hitbox
@@ -87,8 +104,11 @@ func _physics_process(delta: float) -> void:
 	_stomp_ready_in -= delta
 	_barrage_ready_in -= delta
 	_shockwave -= delta
+	_flight_ready_in -= delta
 
 	match state:
+		State.FLYING:
+			_fly(delta)
 		State.IDLE, State.STALK:
 			_stalk()
 		State.STOMP_WINDUP:
@@ -100,7 +120,7 @@ func _physics_process(delta: float) -> void:
 			if _timer <= 0.0:
 				_finish_topple()
 				return
-	if state != State.TOPPLING:
+	if state not in [State.TOPPLING, State.FLYING]:
 		velocity += Carousel.push_for(get_tree(), global_position)
 		move_and_slide()
 		# Machinery: a totem lured onto the carousel belt loses its footing.
@@ -132,12 +152,19 @@ func hit_by_foam(from: Vector2) -> void:
 func _stalk() -> void:
 	velocity = Vector2.ZERO
 	if not _can_see_player():
+		# A player in range but behind furniture: fly over it.
+		if _flight_ready_in <= 0.0 and _player_in_range():
+			_take_off()
+			return
 		state = State.IDLE
 		return
 	if state == State.IDLE:
 		_command_chickens()
 	state = State.STALK
 	var distance := global_position.distance_to(_player.global_position)
+	if distance >= flight_min_range and _flight_ready_in <= 0.0:
+		_take_off()
+		return
 	if distance < stomp_trigger and _stomp_ready_in <= 0.0:
 		state = State.STOMP_WINDUP
 		_timer = stomp_windup
@@ -148,6 +175,55 @@ func _stalk() -> void:
 	var next := _agent.get_next_path_position()
 	var target := next if next.distance_to(global_position) > 0.5 else _player.global_position
 	velocity = global_position.direction_to(target) * speed
+
+
+func _take_off() -> void:
+	state = State.FLYING
+	_timer = flight_time
+	_flight_elapsed = 0.0
+	# Airborne: over furniture and out of reach of carts and the belt.
+	collision_mask = 0
+	collision_layer = 0
+
+
+func _fly(delta: float) -> void:
+	_flight_elapsed += delta
+	# Home in on the player until the landing spot is marked, then drop
+	# straight down onto it, so a quick player can step out of the way.
+	if _timer > landing_warning and _player and not _player.is_dead:
+		velocity = global_position.direction_to(_player.global_position) * flight_speed
+	else:
+		velocity = Vector2.ZERO
+	move_and_slide()
+	if _timer > 0.0:
+		return
+	if _overlaps_world():
+		# Can't land inside furniture: keep flying a moment longer.
+		_timer = 0.05
+		return
+	collision_mask = WORLD_LAYER
+	collision_layer = CHICKEN_LAYER
+	state = State.STALK
+	_flight_ready_in = flight_interval
+	# Landing slam.
+	_stomp()
+
+
+func _overlaps_world() -> bool:
+	var params := PhysicsShapeQueryParameters2D.new()
+	params.shape = ($CollisionShape2D as CollisionShape2D).shape
+	params.transform = ($CollisionShape2D as CollisionShape2D).global_transform
+	params.collision_mask = WORLD_LAYER
+	return not get_world_2d().direct_space_state.intersect_shape(params, 1).is_empty()
+
+
+## Height above the floor: rising after take-off, sinking before landing.
+func _altitude() -> float:
+	if state != State.FLYING:
+		return 0.0
+	var rise := clampf(_flight_elapsed / 0.3, 0.0, 1.0)
+	var sink := clampf(maxf(_timer, 0.0) / 0.3, 0.0, 1.0)
+	return roundf(flight_height * minf(rise, sink))
 
 
 func _stomp() -> void:
@@ -223,10 +299,13 @@ func _break_apart(fell: bool) -> void:
 	queue_free()
 
 
+func _player_in_range() -> bool:
+	return _player != null and not _player.is_dead and not _player.is_hidden \
+		and global_position.distance_to(_player.global_position) <= sight_range
+
+
 func _can_see_player() -> bool:
-	if _player == null or _player.is_dead or _player.is_hidden:
-		return false
-	if global_position.distance_to(_player.global_position) > sight_range:
+	if not _player_in_range():
 		return false
 	var query := PhysicsRayQueryParameters2D.create(global_position, _player.global_position, WORLD_LAYER)
 	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
@@ -245,7 +324,7 @@ func _update_layers() -> void:
 			# A visible wobble, worse further up; the base looks strained.
 			var sway := sin(_time * 3.0 + i * 0.8) * (i * 0.6)
 			var shake := (randi() % 3 - 1) if state == State.STOMP_WINDUP else 0
-			layer.position = Vector2(roundf(sway) + shake, -i * LAYER_HEIGHT)
+			layer.position = Vector2(roundf(sway) + shake, -i * LAYER_HEIGHT - _altitude())
 			layer.scale = Vector2(1.1, 0.9) if i == 0 and members > 1 else Vector2.ONE
 		layer.flip_h = _player != null and _player.global_position.x < global_position.x
 
@@ -257,7 +336,15 @@ func _draw() -> void:
 		# Stomp shockwave: a ring spreading across the floor.
 		var r := stomp_radius * (1.0 - _shockwave / 0.3)
 		draw_arc(Vector2.ZERO, r, 0.0, TAU, 24, SHOCKWAVE_COLOR, 2.0)
+	if state == State.FLYING and _timer <= landing_warning:
+		# Where it's about to slam down.
+		draw_circle(Vector2.ZERO, stomp_radius, LANDING_WARNING_COLOR)
 	draw_set_transform(Vector2.ZERO)
+	if state == State.FLYING:
+		# Teal sparks falling from the airborne stack.
+		for k in 4:
+			var spark := Vector2(sin(_time * 9.0 + k * 1.7) * 7.0, -_altitude() + 2.0 + fmod(_time * 20.0 + k * 3.0, 8.0))
+			draw_rect(Rect2(spark.round(), Vector2.ONE), GLOW_COLOR)
 	if state == State.STOMP_WINDUP and int(_timer * 10.0) % 2 == 0:
 		var font := ThemeDB.fallback_font
 		var top := -members * LAYER_HEIGHT - 12.0
