@@ -58,6 +58,11 @@ var is_dead := false
 ## The closest thing Interact would use right now, or null. Only this one
 ## shows its prompt, so overlapping prompts never stack up.
 var interact_target: Node2D = null
+## The closet the player is hiding in, or null.
+var hidden_in: HidingSpot = null
+var is_hidden: bool:
+	get:
+		return hidden_in != null
 
 var _invincible_timer := 0.0
 var _exhausted := false
@@ -85,6 +90,10 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if is_hidden:
+		# Inside a closet: no moving, but Interact still lets the player out.
+		interact_target = _nearest_interactable()
+		return
 	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if input != Vector2.ZERO:
 		facing = input.normalized()
@@ -105,6 +114,10 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if is_dead:
 		return
+	if is_hidden:
+		if event.is_action_pressed("interact"):
+			interact()
+		return
 	if event.is_action_pressed("use_item"):
 		use_item()
 	elif event.is_action_pressed("eat_snack"):
@@ -121,7 +134,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Returns true if the hit landed (false while dead or invincible).
 func take_damage(amount: int, from_position: Vector2) -> bool:
-	if is_dead or _invincible_timer > 0.0:
+	if is_dead or is_hidden or _invincible_timer > 0.0:
 		return false
 	health = maxi(health - amount, 0)
 	health_changed.emit(health, max_health)
@@ -136,7 +149,7 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 ## Picks up count of an item. Returns how many didn't fit, so pickups can
 ## leave the rest lying where they were.
 func pick_up(item: String, count: int) -> int:
-	if is_dead:
+	if is_dead or is_hidden:
 		return count
 	if Inventory.ITEMS[item]["stack"] > 1:
 		return count - inventory.add_stackable(item, count)
@@ -231,6 +244,24 @@ func _nearest_interactable() -> Node2D:
 			best = distance
 			nearest = target
 	return nearest
+
+
+## Steps into a closet: hidden, untouchable, and out of the way.
+func hide_in(spot: HidingSpot) -> void:
+	hidden_in = spot
+	global_position = spot.base_point()
+	velocity = Vector2.ZERO
+	_knockback = Vector2.ZERO
+	collision_layer = 0
+	visible = false
+
+
+## Steps back out, optionally shoved (when chickens burst the door).
+func leave_hiding(push: Vector2) -> void:
+	hidden_in = null
+	collision_layer = 2
+	visible = true
+	_knockback = push
 
 
 ## Stops all player control, e.g. when the level is won.

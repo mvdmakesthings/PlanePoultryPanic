@@ -50,7 +50,8 @@ func _physics_process(delta: float) -> void:
 			return
 
 	var player := get_tree().get_first_node_in_group("player") as Player
-	if player and not player.is_dead and global_position.distance_to(player.global_position) < 7.0:
+	if player and not player.is_dead and not player.is_hidden \
+			and global_position.distance_to(player.global_position) < 7.0:
 		player.take_damage(damage, global_position - direction * 8.0)
 		_splat()
 

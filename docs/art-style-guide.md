@@ -256,6 +256,8 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`ice_block.png`**: one 16x16 ice-block outline drawn over a frozen chicken, which is also tinted icy blue. The outline is the shape cue, so freezing reads without relying on color.
 
+**`closet_door.png`**: two 16x30 frames of the supply closet door on the wall face: closed, then open with a mop inside.
+
 **`feather_poof.png`**: six 24x24 frames of a defeated chicken bursting into feathers. Play once at 12 FPS.
 
 **`carousel.png`**: modular baggage carousel, 16x16 tiles. Rows are pieces; columns are 4 animation frames of the belt moving clockwise (play at about 8 FPS so the slats creep along).

@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/hiding_spot.gd" id="1_spot"]
+[ext_resource type="Texture2D" path="res://assets/sprites/closet_door.png" id="2_texture"]
+
+[node name="HidingSpot" type="Node2D"]
+script = ExtResource("1_spot")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_texture")
+centered = false
+hframes = 2

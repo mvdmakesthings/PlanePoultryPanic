@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/luggage_cart.tscn" id="7_cart"]
 [ext_resource type="PackedScene" path="res://scenes/objects/gate_door.tscn" id="8_gate"]
 [ext_resource type="PackedScene" path="res://scenes/objects/extinguisher_cabinet.tscn" id="9_cabinet"]
+[ext_resource type="PackedScene" path="res://scenes/objects/hiding_spot.tscn" id="10_closet"]
 
 [node name="PrototypeRoom" type="Node2D"]
 script = ExtResource("1_room")
@@ -22,6 +23,9 @@ position = Vector2(400, 32)
 
 [node name="ExtinguisherCabinet" parent="." instance=ExtResource("9_cabinet")]
 position = Vector2(184, 40)
+
+[node name="SupplyCloset" parent="." instance=ExtResource("10_closet")]
+position = Vector2(64, 34)
 
 [node name="Entities" type="Node2D" parent="."]
 y_sort_enabled = true

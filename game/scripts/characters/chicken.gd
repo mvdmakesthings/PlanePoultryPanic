@@ -11,7 +11,7 @@ extends CharacterBody2D
 ## Emitted just before a defeated chicken is removed.
 signal defeated
 
-enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL }
+enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL, BESIEGE }
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
@@ -101,6 +101,8 @@ var _hop_ready_in := 0.0
 var _egg_ready_in := 0.0
 var _slide_velocity := Vector2.ZERO
 var _recoil_velocity := Vector2.ZERO
+var _siege_spot: HidingSpot = null
+var _siege_offset := 0.0
 var _show_prompt := false
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -153,6 +155,8 @@ func _physics_process(delta: float) -> void:
 				_frozen()
 			State.RECOIL:
 				_recoil()
+			State.BESIEGE:
+				_besiege()
 		velocity += Carousel.push_for(get_tree(), global_position)
 	move_and_slide()
 	if not _is_hopping() and Carousel.in_any_chute(get_tree(), global_position):
@@ -172,6 +176,22 @@ func _physics_process(delta: float) -> void:
 func alert() -> void:
 	if state in [State.WANDER, State.SEEK_MUSHROOM]:
 		_start_pursuit(false)
+
+
+## The player hid in a closet. A chicken that was chasing them saw it, and
+## goes to wait outside the door and peck at it.
+func besiege(spot: HidingSpot) -> void:
+	if state not in [State.PURSUE, State.WINDUP]:
+		return
+	state = State.BESIEGE
+	_siege_spot = spot
+	_siege_offset = randf_range(-8.0, 8.0)
+
+
+## True while standing at that closet's door, pecking at it.
+func is_pecking_door(spot: HidingSpot) -> bool:
+	return state == State.BESIEGE and _siege_spot == spot \
+		and global_position.distance_to(_siege_target()) < 6.0
 
 
 ## Freezes the chicken solid. Frozen chickens can't move or peck, but the
@@ -330,6 +350,23 @@ func _check_ice_hits() -> void:
 			return
 
 
+func _besiege() -> void:
+	if not is_instance_valid(_siege_spot) or not _siege_spot.is_occupied():
+		# The player came out (or was thrown out): back to the chase.
+		_start_pursuit(false)
+		return
+	var target := _siege_target()
+	if global_position.distance_to(target) < 4.0:
+		velocity = Vector2.ZERO
+		_facing = Vector2.UP
+		return
+	velocity = _direction_toward(target) * pursue_speed
+
+
+func _siege_target() -> Vector2:
+	return _siege_spot.base_point() + Vector2(_siege_offset, 2.0)
+
+
 func _recoil() -> void:
 	_recoil_velocity = _recoil_velocity.move_toward(Vector2.ZERO, recoil_friction * get_physics_process_delta_time())
 	velocity = _recoil_velocity
@@ -453,7 +490,7 @@ func _try_seek_mushroom() -> void:
 
 
 func _can_see_player() -> bool:
-	if _player == null or _player.is_dead:
+	if _player == null or _player.is_dead or _player.is_hidden:
 		return false
 	var reach := sight_range
 	if power == "rage":

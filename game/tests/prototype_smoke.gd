@@ -104,6 +104,7 @@ func _ready() -> void:
 	await _extinguisher_tests()
 	await _recoil_test()
 	await _inventory_tests()
+	await _hiding_tests()
 
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
@@ -435,6 +436,45 @@ func _inventory_tests() -> void:
 	player.global_position = room.get_node("ExtinguisherCabinet").base_point() + Vector2(0, 4)
 	await get_tree().physics_frame
 	_check(not room.get_node("ExtinguisherCabinet").can_interact(player), "a full inventory can't take an extinguisher")
+	room.queue_free()
+
+
+## Hiding in the supply closet (door base at about (72, 68)).
+func _hiding_tests() -> void:
+	# A wandering chicken that didn't see the player go in can't find them,
+	# and Interact again steps back out.
+	var setup := await _fresh_room(Vector2(300, 250), Vector2(72, 72))
+	var room: Node = setup[0]
+	var chicken: Chicken = setup[1]
+	var player: Player = setup[2]
+	chicken.state = Chicken.State.WANDER
+	_tap("interact")
+	await get_tree().physics_frame
+	_check(player.is_hidden and not player.visible, "Interact at the closet hides the player")
+	_check(not player.take_damage(Player.SUITCASE, player.global_position), "a hidden player can't be hurt")
+	await _wait(0.5)
+	_check(chicken.state != Chicken.State.BESIEGE and not chicken._can_see_player(),
+		"chickens that didn't see the player hide can't find them")
+	_tap("interact")
+	await get_tree().physics_frame
+	_check(not player.is_hidden and player.visible, "Interact again steps out of the closet")
+	room.queue_free()
+
+	# A chicken that was chasing waits at the door and pecks until it bursts.
+	setup = await _fresh_room(Vector2(72, 120), Vector2(72, 72))
+	room = setup[0]
+	chicken = setup[1]
+	player = setup[2]
+	var closet: HidingSpot = room.get_node("SupplyCloset")
+	_tap("interact")
+	await get_tree().physics_frame
+	_check(chicken.state == Chicken.State.BESIEGE, "a chicken that was chasing besieges the closet")
+	await _wait(2.0)
+	_check(chicken.is_pecking_door(closet) and player.is_hidden, "the besieging chicken pecks at the door")
+	await _wait(closet.break_time)
+	print("after the siege, player hidden: %s at %s" % [player.is_hidden, player.global_position])
+	_check(not player.is_hidden and player.global_position.y > 75.0, "enough pecking bursts the door and throws the player out")
+	_check(not closet.can_interact(player), "a burst closet can't be used again right away")
 	room.queue_free()
 
 

@@ -15,6 +15,7 @@ from PIL import Image
 
 import carousel
 import chicken
+import closet
 import effects
 import gate
 import items
@@ -56,6 +57,7 @@ IMAGES = [
     ("ice_block.png", items.ice),
     ("feather_poof.png", effects.poof),
     ("gate_door.png", gate.sheet),
+    ("closet_door.png", closet.sheet),
 ]
 
 
