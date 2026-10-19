@@ -231,7 +231,9 @@ func _cart_tests() -> void:
 	cart.position = Vector2(203, 226)
 	setup[0].get_node("Entities").add_child(cart)
 	chicken.power_up("egg")
-	chicken.egg_keep_distance = 0.0  # stand still and keep shooting
+	# Pin the shooter in place, so it can't walk around the cart for a clear
+	# shot; this test is about the cart blocking eggs.
+	chicken.pursue_speed = 0.0
 	await _wait(4.0)
 	print("player behind the cart has %d/%d health" % [player.health, player.max_health])
 	_check(player.health == player.max_health, "eggs splat on a cart the player hides behind")
