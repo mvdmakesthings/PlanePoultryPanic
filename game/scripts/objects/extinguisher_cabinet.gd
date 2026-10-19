@@ -5,10 +5,6 @@ extends Node2D
 ## on the wall face.
 
 const SIZE := Vector2(16, 20)
-const PROMPT := "F take"
-const PROMPT_WIDTH := 48.0
-const PROMPT_COLOR := Color("ffffff")
-const PROMPT_OUTLINE := Color("181425")
 
 @export var charges := 3
 ## How close the player's feet must be to the wall below the cabinet.
@@ -52,7 +48,4 @@ func interact(player: Player) -> void:
 
 func _draw() -> void:
 	if _show_prompt:
-		var font := ThemeDB.fallback_font
-		var pos := Vector2(SIZE.x / 2.0 - PROMPT_WIDTH / 2.0, -3)
-		draw_string_outline(font, pos, PROMPT, HORIZONTAL_ALIGNMENT_CENTER, PROMPT_WIDTH, 8, 2, PROMPT_OUTLINE)
-		draw_string(font, pos, PROMPT, HORIZONTAL_ALIGNMENT_CENTER, PROMPT_WIDTH, 8, PROMPT_COLOR)
+		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "F take")

@@ -5,10 +5,6 @@ extends CharacterBody2D
 ## feathers. Carts also block eggs and line of sight, so they work as cover.
 
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
-const PROMPT_COLOR := Color("ffffff")
-const PROMPT_OUTLINE := Color("181425")
-const PROMPT := "F push"
-const PROMPT_WIDTH := 48.0
 
 ## Speed right after a shove, in pixels per second.
 @export var shove_speed := 190.0
@@ -94,8 +90,4 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, 11.0, SHADOW_COLOR)
 	draw_set_transform(Vector2.ZERO)
 	if _show_prompt:
-		var font := ThemeDB.fallback_font
-		# Centered in a box wide enough for the whole prompt.
-		var pos := Vector2(-PROMPT_WIDTH / 2.0, -24)
-		draw_string_outline(font, pos, PROMPT, HORIZONTAL_ALIGNMENT_CENTER, PROMPT_WIDTH, 8, 2, PROMPT_OUTLINE)
-		draw_string(font, pos, PROMPT, HORIZONTAL_ALIGNMENT_CENTER, PROMPT_WIDTH, 8, PROMPT_COLOR)
+		InteractPrompt.draw(self, 0.0, -24.0, "F push")
