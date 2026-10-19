@@ -53,7 +53,10 @@ const POWER_WARNING_TIME := 3.0
 ## Longest a chicken that gave up spends walking briskly away from the door.
 @export var retreat_time := 3.0
 ## How far from the door it heads when it gives up (beyond sight range).
-@export var retreat_distance := 110.0
+@export var retreat_distance := 140.0
+## After giving up, it ignores the player this long beyond the retreat, so a
+## player stepping out of hiding has time to slip away.
+@export var lost_interest_time := 3.0
 
 @export_group("Mushrooms")
 @export var mushroom_notice_range := 112.0
@@ -113,6 +116,7 @@ var _siege_offset := 0.0
 var _siege_time := 0.0
 var _retreat_left := 0.0
 var _retreat_target := Vector2.ZERO
+var _uninterested_left := 0.0
 var _show_prompt := false
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -142,6 +146,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_timer -= delta
 	_retreat_left -= delta
+	_uninterested_left -= delta
 	_egg_ready_in -= delta
 	_hop_ready_in -= delta
 	_update_power(delta)
@@ -392,19 +397,35 @@ func _give_up_siege() -> void:
 	_wander_dir = Vector2.ZERO
 	_timer = retreat_time
 	_retreat_left = retreat_time
-	# Head somewhere walkable well away from the door and off any carousel
-	# belt, routing around furniture on the way.
+	_uninterested_left = retreat_time + lost_interest_time
+	# Head well away from the door along a clear straight line: no walls,
+	# furniture, or carousel belt anywhere on the way. Prefer heading into
+	# the room, then along the wall either side.
 	var door := _siege_spot.base_point()
-	var map := get_world_2d().navigation_map
-	var angles := [90.0, 60.0, 120.0, 30.0, 150.0, 0.0, 180.0]
 	var offset := randf_range(-15.0, 15.0)
-	_retreat_target = door + Vector2.DOWN * retreat_distance
-	for angle: float in angles:
-		var spot := NavigationServer2D.map_get_closest_point(
-			map, door + Vector2.from_angle(deg_to_rad(angle + offset)) * retreat_distance)
-		if spot.distance_to(door) > sight_range and Carousel.push_for(get_tree(), spot) == Vector2.ZERO:
-			_retreat_target = spot
-			break
+	_retreat_target = door
+	for angle: float in [90.0, 60.0, 120.0, 30.0, 150.0, 10.0, 170.0]:
+		for distance: float in [retreat_distance, retreat_distance * 0.75]:
+			var spot := door + Vector2.from_angle(deg_to_rad(angle + offset)) * distance
+			if distance > sight_range and _clear_walk(door, spot):
+				_retreat_target = spot
+				_retreat_left = distance / pursue_speed + 0.5
+				_uninterested_left = _retreat_left + lost_interest_time
+				return
+
+
+## True if a chicken could walk straight from a to b: on walkable floor the
+## whole way, with no carousel belt to get carried off by.
+func _clear_walk(a: Vector2, b: Vector2) -> bool:
+	var map := get_world_2d().navigation_map
+	var steps := int(a.distance_to(b) / 6.0)
+	for i in range(1, steps + 1):
+		var p := a.lerp(b, float(i) / steps)
+		if NavigationServer2D.map_get_closest_point(map, p).distance_to(p) > 1.0:
+			return false
+		if Carousel.push_for(get_tree(), p) != Vector2.ZERO:
+			return false
+	return true
 
 
 func _siege_target() -> Vector2:
@@ -534,7 +555,7 @@ func _try_seek_mushroom() -> void:
 
 
 func _can_see_player() -> bool:
-	if _player == null or _player.is_dead or _player.is_hidden:
+	if _player == null or _player.is_dead or _player.is_hidden or _uninterested_left > 0.0:
 		return false
 	var reach := sight_range
 	if power == "rage":

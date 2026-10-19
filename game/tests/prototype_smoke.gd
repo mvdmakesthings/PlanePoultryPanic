@@ -469,15 +469,23 @@ func _hiding_tests() -> void:
 	var closet: HidingSpot = room.get_node("SupplyCloset")
 	_tap("interact")
 	await get_tree().physics_frame
+	print("on hiding, the chaser is in state %d at %s" % [chicken.state, chicken.global_position])
 	_check(chicken.state == Chicken.State.BESIEGE, "a chicken that was chasing besieges the closet")
 	await _wait(2.0)
 	_check(chicken.is_pecking_door(closet) and player.is_hidden, "the besieging chicken pecks at the door")
 	await _wait(chicken.siege_patience + chicken.retreat_time)
+	if not is_instance_valid(chicken):
+		_check(false, "the chicken survives walking away from the closet")
+		room.queue_free()
+		return
 	var distance := chicken.global_position.distance_to(closet.base_point())
 	print("after giving up, the chicken is %.0f px from the door" % distance)
 	_check(player.is_hidden and distance > chicken.sight_range, "a besieging chicken gives up and walks out of sight")
 	_tap("interact")
 	await _wait(0.5)
+	if is_instance_valid(chicken):
+		print("after coming out, player at %s, chicken in state %d at %s" % [
+			player.global_position, chicken.state, chicken.global_position])
 	_check(not player.is_hidden and is_instance_valid(chicken) and chicken.state != Chicken.State.PURSUE,
 		"the player comes out safely once it's gone")
 	room.queue_free()

@@ -123,7 +123,7 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 Eating a snack restores one whole suitcase. Snacks are the only way to heal, so every snack is a choice between healing now and distracting chickens later.
 
 ### Hiding
-Bathroom stalls and supply closets are hiding spots. Press Interact at the door to slip inside and again to come out. While hidden, the player can't be hurt and chickens lose track of them. Chickens that were chasing the player when they went in wait outside and peck at the door, which shakes. After about 5 seconds they give up and walk off out of sight, so hiding is a real way to shake pursuers: once the door stops shaking, it's safe to come out.
+Bathroom stalls and supply closets are hiding spots. Press Interact at the door to slip inside and again to come out. While hidden, the player can't be hurt and chickens lose track of them. Chickens that were chasing the player when they went in wait outside and peck at the door, which shakes. After about 5 seconds they give up, walk off out of sight along a clear path, and ignore the player for a few more seconds, so hiding is a real way to shake pursuers: once the door stops shaking, it's safe to come out.
 
 ---
 
