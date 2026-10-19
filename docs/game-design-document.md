@@ -117,6 +117,7 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 ### Damage
 - Chicken pecks and environmental hazards cost a whole suitcase. Eggs only sting: a quarter of a suitcase each, shown as a partly emptied icon.
 - After a hit, the player is briefly knocked back and is invincible for 1.5 seconds (the sprite blinks).
+- A chicken that lands a peck bounces back about two tiles and is dazed for a moment before chasing again, so the player has a chance to run.
 
 ### Healing
 Eating a snack restores one whole suitcase. Snacks are the only way to heal, so every snack is a choice between healing now and distracting chickens later.

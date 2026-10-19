@@ -102,6 +102,7 @@ func _ready() -> void:
 	await _cornered_cart_test()
 	await _gate_test()
 	await _extinguisher_tests()
+	await _recoil_test()
 
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
@@ -373,6 +374,21 @@ func _extinguisher_tests() -> void:
 	chicken.freeze(4.0)
 	await _wait(2.0)
 	_check(defeated[0], "a frozen chicken on the belt rides into the chute")
+	setup[0].queue_free()
+
+
+## A chicken that lands a peck bounces back and is dazed for a moment.
+func _recoil_test() -> void:
+	var setup := await _fresh_room(Vector2(244, 200), Vector2(232, 200))
+	var chicken: Chicken = setup[1]
+	var player: Player = setup[2]
+	await _wait(0.5)
+	var distance := chicken.global_position.distance_to(player.global_position)
+	print("chicken bounced back to %.0f px after pecking" % distance)
+	_check(player.health == player.max_health - Player.SUITCASE, "the chicken lands one peck")
+	_check(distance >= 24.0, "a chicken bounces back after pecking")
+	await _wait(0.8)
+	_check(chicken.state == Chicken.State.PURSUE, "a dazed chicken resumes the chase")
 	setup[0].queue_free()
 
 

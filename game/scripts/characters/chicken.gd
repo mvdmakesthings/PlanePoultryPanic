@@ -11,7 +11,7 @@ extends CharacterBody2D
 ## Emitted just before a defeated chicken is removed.
 signal defeated
 
-enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN }
+enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL }
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
@@ -42,6 +42,11 @@ const POWER_WARNING_TIME := 3.0
 @export var alert_radius := 48.0
 @export var snack_notice_range := 100.0
 @export var eat_time := 2.5
+## After a peck lands, the chicken bounces back about two tiles and stays
+## dazed briefly, giving the player a chance to run.
+@export var recoil_speed := 180.0
+@export var recoil_friction := 500.0
+@export var daze_time := 0.8
 
 @export_group("Mushrooms")
 @export var mushroom_notice_range := 112.0
@@ -95,6 +100,7 @@ var _hop_start := Vector2.ZERO
 var _hop_ready_in := 0.0
 var _egg_ready_in := 0.0
 var _slide_velocity := Vector2.ZERO
+var _recoil_velocity := Vector2.ZERO
 var _show_prompt := false
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -145,6 +151,8 @@ func _physics_process(delta: float) -> void:
 				_windup()
 			State.FROZEN:
 				_frozen()
+			State.RECOIL:
+				_recoil()
 		velocity += Carousel.push_for(get_tree(), global_position)
 	move_and_slide()
 	if not _is_hopping() and Carousel.in_any_chute(get_tree(), global_position):
@@ -322,6 +330,14 @@ func _check_ice_hits() -> void:
 			return
 
 
+func _recoil() -> void:
+	_recoil_velocity = _recoil_velocity.move_toward(Vector2.ZERO, recoil_friction * get_physics_process_delta_time())
+	velocity = _recoil_velocity
+	if _timer <= 0.0:
+		_recoil_velocity = Vector2.ZERO
+		_start_pursuit(false)
+
+
 func _windup() -> void:
 	velocity = Vector2.ZERO
 	_facing = global_position.direction_to(_player.global_position)
@@ -463,11 +479,15 @@ func _start_pursuit(alert_others: bool) -> void:
 
 
 func _check_hit() -> void:
-	if state in [State.EATING, State.FEEDING, State.FROZEN] or _is_hopping():
+	if state in [State.EATING, State.FEEDING, State.FROZEN, State.RECOIL] or _is_hopping():
 		return
 	for body in _hitbox.get_overlapping_bodies():
-		if body is Player:
-			(body as Player).take_damage(Player.SUITCASE, global_position)
+		if body is Player and (body as Player).take_damage(Player.SUITCASE, global_position):
+			# Bounce back off the player and stay dazed for a moment.
+			state = State.RECOIL
+			_timer = daze_time
+			_recoil_velocity = body.global_position.direction_to(global_position) * recoil_speed
+			return
 
 
 func _update_visuals() -> void:

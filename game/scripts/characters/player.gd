@@ -108,9 +108,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		spray()
 
 
-func take_damage(amount: int, from_position: Vector2) -> void:
+## Returns true if the hit landed (false while dead or invincible).
+func take_damage(amount: int, from_position: Vector2) -> bool:
 	if is_dead or _invincible_timer > 0.0:
-		return
+		return false
 	health = maxi(health - amount, 0)
 	health_changed.emit(health, max_health)
 	_knockback = (global_position - from_position).normalized() * knockback_strength
@@ -118,6 +119,7 @@ func take_damage(amount: int, from_position: Vector2) -> void:
 		_die()
 	else:
 		_invincible_timer = invincibility_time
+	return true
 
 
 ## Returns false when the snack bag is full, so the pickup stays in the world.
