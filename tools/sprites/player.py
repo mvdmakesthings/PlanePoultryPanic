@@ -336,6 +336,99 @@ def run_cycle():
     }
 
 
+# ---------- messy hair ----------
+# Her hair gets messier as she loses health. Flyaway strands are an overlay
+# drawn over whatever animation is playing, so every sheet stays tidy and
+# only this one small sheet changes with health. Each overlay frame is
+# 24x20 and lines up with the top-left of a 16x32 player frame moved 4px
+# up and left (MESS_MARGIN), so strands can poke out above and beside the
+# head. The game lines it up with the head in each frame by finding the top
+# of the head (the first opaque row), so it follows bobbing and breathing.
+
+MESS_SIZE = (24, 20)
+MESS_MARGIN = 4
+MESS_LEVELS = 3
+
+# Tufts per view, added on top of the previous level's. Each tuft is a root
+# pixel on the head's outline followed by the pixels it puffs out through,
+# in player-frame coordinates (they may go above or beside the frame).
+# A tuft marked "lock" hangs inside the head instead (over the face).
+HAIR_STRANDS = {
+    "down": [
+        # 1: a cowlick curling off the crown, a kink at one side.
+        [[(8, 0), (8, -1), (9, -1), (9, -2)], [(14, 7), (15, 7), (15, 8)]],
+        # 2: tufts puffing out at the top left and both sides.
+        [[(5, 0), (5, -1), (4, -1), (4, 0)], [(1, 6), (0, 6), (0, 7), (-1, 7)],
+         [(14, 10), (15, 10), (15, 11), (16, 11)]],
+        # 3: frizz all round, and a lock fallen over the face.
+        [[(10, 0), (10, -1), (11, -1), (11, -2), (12, -2)], [(3, 1), (2, 1), (2, 0), (1, 0)],
+         [(1, 4), (0, 4), (0, 3), (-1, 3)], [(14, 5), (15, 5), (15, 4), (16, 4)],
+         ["lock", (6, 5), (6, 6)]],
+    ],
+    "up": [
+        [[(7, 0), (7, -1), (6, -1), (6, -2)], [(1, 7), (0, 7), (0, 8)]],
+        [[(10, 0), (10, -1), (11, -1), (11, 0)], [(14, 6), (15, 6), (15, 5), (16, 5)],
+         [(1, 10), (0, 10), (0, 11), (-1, 11)]],
+        [[(5, 0), (5, -1), (4, -1), (4, -2), (3, -2)], [(12, 1), (13, 1), (13, 0), (14, 0)],
+         [(14, 9), (15, 9), (15, 10), (16, 10)], [(1, 4), (0, 4), (0, 3), (-1, 3)],
+         ["lock", (6, 6), (7, 7), (7, 8)]],
+    ],
+    "right": [
+        [[(8, 0), (8, -1), (7, -1), (7, -2)], [(2, 7), (1, 7), (1, 8)]],
+        [[(5, 1), (5, 0), (4, 0), (4, -1)], [(2, 9), (1, 9), (1, 10), (0, 10)]],
+        [[(10, 0), (10, -1), (11, -1), (11, -2), (12, -2)], [(3, 2), (2, 2), (2, 1), (1, 1)],
+         [(2, 4), (1, 4), (1, 5), (0, 5)], [(13, 3), (14, 3), (14, 2)],
+         ["lock", (6, 4), (7, 5)]],
+    ],
+}
+
+
+def _hair_mess(base, strands_by_level, level):
+    """One overlay frame: strands up to level, outlined, on a clear canvas."""
+    w, h = MESS_SIZE
+    m = MESS_MARGIN
+    solid = lambda x, y: 0 <= x < 16 and 0 <= y < 32 and base[y][x] != "."
+    g = ["." * w for _ in range(h)]
+    hair = set()
+    for strands in strands_by_level[:level]:
+        for strand in strands:
+            if strand[0] == "lock":
+                for i, (x, y) in enumerate(strand[1:]):
+                    put(g, y + m, x + m, "d" if i else "H")
+                continue
+            for i, (x, y) in enumerate(strand):
+                put(g, y + m, x + m, "H")
+                hair.add((x, y))
+    # Outline the strands where they stick out past the head.
+    for x, y in hair:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx, ny = x + dx, y + dy
+            if (nx, ny) in hair or solid(nx, ny):
+                continue
+            if 0 <= nx + m < w and 0 <= ny + m < h:
+                put(g, ny + m, nx + m, "O")
+    return g
+
+
+def hair_mess_sheet():
+    """Rows are directions (down, up, right, left); columns are mess levels 1-3."""
+    from PIL import Image
+    from palette import to_image
+    w, h = MESS_SIZE
+    out = Image.new("RGBA", (w * MESS_LEVELS, h * 4), (0, 0, 0, 0))
+    views = {"down": FRONT, "up": BACK, "right": SIDE}
+    for row, direction in enumerate(("down", "up", "right", "left")):
+        view = "right" if direction == "left" else direction
+        for level in range(1, MESS_LEVELS + 1):
+            g = _hair_mess(views[view], HAIR_STRANDS[view], level)
+            if direction == "left":
+                # The margins are equal on both sides, so flipping the whole
+                # overlay mirrors it around the player frame too.
+                g = mirror(g)
+            out.alpha_composite(to_image(g), ((level - 1) * w, row * h))
+    return out
+
+
 # ---------- holding the fire extinguisher ----------
 
 # A small extinguisher carried by its handle: 5x8.

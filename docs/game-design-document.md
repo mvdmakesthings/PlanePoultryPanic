@@ -117,6 +117,7 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 ### Damage
 - Chicken pecks cost half a suitcase, so it takes 10 pecks to lose all 5. Environmental hazards cost a whole suitcase. Eggs only sting: a quarter of a suitcase each. A partly lost suitcase is shown as a partly emptied icon.
 - After a hit, the player is briefly knocked back and is invincible for 1.5 seconds (the sprite blinks).
+- Her hair gets messier as she loses health: a cowlick below 75%, puffed-out tufts below 50%, and wild frizz with a lock over her face below 25%. Healing tidies it again. It shows how hurt she is at a glance, without looking at the HUD.
 - A chicken that lands a peck bounces back about two tiles and is dazed for a moment before chasing again, so the player has a chance to run.
 
 ### Healing
@@ -467,3 +468,4 @@ game/
 | 2026-10-19 | Rolling suitcases can be carried overhead and thrown; a hit defeats the chicken | You |
 | 2026-10-19 | A suitcase bursts open when it defeats a chicken (one defeat each), but a missed throw can be picked up again; carrying it slows the player and blocks running, items, and hiding | Proposed |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |
+| 2026-10-19 | The player's hair gets messier as her health drops | You |

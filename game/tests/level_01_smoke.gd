@@ -11,6 +11,7 @@ var _failures: Array[String] = []
 
 func _ready() -> void:
 	await _layout_tests()
+	await _hair_test()
 	await _critical_path_test()
 	await _chicken_path_test()
 
@@ -54,6 +55,28 @@ func _layout_tests() -> void:
 	_check(door.is_locked, "the door stays locked without the key")
 	await get_tree().physics_frame
 	_check(hud._hint.contains("staff room"), "trying the locked door hints where the key is")
+	level.queue_free()
+
+
+## Her hair gets messier as she loses health, and tidies up as she heals.
+func _hair_test() -> void:
+	var level := await _fresh_level()
+	var player: Player = level.get_node("Entities/Player")
+	_kill_chickens()
+	await get_tree().physics_frame
+	_check(player.hair_mess_level() == 0 and not player._hair.visible, "hair is tidy at full health")
+	var levels: Array[int] = []
+	for i in 4:
+		player._invincible_timer = 0.0
+		player.take_damage(Player.SUITCASE, player.global_position + Vector2.LEFT)
+		levels.append(player.hair_mess_level())
+	print("hair mess after losing 1-4 suitcases: %s" % [levels])
+	_check(levels == [0, 1, 2, 3], "hair gets messier with each suitcase lost below 75%")
+	await get_tree().physics_frame
+	_check(player._hair.visible and player._hair.frame % Player.HAIR_LEVELS == 2, "wild hair is drawn")
+	player.add_snack()
+	player.eat_snack()
+	_check(player.hair_mess_level() == 2, "eating tidies her hair a little")
 	level.queue_free()
 
 
