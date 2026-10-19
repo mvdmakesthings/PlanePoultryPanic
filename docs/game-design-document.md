@@ -171,7 +171,7 @@ Chickens that eat from a mushroom patch power up for 30-60 seconds, then return 
 |---|---|---|
 | Flight | Short hops over furniture and low obstacles | Glowing teal mushroom cap, glowing wings, particle trail |
 | Rage | Faster than the player's walk, relentless chase | Red spotted mushroom cap, flames, puffed-up pose |
-| Egg Shooter | Stops and fires egg projectiles at range | Yellow mushroom cap, bulging throat, wind-up before each shot |
+| Egg Shooter | Stops and fires egg projectiles at range | Purple spotted mushroom cap, bulging throat, wind-up before each shot |
 
 Chickens head for mushroom patches when they can. Watching a patch and timing a route while the chickens around it are still normal is a core tactic.
 
@@ -449,4 +449,5 @@ game/
 | 2026-10-19 | Mushroom theme: power-ups come from mushroom patches instead of drug disposal boxes; powered chickens wear the cap of the mushroom they ate; the final totem is crowned with a giant mushroom | You |
 | 2026-10-19 | Claude's sprites are first-pass art; the creator redraws all sprites by hand once the game is done | You |
 | 2026-10-19 | Mushroom patches can be destroyed with one fire extinguisher charge | Proposed |
+| 2026-10-19 | Egg-shooter cap is purple instead of yellow, because yellow blended into the beak and legs at 16x16 | Proposed |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |

@@ -12,7 +12,7 @@ The catalyst came when a flock of free-range chickens discovered a patch of wild
 
 The mystical mushrooms triggered a mass awakening. Suddenly, chickens possessed not only sentience and intelligence, but supernatural abilities that made a mockery of their earthbound nature. They could fly, albeit briefly. They could channel their rage into devastating attacks. Most importantly, they could communicate telepathically, forming a global network of grievance against humanity’s monopoly on flight.
 
-But the magic came with a price. The effects were temporary, requiring regular “refueling” to maintain their powers. The chickens quickly learned to grow the mushrooms wherever they settled. Airports turned out to be perfect for it: warm, full of planters, spilled food, and carpet, and fresh mushrooms meant stronger powers. Each variety grants a different gift: teal glowcaps for flight, red spotted caps for rage, and yellow caps that turn a hen into an egg cannon.
+But the magic came with a price. The effects were temporary, requiring regular “refueling” to maintain their powers. The chickens quickly learned to grow the mushrooms wherever they settled. Airports turned out to be perfect for it: warm, full of planters, spilled food, and carpet, and fresh mushrooms meant stronger powers. Each variety grants a different gift: teal glowcaps for flight, red spotted caps for rage, and purple caps that turn a hen into an egg cannon.
 
 ### **The Fall of Civilization**
 

@@ -28,6 +28,9 @@ SHEETS = [
     ("player_idle.png", player.idle_cycle(), 16, 32, 2),
     ("chicken_walk.png", chicken.walk_cycle(), 16, 16, 8),
     ("chicken_idle.png", chicken.idle_cycle(), 16, 16, 4),
+    ("chicken_flight_walk.png", chicken.powered_walk("flight"), 16, 16, 8),
+    ("chicken_rage_walk.png", chicken.powered_walk("rage"), 16, 16, 10),
+    ("chicken_egg_walk.png", chicken.powered_walk("egg"), 16, 16, 8),
 ]
 
 

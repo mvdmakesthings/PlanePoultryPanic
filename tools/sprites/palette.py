@@ -33,6 +33,9 @@ PALETTE = {
     "r": "a22633",
     "Y": "feae34",
     "y": "f77622",
+    # mushroom caps and effects
+    "F": "fee761",  # light yellow
+    "q": "2ce8f5",  # supernatural teal glow
 }
 
 

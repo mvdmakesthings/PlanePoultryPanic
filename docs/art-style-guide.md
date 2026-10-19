@@ -64,7 +64,7 @@ One shared palette for the whole game. No colors outside it, ever.
 | Greens (plants, exit signs, healing) | `#265c42` `#3e8948` `#63c74d` |
 | Browns (luggage, wood, carousels) | `#3e2731` `#733e39` `#b86f50` `#c28569` |
 | Skin tones | `#e8b796` `#c28569` `#b86f50` `#733e39` |
-| Purples and pinks (the player's hair, spore effects) | `#68386c` `#b55088` `#f6757a` |
+| Purples and pinks (the player's hair, egg-shooter caps, spore effects) | `#68386c` `#b55088` `#f6757a` |
 | Light warm (chicken shading, paper) | `#ead4aa` |
 
 ### Color Rules
@@ -103,13 +103,13 @@ Every powered state has a color cue **and** a shape or animation cue, so it stil
 |---|---|---|
 | Flight | Teal glowing mushroom cap, `#2ce8f5` glow on wings | Wings spread, hovering bob, particle trail |
 | Rage | Red-and-white spotted mushroom cap, flames (`#f77622`, `#feae34`) | Puffed-up feathers, faster walk cycle, flickering flames |
-| Egg Shooter | Yellow mushroom cap (`#feae34`) | Bulging throat, wind-up squash before each shot |
+| Egg Shooter | Purple mushroom cap (`#b55088`, pink spots) | Bulging throat, wind-up squash before each shot |
 
 ### Totems
 Stacked chickens with a visible wobble. The bottom chicken looks strained, the top one looks smug. The final boss totem is taller and crowned with a giant glowing mushroom.
 
 ### Mushroom Patches
-Clusters of 3-5 mushrooms growing out of carpet, planters, and spilled food. Each patch is one variety, colored to match the cap its chickens wear: teal glowcaps (flight), red spotted caps (rage), yellow caps (egg shooter). Patches glow softly and puff spores so they're easy to spot from across a room.
+Clusters of 3-5 mushrooms growing out of carpet, planters, and spilled food. Each patch is one variety, colored to match the cap its chickens wear: teal glowcaps (flight), red spotted caps (rage), purple caps (egg shooter). Patches glow softly and puff spores so they're easy to spot from across a room.
 
 ## Animation
 
@@ -211,6 +211,11 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 | `player_idle.png` | 16x32 | 2 per direction | Breathing: the head sinks 1px on the second frame. Play slowly (about 2 FPS). |
 | `chicken_walk.png` | 16x16 | 4 per direction | Head bobs forward on side-view contact frames; front and back views waddle. |
 | `chicken_idle.png` | 16x16 | 3 per direction | Stand, dip, peck. Hold the first frame and play the peck now and then. |
+| `chicken_flight_walk.png` | 16x16 | 4 per direction | Teal glowcap, glowing wings, drifting sparkles |
+| `chicken_rage_walk.png` | 16x16 | 4 per direction | Red spotted cap, flickering flames behind the body |
+| `chicken_egg_walk.png` | 16x16 | 4 per direction | Purple spotted cap, bulging throat in side view |
+
+Powered chickens skip the side-view body bob so their caps fit inside the 16x16 frame. The cap is drawn in code over the comb, so any new chicken animation gets caps automatically.
 
 ### Import Settings (Godot)
 - Texture filter: Nearest

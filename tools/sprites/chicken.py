@@ -64,7 +64,7 @@ BACK = [
 ]
 
 
-def chicken_side_walk(base):
+def chicken_side_walk(base, bob=True):
     body = base[:14]
 
     def frame(legs, head_forward, raise_body):
@@ -83,8 +83,8 @@ def chicken_side_walk(base):
     spread_a = ["....y....Y......", "...yy....YY....."]
     spread_b = ["....Y....y......", "...YY....yy....."]
     tucked = ["......Yy........", ".....YY.yy......"]
-    return [frame(spread_a, True, False), frame(tucked, False, True),
-            frame(spread_b, True, False), frame(tucked, False, True)]
+    return [frame(spread_a, True, False), frame(tucked, False, bob),
+            frame(spread_b, True, False), frame(tucked, False, bob)]
 
 
 def chicken_waddle(base):
@@ -144,3 +144,118 @@ def idle_cycle():
         "left": [mirror(f) for f in right],
     }
 
+
+# ---------- powered-up chickens ----------
+
+# Mushroom cap, centered on the comb. X = cap, x = cap shade, S = spot.
+CAP = [
+    "..OOOO..",
+    ".OXSXXO.",
+    "OXXXXSXO",
+    "OxxxxxxO",
+]
+CAP_COLORS = {
+    "flight": {"X": "q", "x": "b", "S": "C"},
+    "rage": {"X": "R", "x": "r", "S": "C"},
+    "egg": {"X": "H", "x": "d", "S": "h"},
+}
+# Two flicker states for rage flames, drawn only behind the body.
+TAIL_FLAMES = [
+    [".Y..", ".YY.", "yYYy", "yRRy"],
+    ["..Y.", ".YY.", "yYYy", "RyyR"],
+]
+SIDE_FLAMES = [
+    [".Y.", "yYy", "RyR"],
+    ["Y..", "yYy", "yRy"],
+]
+# Flight sparkles: (row, col) per frame, drawn only on empty pixels.
+SPARKLES = [[(1, 1), (9, 15)], [(4, 0), (0, 14)], [(2, 2), (8, 15)], [(6, 0), (1, 15)]]
+
+
+def overlay(grid, sprite, top, left, behind=True):
+    """Draw sprite onto grid. With behind=True only empty pixels are filled."""
+    g = list(grid)
+    for i, text in enumerate(sprite):
+        for j, ch in enumerate(text):
+            r, c = top + i, left + j
+            if ch != "." and 0 <= r < len(g) and 0 <= c < 16 and (not behind or g[r][c] == "."):
+                put(g, r, c, ch)
+    return g
+
+
+def add_cap(grid, mode):
+    comb_rows = [r for r, row in enumerate(grid) if "R" in row]
+    top = comb_rows[0]
+    cols = [c for r in (top, top + 1) for c, ch in enumerate(grid[r]) if ch == "R"]
+    left = (min(cols) + max(cols) + 1) // 2 - 4
+    colors = CAP_COLORS[mode]
+    cap = ["".join(colors.get(ch, ch) for ch in row) for row in CAP]
+    # Clear the comb so no red shows around the cap.
+    g = [row.replace("R", ".") if r in (top, top + 1) else row for r, row in enumerate(grid)]
+    return overlay(g, cap, top - 1, left, behind=False)
+
+
+def first_filled_row(grid, col):
+    return next(r for r, row in enumerate(grid) if row[col] != ".")
+
+
+def rage(grid, i, view):
+    if view == "side":
+        return overlay(grid, TAIL_FLAMES[i % 2], first_filled_row(grid, 2) - 4, 0)
+    flame = SIDE_FLAMES[i % 2]
+    top = first_filled_row(grid, 2) - 3
+    g = overlay(grid, flame, top, 1)
+    return overlay(g, [row[::-1] for row in SIDE_FLAMES[(i + 1) % 2]], top, 12)
+
+
+def flight(grid, i, view):
+    # Only the wings glow teal.
+    if view == "side":
+        rows, cols = range(9, 12), range(4, 11)
+    else:
+        rows, cols = range(6, 12), [*range(0, 4), *range(12, 16)]
+    g = list(grid)
+    for r in rows:
+        for c in cols:
+            if g[r][c] in "Cc":
+                put(g, r, c, "q" if g[r][c] == "c" else g[r][c])
+    for r in rows:
+        for c in cols:
+            if g[r][c] == "q":
+                for nc in (c - 1, c + 1):
+                    if 0 <= nc < 16 and g[r][nc] == "C":
+                        put(g, r, nc, "q")
+                        break
+    return _sparkle(g, i)
+
+
+def _sparkle(grid, i):
+    g = list(grid)
+    for r, c in SPARKLES[i % 4]:
+        if g[r][c] == ".":
+            put(g, r, c, "q")
+    return g
+
+
+def egg(grid, i, view):
+    if view != "side":
+        return grid
+    # Bulging throat just behind the wattle.
+    wattle = [(r, row.index("R")) for r, row in enumerate(grid) if "R" in row][-1]
+    r, c = wattle
+    return overlay(grid, [".CO", "ccO", "OO."], r, c, behind=False)
+
+
+EFFECTS = {"flight": flight, "rage": rage, "egg": egg}
+
+
+def powered_walk(mode):
+    """Walk cycle for a powered chicken: mushroom cap plus the mode's effect."""
+    base = walk_cycle()
+    base["right"] = chicken_side_walk(SIDE, bob=False)
+    out = {}
+    for direction, view in (("down", "front"), ("up", "back"), ("right", "side")):
+        out[direction] = [EFFECTS[mode](add_cap(f, mode), i, view)
+                          for i, f in enumerate(base[direction])]
+    out["left"] = [mirror(f) for f in out["right"]]
+    return out
