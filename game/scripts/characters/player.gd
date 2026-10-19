@@ -49,6 +49,9 @@ var snacks: int
 var extinguisher_charges := 0
 var facing := Vector2.DOWN
 var is_dead := false
+## The closest thing Interact would use right now, or null. Only this one
+## shows its prompt, so overlapping prompts never stack up.
+var interact_target: Node2D = null
 
 var _invincible_timer := 0.0
 var _exhausted := false
@@ -87,6 +90,7 @@ func _physics_process(delta: float) -> void:
 	velocity += Carousel.push_for(get_tree(), global_position)
 	move_and_slide()
 
+	interact_target = _nearest_interactable()
 	_update_animation(input, running)
 	_update_invincibility(delta)
 
@@ -165,6 +169,12 @@ func spray() -> void:
 
 ## Uses the nearest thing in reach that can be interacted with, if any.
 func interact() -> void:
+	var target := _nearest_interactable()
+	if target:
+		target.interact(self)
+
+
+func _nearest_interactable() -> Node2D:
 	var nearest: Node2D = null
 	var best := INF
 	for node in get_tree().get_nodes_in_group("interactables"):
@@ -173,8 +183,7 @@ func interact() -> void:
 		if target.can_interact(self) and distance < best:
 			best = distance
 			nearest = target
-	if nearest:
-		nearest.interact(self)
+	return nearest
 
 
 ## Stops all player control, e.g. when the level is won.

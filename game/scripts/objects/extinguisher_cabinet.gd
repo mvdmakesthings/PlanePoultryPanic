@@ -23,7 +23,7 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Player
-	var near := player != null and can_interact(player)
+	var near := player != null and player.interact_target == self
 	if near != _show_prompt:
 		_show_prompt = near
 		queue_redraw()

@@ -501,7 +501,7 @@ func _update_visuals() -> void:
 		_sprite.position.y = -roundf(sin(t * PI) * hop_height) if t < 1.0 else -hop_height
 	_alert_label.visible = state in [State.PURSUE, State.WINDUP]
 	var frozen := state == State.FROZEN
-	var prompt := _player != null and can_interact(_player)
+	var prompt := _player != null and _player.interact_target == self
 	if prompt != _show_prompt:
 		_show_prompt = prompt
 		queue_redraw()

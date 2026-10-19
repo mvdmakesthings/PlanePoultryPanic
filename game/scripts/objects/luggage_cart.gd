@@ -36,7 +36,7 @@ func blocks_egg(pos: Vector2) -> bool:
 
 func _physics_process(delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Player
-	var near := player != null and can_interact(player) and velocity == Vector2.ZERO
+	var near := player != null and player.interact_target == self
 	if near != _show_prompt:
 		_show_prompt = near
 		queue_redraw()
@@ -56,7 +56,7 @@ func _physics_process(delta: float) -> void:
 
 
 func can_interact(player: Player) -> bool:
-	return global_position.distance_to(player.global_position) <= reach
+	return velocity == Vector2.ZERO and global_position.distance_to(player.global_position) <= reach
 
 
 func interact(player: Player) -> void:
