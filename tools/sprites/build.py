@@ -13,6 +13,7 @@ from pathlib import Path
 
 from PIL import Image
 
+import carousel
 import chicken
 import mushrooms
 import player
@@ -40,6 +41,7 @@ SHEETS = [
 IMAGES = [
     ("tiles_arrivals.png", tiles.sheet),
     ("mushroom_patch.png", mushrooms.sheet),
+    ("carousel.png", carousel.sheet),
 ]
 
 
@@ -109,10 +111,12 @@ def mock_screen():
                 name = f"{floor(col)}_{'ab'[(row * 7 + col * 3) % 2]}"
             scr.alpha_composite(to_image(t[name]), (col * 16, row * 16))
 
+    scr.alpha_composite(carousel.assemble(6, 3, 0), (32, 96))
+
     walk = chicken.walk_cycle()
     things = [
         (to_image(player.FRONT), 150, 92),
-        (to_image(walk["right"][0]), 70, 120),
+        (to_image(walk["right"][0]), 64, 93),  # riding the carousel
         (to_image(walk["left"][1]), 112, 150),
         (to_image(chicken.idle_cycle()["down"][2]), 40, 150),
         (to_image(chicken.powered_walk("flight")["left"][0]), 200, 104),
@@ -120,7 +124,7 @@ def mock_screen():
         (to_image(chicken.powered_walk("egg")["right"][2]), 190, 158),
         (to_image(mushrooms.patch("flight", 1)), 240, 84),
         (to_image(mushrooms.patch("rage", 2)), 280, 120),
-        (to_image(mushrooms.patch("egg", 0)), 30, 90),
+        (to_image(mushrooms.patch("egg", 0)), 100, 66),
     ]
     for img, x, y in sorted(things, key=lambda it: it[2] + it[0].height):
         scr.alpha_composite(floor_shadow(img.width - 2), (x + 1, y + img.height - 2))
@@ -147,6 +151,13 @@ def main():
             img.resize((img.width * 8, img.height * 8), Image.NEAREST).save(
                 args.preview / name.replace(".png", "_8x.png"))
         mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_arrivals_4x.png")
+        frames = []
+        for f in range(carousel.FRAMES):
+            img = Image.new("RGBA", (6 * 16 + 16, 4 * 16 + 16), (90, 105, 136, 255))
+            img.alpha_composite(carousel.assemble(6, 4, f), (8, 8))
+            frames.append(img.resize((img.width * 6, img.height * 6), Image.NEAREST).convert("RGB"))
+        frames[0].save(args.preview / "carousel.gif", save_all=True, append_images=frames[1:],
+                       duration=125, loop=0)
         print(f"wrote previews to {args.preview}")
 
 

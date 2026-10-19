@@ -54,7 +54,7 @@ One room, colored shapes instead of art. Goal: find out whether the core loop is
 - [x] Player sprite: idle and walk in 4 directions (run cycle comes in M4)
 - [x] Normal chicken sprite: idle and walk, plus the three powered mushroom modes
 - [x] Airport floor and wall tiles, and a mushroom patch
-- [ ] One carousel piece
+- [x] Baggage carousel (modular and animated)
 - [x] Mock screenshot at real size (320x180, shown at 4x)
 - [ ] Adjust until you're happy; update the style guide with what we learned
 

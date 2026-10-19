@@ -239,6 +239,16 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`mushroom_patch.png`**: 16x16 frames. Rows are varieties (flight, rage, egg shooter); columns are 3 frames (resting, spores rising, spores drifting higher). Loop slowly, about 3 FPS.
 
+**`carousel.png`**: modular baggage carousel, 16x16 tiles. Rows are pieces; columns are 4 animation frames of the belt moving clockwise (play at about 8 FPS so the slats creep along).
+
+| Row | Piece |
+|---|---|
+| 0-2 | `top_left`, `top`, `top_right` |
+| 3-5 | `left`, `island`, `right` |
+| 6-8 | `bottom_left`, `bottom`, `bottom_right` |
+
+Build any size of carousel (at least 2x2 tiles) as a rectangle: corners at the corners, `top` and `bottom` along the long edges, `left` and `right` along the short edges, and `island` filling the middle. The bottom pieces include the front skirt, so the carousel looks raised off the floor. Draw the carousel on a tile layer above the floor, since the outside of each corner is transparent.
+
 ### Import Settings (Godot)
 - Texture filter: Nearest
 - No mipmaps
@@ -251,6 +261,6 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 - [x] Player: idle and walk, 4 directions
 - [x] Normal chicken: idle and walk, plus all three powered modes
 - [x] Arrivals floor and wall tiles
-- [ ] One carousel piece
+- [x] Baggage carousel
 - [x] Mock screenshot at 320x180, viewed at 4x (`build.py --preview` writes `mock_arrivals_4x.png`)
 - [ ] Your sign-off, and any changes to this guide recorded
