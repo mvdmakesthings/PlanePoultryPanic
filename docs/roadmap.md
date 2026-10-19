@@ -51,7 +51,7 @@ One room, colored shapes instead of art. Goal: find out whether the core loop is
 ## M2: Style Test
 
 - [ ] Lock the palette ([art-style-guide.md](art-style-guide.md))
-- [ ] Player sprite: idle and walk in 4 directions
+- [ ] Player sprite: idle and walk in 4 directions (run cycle comes in M4)
 - [ ] Normal chicken sprite: idle and walk
 - [ ] Airport floor and wall tiles, one carousel piece
 - [ ] Mock screenshot at real size (320x180, shown at 4x)

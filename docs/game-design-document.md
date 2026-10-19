@@ -324,9 +324,9 @@ The full rules live in [art-style-guide.md](art-style-guide.md). In short:
 - **Style**: 16-bit SNES era, inspired by *Zombies Ate My Neighbors*
 - **View**: 3/4 view: floors seen from above, walls and characters seen from the front
 - **Resolution**: 320x180, scaled up by whole numbers (4x at 720p, 6x at 1080p, 4x on Steam Deck)
-- **Grid**: 16x16 tiles; player 16x24; chickens 16x16
+- **Grid**: 16x16 tiles; player 16x32; chickens 16x16
 - **Palette**: One shared 32-color palette for the whole game
-- **Who makes it**: Claude makes the in-game pixel art with the user as art director. Steam store artwork is commissioned near launch.
+- **Who makes it**: Claude makes first-pass pixel art so the game can be built and playtested. After the game is done, the creator redraws every sprite by hand at the same sizes and layouts. Store art is made or commissioned near launch.
 
 ---
 
@@ -447,4 +447,6 @@ game/
 | 2026-10-19 | Throwing aims where the player faces; no mouse aiming | Proposed |
 | 2026-10-19 | Steam first, with Steam Deck support from the start | Proposed |
 | 2026-10-19 | Mushroom theme: power-ups come from mushroom patches instead of drug disposal boxes; powered chickens wear the cap of the mushroom they ate; the final totem is crowned with a giant mushroom | You |
+| 2026-10-19 | Claude's sprites are first-pass art; the creator redraws all sprites by hand once the game is done | You |
 | 2026-10-19 | Mushroom patches can be destroyed with one fire extinguisher charge | Proposed |
+| 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |

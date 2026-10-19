@@ -8,9 +8,11 @@ The rules every piece of in-game art follows. Consistency is what makes pixel ar
 
 ## Who Makes the Art
 
-- **Claude** makes all in-game pixel art: characters, chickens, tiles, objects, effects, UI, and fonts if needed.
-- **You** are the art director. You approve the style test, give feedback ("the chicken should look dumber"), and share reference games or images you like.
-- **Commissioned**: Steam capsule images and key art, near launch. These are large illustrations, not in-game sprites, and they drive store-page clicks.
+- **First pass (now)**: Claude makes all in-game pixel art (characters, chickens, tiles, objects, effects, UI) so the game can be built and playtested with real-looking art.
+- **Final art (after the game is done)**: You redraw every sprite by hand, using Claude's sprites as templates. Keep the same frame sizes, sheet layouts, and file names, so each redrawn sheet drops straight into the game with no code changes.
+- **Art direction**: You approve the style and give feedback throughout.
+- **Store art**: Steam capsule images and key art, made by you or commissioned near launch. These are large illustrations, not in-game sprites, and they drive store-page clicks.
+- **AI disclosure**: Steam asks developers to disclose AI-generated content that ships in the game or on the store page. Check the current rules before launch, especially if any first-pass sprites are still in the game.
 
 ## Look and Feel
 
@@ -26,7 +28,7 @@ The rules every piece of in-game art follows. Consistency is what makes pixel ar
 |---|---|
 | Screen | 320x180 (20 x about 11 tiles visible) |
 | Tile | 16x16 |
-| Player | 16x24 frame |
+| Player | 16x32 frame |
 | Chicken | 16x16 frame, about 12x12 of visible bird |
 | Chicken totem | 16 px wide, each stacked chicken adds about 10 px of height |
 | Items and pickups | 8x8 or 16x16 |
@@ -86,8 +88,9 @@ One shared palette for the whole game. No colors outside it, ever.
 ## Characters
 
 ### Player
-- An ordinary, tired traveler: hoodie, backpack, messy hair. Readable as "a person" at 16x24.
-- Primary color blue (`#0099db` family), so the player stands out against the gray terminal and the white chickens.
+- Based on the creator's reference photos: shoulder-length pink hair, a heather-gray tee with a mushroom print, a blue backpack, black leggings, black boots, and tattooed forearms.
+- The pink hair (`#b55088` family) and blue backpack (`#124e89` family) are the player's signature colors. They make the player stand out against the gray terminal and the white chickens, so no other character or prop should use that pairing.
+- At 16x32, details are hinted, not drawn: tattoos are a few ink pixels on each forearm, and the shirt print is a small mushroom shape.
 
 ### Normal Chickens
 - Classic white farm hen: white body shaded with `#ead4aa`, red comb, yellow-orange beak and legs.
@@ -121,6 +124,37 @@ Clusters of 3-5 mushrooms growing out of carpet, planters, and spilled food. Eac
 
 - Favor **squash and stretch** and exaggerated poses. A few frames done well beat many stiff ones.
 - Every attack has a **wind-up frame** so the player has a chance to react.
+
+### Animation Sets
+
+Left-facing frames are mirrored from right-facing ones, so each character only needs 3 drawn directions (down, up, right).
+
+**Player**
+
+| Animation | Directions | Frames | Needed by |
+|---|---|---|---|
+| Idle | 4 | 2 | M2 style test |
+| Walk | 4 | 4 | M2 style test |
+| Run | 4 | 4 (longer stride, forward lean, hair and backpack bounce) | M4 vertical slice |
+| Throw | 4 | 3 | M4 |
+| Eat | 1 (facing down) | 3 | M4 |
+| Hurt | 4 | 1, plus blinking | M4 |
+| Defeat | 1 | 4 | M4 |
+
+Until the run cycle exists, running plays the walk cycle faster with small dust puffs at the player's heels. Running is a core mechanic tied to stamina, so it gets its own cycle before the vertical slice. That way players can see at a glance when they're spending stamina.
+
+**Chickens**
+
+| Animation | Directions | Frames | Needed by |
+|---|---|---|---|
+| Idle and peck | 4 | 3 | M2 style test |
+| Walk | 4 | 4 | M2 style test |
+| Chase (fast walk, wings out) | 4 | 4 | M4 |
+| Eat snack | 1 | 3 | M4 |
+| Flight hop | 4 | 4 | M3 risk prototypes |
+| Egg shot (wind-up and fire) | 4 | 3 | M3 |
+| Feather poof | 1 | 6 | M3 |
+| Totem stack and topple | 1 | 6 each | M3 |
 
 ## Environment
 
