@@ -328,6 +328,27 @@ func _extinguisher_tests() -> void:
 	_check(not player._sprite.animation.contains("_ext"), "an empty extinguisher is put away")
 	setup[0].queue_free()
 
+	# A frozen chicken is a block of ice the player can shove into others.
+	setup = await _fresh_room(Vector2(200, 262), Vector2(186, 262))
+	room = setup[0]
+	var ice: Chicken = setup[1]
+	player = setup[2]
+	var victim: Chicken = preload("res://scenes/characters/chicken.tscn").instantiate()
+	victim.position = Vector2(290, 262)
+	room.get_node("Entities").add_child(victim)
+	await get_tree().physics_frame
+	victim.state = Chicken.State.EATING
+	victim._timer = 5.0
+	var flattened := [false]
+	victim.defeated.connect(func() -> void: flattened[0] = true)
+	ice.freeze(4.0)
+	player.facing = Vector2.RIGHT
+	_tap("interact")
+	await _wait(1.5)
+	_check(flattened[0], "a shoved frozen chicken flattens the chicken it slides into")
+	_check(is_instance_valid(ice) and ice.state == Chicken.State.FROZEN, "the shoved ice block survives")
+	room.queue_free()
+
 	# A frozen chicken on the belt rides into the chute.
 	setup = await _fresh_room(Vector2(84, 151), Vector2(400, 290))
 	chicken = setup[1]

@@ -60,12 +60,7 @@ func can_interact(player: Player) -> bool:
 
 
 func interact(player: Player) -> void:
-	var direction := player.global_position.direction_to(global_position)
-	# Push along the player's facing when they're lined up, otherwise away
-	# from them, so a shove always moves the cart somewhere sensible.
-	if player.facing.dot(direction) > 0.3:
-		direction = player.facing
-	direction = _free_direction(direction.normalized())
+	var direction := Shove.direction_for(self, player)
 	if direction == Vector2.ZERO:
 		return
 	velocity = direction * shove_speed
@@ -73,16 +68,6 @@ func interact(player: Player) -> void:
 		_sprite.flip_h = direction.x < 0.0
 	_show_prompt = false
 	queue_redraw()
-
-
-## The shove direction, or the nearest open one if a wall is in the way:
-## sideways along the wall first, then straight back. This way a cart
-## jammed into a corner can always be worked back out.
-func _free_direction(wanted: Vector2) -> Vector2:
-	for option: Vector2 in [wanted, wanted.orthogonal(), -wanted.orthogonal(), -wanted]:
-		if not test_move(global_transform, option * 12.0):
-			return option
-	return Vector2.ZERO
 
 
 func _draw() -> void:

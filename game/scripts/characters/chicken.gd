@@ -61,6 +61,14 @@ const POWER_WARNING_TIME := 3.0
 @export var hop_cooldown := 1.6
 @export var hop_height := 10.0
 
+@export_group("Frozen")
+## A frozen chicken is a block of ice the player can shove. Ice slides
+## further than a cart, and flattens any chicken it crashes into.
+@export var ice_shove_speed := 200.0
+@export var ice_friction := 160.0
+@export var ice_lethal_speed := 60.0
+@export var ice_shove_reach := 18.0
+
 @export_group("Egg Shooter")
 @export var egg_range := 112.0
 @export var egg_windup := 0.5
@@ -86,6 +94,8 @@ var _hop_dir := Vector2.ZERO
 var _hop_start := Vector2.ZERO
 var _hop_ready_in := 0.0
 var _egg_ready_in := 0.0
+var _slide_velocity := Vector2.ZERO
+var _show_prompt := false
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
@@ -97,6 +107,7 @@ var _egg_ready_in := 0.0
 
 func _ready() -> void:
 	_player = get_tree().get_first_node_in_group("player") as Player
+	add_to_group("interactables")
 	var frames := SpriteFrames.new()
 	frames.remove_animation("default")
 	SpriteSheets.add_directional(frames, "walk", WALK_SHEET, FRAME_SIZE, 8.0)
@@ -139,6 +150,8 @@ func _physics_process(delta: float) -> void:
 	if not _is_hopping() and Carousel.in_any_chute(get_tree(), global_position):
 		defeat()
 		return
+	if state == State.FROZEN:
+		_check_ice_hits()
 	if state == State.WANDER and get_slide_collision_count() > 0:
 		_pick_wander()
 	if velocity.length() > 1.0:
@@ -162,6 +175,17 @@ func freeze(seconds: float) -> void:
 	state = State.FROZEN
 	_timer = seconds
 	velocity = Vector2.ZERO
+	_slide_velocity = Vector2.ZERO
+
+
+## Frozen chickens can be shoved like a cart.
+func can_interact(player: Player) -> bool:
+	return state == State.FROZEN and _slide_velocity == Vector2.ZERO \
+		and global_position.distance_to(player.global_position) <= ice_shove_reach
+
+
+func interact(player: Player) -> void:
+	_slide_velocity = Shove.direction_for(self, player) * ice_shove_speed
 
 
 ## Bursts into feathers and leaves the game.
@@ -275,10 +299,27 @@ func _seek_mushroom() -> void:
 
 
 func _frozen() -> void:
-	velocity = Vector2.ZERO
+	_slide_velocity = _slide_velocity.move_toward(Vector2.ZERO, ice_friction * get_physics_process_delta_time())
+	velocity = _slide_velocity
 	if _timer <= 0.0:
+		_slide_velocity = Vector2.ZERO
 		state = State.WANDER
 		_pick_wander()
+
+
+## While sliding as ice: flatten chickens in the way, and stop at walls.
+func _check_ice_hits() -> void:
+	if _slide_velocity == Vector2.ZERO:
+		return
+	var lethal := _slide_velocity.length() >= ice_lethal_speed
+	for i in get_slide_collision_count():
+		var other := get_slide_collision(i).get_collider()
+		if other is Chicken:
+			if lethal:
+				(other as Chicken).defeat()
+		else:
+			_slide_velocity = Vector2.ZERO
+			return
 
 
 func _windup() -> void:
@@ -460,6 +501,10 @@ func _update_visuals() -> void:
 		_sprite.position.y = -roundf(sin(t * PI) * hop_height) if t < 1.0 else -hop_height
 	_alert_label.visible = state in [State.PURSUE, State.WINDUP]
 	var frozen := state == State.FROZEN
+	var prompt := _player != null and can_interact(_player)
+	if prompt != _show_prompt:
+		_show_prompt = prompt
+		queue_redraw()
 	_ice.visible = frozen
 	_sprite.modulate = FROZEN_TINT if frozen else Color.WHITE
 	if frozen:
@@ -470,3 +515,6 @@ func _update_visuals() -> void:
 func _draw() -> void:
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, 0.4))
 	draw_circle(Vector2.ZERO, 5.0, SHADOW_COLOR)
+	draw_set_transform(Vector2.ZERO)
+	if _show_prompt:
+		InteractPrompt.draw(self, 0.0, -20.0, "F push")
