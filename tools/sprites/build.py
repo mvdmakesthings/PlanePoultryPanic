@@ -15,6 +15,7 @@ from PIL import Image
 
 import carousel
 import chicken
+import items
 import mushrooms
 import player
 import tiles
@@ -42,6 +43,8 @@ IMAGES = [
     ("tiles_arrivals.png", tiles.sheet),
     ("mushroom_patch.png", mushrooms.sheet),
     ("carousel.png", carousel.sheet),
+    ("item_snack.png", items.snack),
+    ("hud_luggage.png", items.luggage),
 ]
 
 
