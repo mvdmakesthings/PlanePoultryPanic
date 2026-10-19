@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/thrown_snack.gd" id="1_snack"]
+[ext_resource type="Texture2D" path="res://assets/sprites/item_snack.png" id="2_texture"]
+
+[node name="ThrownSnack" type="Node2D"]
+script = ExtResource("1_snack")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -4)
+texture = ExtResource("2_texture")

@@ -1,0 +1,57 @@
+class_name ThrownSnack
+extends Node2D
+## A thrown snack. Slides along the floor, then sits as a lure that
+## distracts nearby chickens until one eats it or it goes stale.
+
+const WORLD_LAYER := 1
+
+@export var throw_speed := 220.0
+@export var friction := 500.0
+@export var lifetime := 8.0
+
+var direction := Vector2.DOWN
+
+var _velocity: Vector2
+var _landed := false
+var _consumed := false
+
+
+func _ready() -> void:
+	_velocity = direction * throw_speed
+
+
+func _physics_process(delta: float) -> void:
+	if _landed:
+		lifetime -= delta
+		# Blink during the last two seconds so the player knows it's going stale.
+		visible = lifetime > 2.0 or int(lifetime * 8.0) % 2 == 0
+		if lifetime <= 0.0:
+			queue_free()
+		return
+	# Raycast each step so the snack stops at walls and furniture instead of
+	# sliding into them.
+	var step := _velocity * delta
+	var query := PhysicsRayQueryParameters2D.create(global_position, global_position + step, WORLD_LAYER)
+	var hit := get_world_2d().direct_space_state.intersect_ray(query)
+	if not hit.is_empty():
+		global_position = hit.position - _velocity.normalized() * 3.0
+		_land()
+		return
+	position += step
+	_velocity = _velocity.move_toward(Vector2.ZERO, friction * delta)
+	if _velocity == Vector2.ZERO:
+		_land()
+
+
+## Returns false if another chicken got here first.
+func consume() -> bool:
+	if _consumed:
+		return false
+	_consumed = true
+	queue_free()
+	return true
+
+
+func _land() -> void:
+	_landed = true
+	add_to_group("snack_lures")
