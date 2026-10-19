@@ -237,6 +237,8 @@ Sheets that aren't animations use their own layouts.
 
 A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall_face_upper`, `wall_face_lower`, then a shadow floor tile.
 
+**`mushroom_patch.png`**: 16x16 frames. Rows are varieties (flight, rage, egg shooter); columns are 3 frames (resting, spores rising, spores drifting higher). Loop slowly, about 3 FPS.
+
 ### Import Settings (Godot)
 - Texture filter: Nearest
 - No mipmaps

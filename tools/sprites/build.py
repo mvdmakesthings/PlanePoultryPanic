@@ -14,6 +14,7 @@ from pathlib import Path
 from PIL import Image
 
 import chicken
+import mushrooms
 import player
 import tiles
 from palette import to_image
@@ -38,6 +39,7 @@ SHEETS = [
 # Tile and object layouts are documented in docs/art-style-guide.md.
 IMAGES = [
     ("tiles_arrivals.png", tiles.sheet),
+    ("mushroom_patch.png", mushrooms.sheet),
 ]
 
 
