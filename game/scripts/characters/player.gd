@@ -3,7 +3,8 @@ extends CharacterBody2D
 ## The stranded passenger: 8-directional movement, stamina-limited running,
 ## luggage-icon health with invincibility frames, and a six-slot inventory.
 ## Space uses the selected item (throw a snack, spray the extinguisher), Q
-## and R switch slots, E eats a snack, and G drops the selected item.
+## and R switch slots, E eats a snack, and G drops the selected item. While
+## carrying a suitcase overhead, Space throws it and F puts it down.
 
 ## Health is counted in quarter suitcases (see SUITCASE).
 signal health_changed(current: int, maximum: int)
@@ -29,6 +30,8 @@ const SPRAY_AIM_RANGE := 64.0
 
 @export var walk_speed := 100.0
 @export var run_speed := 150.0
+## Walking speed while carrying a suitcase; running isn't possible then.
+@export var carry_speed := 75.0
 ## Health in suitcases, as shown on the HUD.
 @export var suitcases := 3
 @export var max_stamina := 100.0
@@ -61,6 +64,8 @@ var is_dead := false
 ## The closest thing Interact would use right now, or null. Only this one
 ## shows its prompt, so overlapping prompts never stack up.
 var interact_target: Node2D = null
+## The suitcase held overhead, or null.
+var carrying: Suitcase = null
 ## The closet the player is hiding in, or null.
 var hidden_in: HidingSpot = null
 var is_hidden: bool:
@@ -101,15 +106,18 @@ func _physics_process(delta: float) -> void:
 	if input != Vector2.ZERO:
 		facing = input.normalized()
 
-	var running := Input.is_action_pressed("run") and input != Vector2.ZERO and not _exhausted
+	var running := Input.is_action_pressed("run") and input != Vector2.ZERO and not _exhausted \
+		and carrying == null
 	_update_stamina(running, delta)
 
 	_knockback = _knockback.move_toward(Vector2.ZERO, knockback_decay * delta)
-	velocity = input * (run_speed if running else walk_speed) + _knockback
+	var speed := carry_speed if carrying else run_speed if running else walk_speed
+	velocity = input * speed + _knockback
 	velocity += Carousel.push_for(get_tree(), global_position)
 	move_and_slide()
 
-	interact_target = _nearest_interactable()
+	# Both hands are full while carrying, so nothing else can be used.
+	interact_target = null if carrying else _nearest_interactable()
 	_update_animation(input, running)
 	_update_invincibility(delta)
 
@@ -120,6 +128,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if is_hidden:
 		if event.is_action_pressed("interact"):
 			interact()
+		return
+	if carrying:
+		if event.is_action_pressed("use_item"):
+			throw_suitcase()
+		elif event.is_action_pressed("interact"):
+			put_down_suitcase()
 		return
 	if event.is_action_pressed("use_item"):
 		use_item()
@@ -142,6 +156,7 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 	health = maxi(health - amount, 0)
 	health_changed.emit(health, max_health)
 	_knockback = (global_position - from_position).normalized() * knockback_strength
+	put_down_suitcase()
 	if health == 0:
 		_die()
 	else:
@@ -231,6 +246,28 @@ func _spray_aim() -> Vector2:
 	return aim
 
 
+## Lifts a suitcase overhead with both hands.
+func carry(suitcase: Suitcase) -> void:
+	carrying = suitcase
+	suitcase.lift(self)
+
+
+## Throws the carried suitcase the way the player is facing.
+func throw_suitcase() -> void:
+	if carrying == null:
+		return
+	carrying.throw(facing)
+	carrying = null
+
+
+## Sets the carried suitcase down at the player's feet, if holding one.
+func put_down_suitcase() -> void:
+	if carrying == null:
+		return
+	carrying.put_down()
+	carrying = null
+
+
 ## Drops the whole selected slot on the floor just ahead, to make room.
 func drop_item() -> void:
 	var slot := inventory.remove_selected()
@@ -305,7 +342,7 @@ func _update_animation(input: Vector2, running: bool) -> void:
 	var direction := SpriteSheets.direction_name(facing)
 	var animation := "walk" if input != Vector2.ZERO else "idle"
 	# Carry the extinguisher in hand while it's the selected item.
-	if inventory.selected_item() == "extinguisher":
+	if inventory.selected_item() == "extinguisher" and carrying == null:
 		animation += "_ext"
 	animation += "_" + direction
 	if _sprite.animation != animation:

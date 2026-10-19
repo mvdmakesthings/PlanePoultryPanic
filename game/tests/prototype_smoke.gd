@@ -100,6 +100,7 @@ func _ready() -> void:
 	await _carousel_tests()
 	await _cart_tests()
 	await _cornered_cart_test()
+	await _suitcase_tests()
 	await _gate_test()
 	await _extinguisher_tests()
 	await _recoil_test()
@@ -259,6 +260,65 @@ func _cart_tests() -> void:
 	player.global_position = lure.global_position
 	await _wait(0.2)
 	_check(player.snacks == count and not is_instance_valid(lure), "walking over a thrown snack picks it back up")
+	setup[0].queue_free()
+
+
+## Suitcases: lift one with Interact, throw it with Use, and it defeats the
+## chicken it hits and bursts. A miss can be picked up again.
+func _suitcase_tests() -> void:
+	var setup := await _fresh_room(Vector2(215, 262), Vector2(150, 262))
+	var chicken: Chicken = setup[1]
+	var player: Player = setup[2]
+	chicken.state = Chicken.State.EATING
+	chicken._timer = 5.0
+	var defeated := [false]
+	chicken.defeated.connect(func() -> void: defeated[0] = true)
+	var suitcase: Suitcase = preload("res://scenes/objects/suitcase.tscn").instantiate()
+	suitcase.position = Vector2(158, 262)
+	setup[0].get_node("Entities").add_child(suitcase)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	player.facing = Vector2.RIGHT
+	_tap("interact")
+	await get_tree().physics_frame
+	_check(player.carrying == suitcase, "Interact lifts a nearby suitcase")
+	var snacks := player.snacks
+	_tap("eat_snack")
+	await _hold(["move_left", "run"], 0.3)
+	_check(player.snacks == snacks, "can't eat while carrying a suitcase")
+	_check(player.global_position.x > 150.0 - player.carry_speed * 0.3 - 2.0,
+		"carrying a suitcase blocks running")
+	_check(suitcase.global_position.distance_to(player.global_position) < 1.0, "a carried suitcase moves with the player")
+	player.facing = Vector2.RIGHT
+	_tap("use_item")
+	await _wait(0.8)
+	_check(player.carrying == null, "Use throws the carried suitcase")
+	_check(defeated[0], "a thrown suitcase defeats the chicken it hits")
+	await _wait(0.7)
+	_check(not is_instance_valid(suitcase), "a suitcase that hits a chicken bursts and is gone")
+	setup[0].queue_free()
+
+	# A miss lands and can be lifted again; taking a hit drops it.
+	setup = await _fresh_room(Vector2(440, 120), Vector2(150, 262))
+	setup[1].queue_free()
+	player = setup[2]
+	suitcase = preload("res://scenes/objects/suitcase.tscn").instantiate()
+	setup[0].get_node("Entities").add_child(suitcase)
+	player.carry(suitcase)
+	player.facing = Vector2.RIGHT
+	player.throw_suitcase()
+	await _wait(1.2)
+	print("missed suitcase landed at %s" % suitcase.global_position)
+	_check(suitcase.state == Suitcase.State.LYING and suitcase.global_position.x > 200.0,
+		"a missed throw lands a few tiles away")
+	player.global_position = suitcase.global_position + Vector2(-8, 0)
+	await get_tree().physics_frame
+	_tap("interact")
+	await get_tree().physics_frame
+	_check(player.carrying == suitcase, "a missed suitcase can be lifted again")
+	player.take_damage(1, player.global_position + Vector2.LEFT)
+	_check(player.carrying == null and suitcase.state == Suitcase.State.LYING,
+		"taking a hit drops the carried suitcase")
 	setup[0].queue_free()
 
 
