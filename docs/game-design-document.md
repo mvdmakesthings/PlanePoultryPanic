@@ -102,7 +102,7 @@ When health reaches zero, the player restarts from the last checkpoint with thei
 ## Player
 
 ### Identity
-A stranded connecting passenger. They start with a carry-on, a wallet, and an expired boarding pass from their cancelled flight.
+**Amanda**, a stranded connecting passenger. She starts with a carry-on, a wallet, and an expired boarding pass from her cancelled flight.
 
 ### Attributes
 | Attribute | Starting value |
@@ -471,4 +471,5 @@ game/
 | 2026-10-19 | A suitcase bursts open when it defeats a chicken (one defeat each), but a missed throw can be picked up again; carrying it slows the player and blocks running, items, and hiding | Proposed |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |
 | 2026-10-19 | The player's hair gets messier as her health drops | You |
+| 2026-10-19 | The player character is named Amanda (she/her) | You |
 | 2026-10-19 | Arrivals music should be energetic and dystopian, not slow and sad; until the composer's tracks arrive, the game plays no music | You |
