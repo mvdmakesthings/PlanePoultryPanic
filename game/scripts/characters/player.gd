@@ -4,6 +4,7 @@ extends CharacterBody2D
 ## luggage-icon health with invincibility frames, and snacks that either heal
 ## or get thrown to distract chickens.
 
+## Health is counted in quarter suitcases (see SUITCASE).
 signal health_changed(current: int, maximum: int)
 signal stamina_changed(current: float, maximum: float)
 signal snacks_changed(count: int)
@@ -17,11 +18,15 @@ const IDLE_SHEET := preload("res://assets/sprites/player_idle.png")
 const WALK_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_walk_extinguisher.png")
 const IDLE_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_idle_extinguisher.png")
 const FRAME_SIZE := Vector2i(16, 32)
+## Health units in one suitcase on the HUD. A chicken peck costs a whole
+## suitcase; an egg costs a single unit, a quarter of one.
+const SUITCASE := 4
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 
 @export var walk_speed := 100.0
 @export var run_speed := 150.0
-@export var max_health := 3
+## Health in suitcases, as shown on the HUD.
+@export var suitcases := 3
 @export var max_stamina := 100.0
 ## Stamina spent per second while running.
 @export var stamina_drain := 40.0
@@ -35,7 +40,9 @@ const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 @export var knockback_strength := 160.0
 @export var knockback_decay := 800.0
 
+## Current and maximum health, in quarter suitcases.
 var health: int
+var max_health: int
 var stamina: float
 var snacks: int
 ## Fire extinguisher charges left; 0 means no extinguisher.
@@ -51,6 +58,7 @@ var _knockback := Vector2.ZERO
 
 
 func _ready() -> void:
+	max_health = suitcases * SUITCASE
 	health = max_health
 	stamina = max_stamina
 	snacks = starting_snacks
@@ -132,7 +140,8 @@ func eat_snack() -> void:
 	if snacks <= 0 or health >= max_health:
 		return
 	snacks -= 1
-	health += 1
+	# A snack restores one whole suitcase.
+	health = mini(health + SUITCASE, max_health)
 	snacks_changed.emit(snacks)
 	health_changed.emit(health, max_health)
 

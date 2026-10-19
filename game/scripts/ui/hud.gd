@@ -60,10 +60,17 @@ func _on_extinguisher_changed(charges: int) -> void:
 func _draw() -> void:
 	var font := get_theme_default_font()
 
-	for i in _max_health:
-		var frame := 0 if i < _health else 1
-		var source := Rect2(Vector2(frame * LUGGAGE_SIZE.x, 0), LUGGAGE_SIZE)
-		draw_texture_rect_region(LUGGAGE, Rect2(Vector2(4 + i * 14, 4), LUGGAGE_SIZE), source)
+	# One suitcase per Player.SUITCASE health units; partly lost suitcases
+	# are drawn partly filled, emptying from the right.
+	for i in _max_health / Player.SUITCASE:
+		var pos := Vector2(4 + i * 14, 4)
+		var fill := clampi(_health - i * Player.SUITCASE, 0, Player.SUITCASE)
+		var empty := Rect2(Vector2(LUGGAGE_SIZE.x, 0), LUGGAGE_SIZE)
+		draw_texture_rect_region(LUGGAGE, Rect2(pos, LUGGAGE_SIZE), empty)
+		if fill > 0:
+			var width := roundf(LUGGAGE_SIZE.x * fill / Player.SUITCASE)
+			var full := Rect2(Vector2.ZERO, Vector2(width, LUGGAGE_SIZE.y))
+			draw_texture_rect_region(LUGGAGE, Rect2(pos, full.size), full)
 
 	var bar := Rect2(4, 16, 40, 3)
 	draw_rect(bar.grow(1), TEXT_OUTLINE)

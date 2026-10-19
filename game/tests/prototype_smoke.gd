@@ -45,14 +45,15 @@ func _ready() -> void:
 	var health_before := player.health
 	print("health before the damage check: %d/%d" % [health_before, player.max_health])
 	player.take_damage(1, player.global_position + Vector2.LEFT)
-	_check(player.health == maxi(health_before - 1, 0), "taking damage costs 1 health")
+	_check(player.health == maxi(health_before - 1, 0), "taking damage costs that much health")
 
 	if not player.is_dead:
 		player.add_snack()
 		var hurt_health := player.health
 		_tap("eat_snack")
 		await get_tree().physics_frame
-		_check(player.health == hurt_health + 1, "eating a snack heals 1")
+		_check(player.health == mini(hurt_health + Player.SUITCASE, player.max_health),
+			"eating a snack heals a whole suitcase")
 
 	# A snack thrown at the carousel must not land on the solid island, or
 	# chickens would push against it forever trying to reach the snack.
@@ -139,6 +140,7 @@ func _power_tests() -> void:
 	print("egg shooter distance: %.0f, player health %d" % [
 		chicken.global_position.distance_to(player.global_position), player.health])
 	_check(player.health < player.max_health, "egg shooter hits the player from range")
+	_check(player.health >= player.max_health - 2, "an egg costs only a quarter suitcase")
 	setup[0].queue_free()
 
 	# Flight chickens hop over the carousel instead of walking around it.

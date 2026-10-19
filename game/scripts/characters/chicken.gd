@@ -467,7 +467,7 @@ func _check_hit() -> void:
 		return
 	for body in _hitbox.get_overlapping_bodies():
 		if body is Player:
-			(body as Player).take_damage(1, global_position)
+			(body as Player).take_damage(Player.SUITCASE, global_position)
 
 
 func _update_visuals() -> void:

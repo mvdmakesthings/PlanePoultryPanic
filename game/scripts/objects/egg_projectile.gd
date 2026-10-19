@@ -11,6 +11,8 @@ const FLIGHT_HEIGHT := 10.0
 @export var speed := 140.0
 @export var max_lifetime := 2.0
 @export var splat_time := 0.5
+## Damage in quarter suitcases: an egg stings, a peck hurts four times as much.
+@export var damage := 1
 
 var direction := Vector2.RIGHT
 
@@ -49,7 +51,7 @@ func _physics_process(delta: float) -> void:
 
 	var player := get_tree().get_first_node_in_group("player") as Player
 	if player and not player.is_dead and global_position.distance_to(player.global_position) < 7.0:
-		player.take_damage(1, global_position - direction * 8.0)
+		player.take_damage(damage, global_position - direction * 8.0)
 		_splat()
 
 

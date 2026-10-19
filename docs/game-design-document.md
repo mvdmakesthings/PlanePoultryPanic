@@ -107,7 +107,7 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 ### Attributes
 | Attribute | Starting value |
 |---|---|
-| Health | 3 (shown as luggage icons) |
+| Health | 3 suitcases (luggage icons), each split into quarters |
 | Walk speed | 100 px/s |
 | Run speed | 150 px/s |
 | Stamina | Drains in about 2.5 s of running, refills in about 4 s |
@@ -115,11 +115,11 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 | Inventory | 6 slots |
 
 ### Damage
-- Chicken pecks, egg projectiles, and environmental hazards deal 1 damage each.
+- Chicken pecks and environmental hazards cost a whole suitcase. Eggs only sting: a quarter of a suitcase each, shown as a partly emptied icon.
 - After a hit, the player is briefly knocked back and is invincible for 1 second (the sprite blinks).
 
 ### Healing
-Eating a snack restores 1 health. Snacks are the only way to heal, so every snack is a choice between healing now and distracting chickens later.
+Eating a snack restores one whole suitcase. Snacks are the only way to heal, so every snack is a choice between healing now and distracting chickens later.
 
 ### Hiding
 Bathroom stalls and supply closets are hiding spots. While hidden, chickens lose track of the player. Chickens that saw the player go in will wait outside and peck at the door, so hiding buys time but isn't a permanent escape.
@@ -136,7 +136,7 @@ Bathroom stalls and supply closets are hiding spots. While hidden, chickens lose
 ### Usable Items
 | Item | Use | Notes |
 |---|---|---|
-| Snack | Eat to heal 1, or throw as a distraction. A thrown snack nobody has eaten can be picked back up. | Found in the food court, vending machines, and abandoned bags |
+| Snack | Eat to heal a whole suitcase, or throw as a distraction. A thrown snack nobody has eaten can be picked back up. | Found in the food court, vending machines, and abandoned bags |
 | Fire extinguisher | Spray a short cone of foam: chickens in it freeze in a block of ice for 4 seconds, and a mushroom patch in it is destroyed for good | 3 charges, then it's empty. Taken from red emergency cabinets on the walls. Frozen chickens can't peck, but the carousel still carries them and carts still flatten them. A frozen chicken is a block of ice: shove it with Interact and it slides further than a cart, flattening any chicken it crashes into. The player is drawn carrying the extinguisher while it has charges. |
 
 More usable items may come out of prototyping, but every new item has to earn its slot. Fewer items that each do a lot fits the game better than many small ones.
@@ -456,4 +456,5 @@ game/
 | 2026-10-19 | Style test (M2) signed off: ENDESGA 32 palette, sprite sizes, and the Arrivals look are locked | You |
 | 2026-10-19 | Luggage carts are a second way to defeat chickens, alongside the carousel chute | You |
 | 2026-10-19 | The carousel belt is walkable and carries everything; only chickens fit through the chute | Proposed |
+| 2026-10-19 | Health is tracked in quarter suitcases so eggs can deal a quarter of a peck's damage | You |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |
