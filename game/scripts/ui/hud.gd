@@ -2,7 +2,7 @@ class_name Hud
 extends Control
 ## Prototype HUD: luggage health icons and a stamina bar at the top left,
 ## the six inventory slots and key items at the bottom left, a controls
-## hint at the bottom right, and a centered message for winning or losing.
+## hint at the bottom right, and a message for winning or losing, above the player.
 
 const LUGGAGE := preload("res://assets/sprites/hud_luggage.png")
 const LUGGAGE_SIZE := Vector2(12, 10)
@@ -72,7 +72,8 @@ func _draw() -> void:
 	if _message != "":
 		draw_rect(Rect2(Vector2.ZERO, size), Color(TEXT_OUTLINE, 0.6))
 		var lines := _message.split("\n")
-		var y := size.y / 2.0 - (lines.size() - 1) * 6.0
+		# Above center, so it doesn't cover the player the camera is centered on.
+		var y := size.y / 3.0 - (lines.size() - 1) * 6.0
 		for line in lines:
 			_draw_text(font, Vector2(0, y), line, HORIZONTAL_ALIGNMENT_CENTER, size.x)
 			y += 12.0

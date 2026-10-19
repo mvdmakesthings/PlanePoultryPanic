@@ -19,7 +19,10 @@ const WALK_SHEET := preload("res://assets/sprites/player_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/player_idle.png")
 const WALK_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_walk_extinguisher.png")
 const IDLE_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_idle_extinguisher.png")
+const KO_SHEET := preload("res://assets/sprites/player_ko.png")
 const FRAME_SIZE := Vector2i(16, 32)
+## The knocked-out pose lies flat, so its frames are wide and short.
+const KO_FRAME_SIZE := Vector2i(32, 20)
 ## Health units in one suitcase on the HUD. A chicken peck costs half a
 ## suitcase (PECK); an egg costs a single unit, a quarter of one.
 const SUITCASE := 4
@@ -92,6 +95,13 @@ func _ready() -> void:
 	SpriteSheets.add_directional(frames, "idle", IDLE_SHEET, FRAME_SIZE, 2.0)
 	SpriteSheets.add_directional(frames, "walk_ext", WALK_EXTINGUISHER_SHEET, FRAME_SIZE, 8.0)
 	SpriteSheets.add_directional(frames, "idle_ext", IDLE_EXTINGUISHER_SHEET, FRAME_SIZE, 2.0)
+	frames.add_animation("ko")
+	frames.set_animation_speed("ko", 3.0)
+	for column in KO_SHEET.get_width() / KO_FRAME_SIZE.x:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = KO_SHEET
+		atlas.region = Rect2(Vector2(column * KO_FRAME_SIZE.x, 0), KO_FRAME_SIZE)
+		frames.add_frame("ko", atlas)
 	_sprite.sprite_frames = frames
 	_sprite.play("idle_down")
 	# Deferred so listeners that connect in the level's _ready get initial values.
@@ -362,8 +372,10 @@ func _update_invincibility(delta: float) -> void:
 func _die() -> void:
 	is_dead = true
 	freeze()
-	_sprite.stop()
-	modulate = Color(0.5, 0.5, 0.5)
+	# Flat on their back, centered over where they stood.
+	_sprite.offset = Vector2(0, -KO_FRAME_SIZE.y / 2.0)
+	_sprite.play("ko")
+	queue_redraw()
 	died.emit()
 
 
@@ -375,5 +387,7 @@ func _emit_state() -> void:
 
 func _draw() -> void:
 	# Soft floor shadow under the feet; the sprite draws on top of it.
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, 0.4))
+	# Lying down, the shadow stretches the length of the body.
+	var width := 2.5 if is_dead else 1.0
+	draw_set_transform(Vector2(0, -3) if is_dead else Vector2.ZERO, 0.0, Vector2(width, 0.4))
 	draw_circle(Vector2.ZERO, 6.0, SHADOW_COLOR)

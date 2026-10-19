@@ -104,6 +104,7 @@ func _ready() -> void:
 	await _gate_test()
 	await _extinguisher_tests()
 	await _recoil_test()
+	await _knockout_test()
 	await _inventory_tests()
 	await _hiding_tests()
 	await _spray_under_attack_tests()
@@ -437,6 +438,23 @@ func _extinguisher_tests() -> void:
 	chicken.freeze(4.0)
 	await _wait(2.0)
 	_check(defeated[0], "a frozen chicken on the belt rides into the chute")
+	setup[0].queue_free()
+
+
+## Ten pecks knock the player out, and they show the knocked-out pose.
+func _knockout_test() -> void:
+	var setup := await _fresh_room(Vector2(440, 120), Vector2(150, 262))
+	setup[1].queue_free()
+	var player: Player = setup[2]
+	var pecks := 0
+	while not player.is_dead and pecks < 20:
+		player._invincible_timer = 0.0
+		player.take_damage(Player.PECK, player.global_position + Vector2.LEFT)
+		pecks += 1
+	_check(pecks == 10, "ten pecks knock out a player with five suitcases")
+	await get_tree().physics_frame
+	var sprite: AnimatedSprite2D = player.get_node("AnimatedSprite2D")
+	_check(sprite.animation == "ko" and sprite.is_playing(), "a knocked-out player shows the KO pose")
 	setup[0].queue_free()
 
 
