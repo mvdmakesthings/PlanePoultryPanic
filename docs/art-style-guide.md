@@ -2,7 +2,7 @@
 
 The rules every piece of in-game art follows. Consistency is what makes pixel art look professional, so when a new sprite breaks one of these rules, either the sprite changes or the rule changes here first.
 
-**Status**: Draft. The palette and examples get locked in the M2 style test ([roadmap.md](roadmap.md)).
+**Status**: Locked. The style test ([roadmap.md](roadmap.md), M2) was signed off on 2026-10-19. New art follows these rules; changing a rule means updating this guide first.
 
 ---
 
@@ -263,4 +263,4 @@ Build any size of carousel (at least 2x2 tiles) as a rectangle: corners at the c
 - [x] Arrivals floor and wall tiles
 - [x] Baggage carousel
 - [x] Mock screenshot at 320x180, viewed at 4x (`build.py --preview` writes `mock_arrivals_4x.png`)
-- [ ] Your sign-off, and any changes to this guide recorded
+- [x] Your sign-off, and any changes to this guide recorded (2026-10-19)

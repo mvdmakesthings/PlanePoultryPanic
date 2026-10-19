@@ -450,4 +450,5 @@ game/
 | 2026-10-19 | Claude's sprites are first-pass art; the creator redraws all sprites by hand once the game is done | You |
 | 2026-10-19 | Mushroom patches can be destroyed with one fire extinguisher charge | Proposed |
 | 2026-10-19 | Egg-shooter cap is purple instead of yellow, because yellow blended into the beak and legs at 16x16 | Proposed |
+| 2026-10-19 | Style test (M2) signed off: ENDESGA 32 palette, sprite sizes, and the Arrivals look are locked | You |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |

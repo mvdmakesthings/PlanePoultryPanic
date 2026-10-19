@@ -56,7 +56,7 @@ One room, colored shapes instead of art. Goal: find out whether the core loop is
 - [x] Airport floor and wall tiles, and a mushroom patch
 - [x] Baggage carousel (modular and animated)
 - [x] Mock screenshot at real size (320x180, shown at 4x)
-- [ ] Adjust until you're happy; update the style guide with what we learned
+- [x] Adjust until you're happy; update the style guide with what we learned (signed off 2026-10-19)
 
 **Done when** the mock screenshot looks like the game you imagine.
 
