@@ -8,6 +8,9 @@
 - welcome_banner.png: a 48x18 hanging banner, "WELCOME TO BAWKSTON".
 - signs.png: 64x11 wayfinding signs for the wall face, one per frame.
 - maintenance_cart.png: a 24x24 janitor's cart, a floor prop.
+- seating.png: a 48x24 row of three airport seats, a floor prop.
+- floor_litter.png: 16x16 floor decals (feathers, pecked chips, a nest in
+  a suitcase lid, footprints) that show the chickens have moved in.
 """
 import math
 
@@ -50,6 +53,7 @@ FONT = {
     "<": ["..#", ".##", "###", ".##", "..#"],
     ">": ["#..", "##.", "###", "##.", "#.."],
     "v": ["...", "###", "###", ".#.", "..."],
+    "+": ["...", ".#.", "###", ".#.", "..."],
 }
 
 
@@ -375,6 +379,7 @@ SIGNS = [
     ("< SECURITY", "k", "F", "F"),
     ("STAFF ONLY", "r", "C", "C"),
     ("ARRIVALS >", "k", "F", "F"),
+    ("LOST+FOUND", "k", "F", "F"),
 ]
 
 
@@ -400,43 +405,139 @@ CART_W, CART_H = 24, 24
 
 
 def maintenance_cart():
-    """A janitor's cart seen from the front-left: a gray frame with a
-    yellow mop bucket on the left, a mop leaning up out of it, and a dark
-    trash bag hanging on the right. Its base (about 22x6) is the solid part."""
+    """A janitor's cart seen from the front: a yellow mop bucket with a
+    wringer and a mop standing in it on the left, a gray shelf cart with
+    spray bottles on top and a bulging trash bag on the right. Its base
+    (about 22x6) is the solid part."""
     g = _blank(CART_W, CART_H)
-    # Mop handle leaning up and to the left, with its head in the bucket.
-    for i in range(10):
-        put(g, 2 + i, 3 + i // 3, "n")
-    put(g, 2, 3, "a")
-    # Yellow bucket with a wringer on top.
-    _rect(g, 1, 11, 10, 20, "Y")
-    _rect(g, 1, 11, 10, 11, "F")
+    # Cart body: gray shelves, lit on top, shaded on the right.
+    _rect(g, 10, 7, 22, 20, "w")
+    _rect(g, 10, 7, 22, 7, "C")
+    _rect(g, 10, 8, 22, 8, "W")
+    _rect(g, 22, 8, 22, 20, "T")
+    _rect(g, 11, 13, 21, 13, "T")
+    _rect(g, 11, 14, 21, 14, "W")
+    # Supplies on the top shelf: a blue and a green spray bottle, a roll.
+    _rect(g, 12, 3, 13, 6, "b")
+    _rect(g, 12, 2, 13, 2, "C")
+    put(g, 2, 14, "C")
+    _rect(g, 15, 4, 16, 6, "l")
+    _rect(g, 15, 3, 16, 3, "C")
+    _rect(g, 18, 4, 20, 6, "C")
+    _rect(g, 20, 4, 20, 6, "W")
+    # Trash bag bulging out of the lower shelf.
+    _rect(g, 13, 15, 21, 20, "k")
+    _rect(g, 14, 15, 15, 16, "p")
+    put(g, 15, 18, "O")
+    # Mop bucket: yellow, lit on the left, with dark water and a wringer.
+    _rect(g, 1, 12, 10, 20, "Y")
+    _rect(g, 1, 12, 2, 20, "F")
     _rect(g, 9, 12, 10, 20, "y")
-    _rect(g, 2, 13, 8, 13, "y")
-    _rect(g, 3, 9, 8, 10, "T")
-    put(g, 9, 3, "w")
-    # Cart body: a gray shelf unit with a spray bottle on top.
-    _rect(g, 11, 6, 22, 20, "w")
-    _rect(g, 11, 6, 22, 6, "W")
-    _rect(g, 11, 13, 22, 13, "T")
-    _rect(g, 21, 7, 22, 20, "T")
-    _rect(g, 13, 2, 15, 5, "b")
-    _rect(g, 13, 2, 15, 2, "C")
-    put(g, 1, 14, "C")
-    # Trash bag hanging off the side.
-    _rect(g, 16, 8, 21, 12, "O")
-    _rect(g, 17, 9, 20, 11, "k")
-    put(g, 9, 17, "p")
-    # Bottom tray and wheels.
-    _rect(g, 1, 20, 22, 21, "T")
-    _rect(g, 1, 20, 22, 20, "w")
-    for x in (3, 19):
-        _rect(g, x, 22, x + 1, 22, "O")
+    _rect(g, 2, 12, 9, 12, "k")
+    _rect(g, 6, 9, 10, 12, "T")
+    _rect(g, 6, 9, 10, 9, "W")
+    # Mop: handle standing up out of the bucket, gray strands at the rim.
+    _rect(g, 4, 0, 4, 12, "n")
+    put(g, 0, 4, "a")
+    _rect(g, 2, 11, 6, 12, "W")
+    put(g, 11, 3, "C")
+    # Wheels.
+    for x in (2, 8, 12, 20):
+        _rect(g, x, 21, x + 1, 21, "p")
     return _outline(g)
 
 
 def maintenance_cart_sheet():
     return to_image(maintenance_cart())
+
+
+# --- Airport seating ------------------------------------------------------
+
+SEAT_W, SEAT_H = 48, 24
+
+
+def seating():
+    """A row of three joined airport seats facing the viewer: blue padded
+    backs and seats on a chrome beam, armrests between them. The beam's
+    feet (about 44x6) are the solid part."""
+    g = _blank(SEAT_W, SEAT_H)
+    for i in range(3):
+        x0 = 2 + i * 15
+        # Backrest, lit on its top edge, with a seam.
+        _rect(g, x0, 2, x0 + 13, 11, "B")
+        _rect(g, x0, 2, x0 + 13, 2, "b")
+        _rect(g, x0 + 13, 3, x0 + 13, 11, "k")
+        _rect(g, x0 + 2, 7, x0 + 11, 7, "k")
+        # Seat cushion seen from above, in front of the back.
+        _rect(g, x0, 12, x0 + 13, 15, "b")
+        _rect(g, x0, 15, x0 + 13, 15, "B")
+    # Chrome armrests at both ends and between seats.
+    for x in (1, 16, 31, 46):
+        _rect(g, x, 9, x, 15, "C")
+        _rect(g, x, 16, x, 16, "w")
+    # Beam and feet.
+    _rect(g, 1, 17, 46, 18, "W")
+    _rect(g, 1, 18, 46, 18, "w")
+    for x in (4, 22, 40):
+        _rect(g, x, 19, x + 2, 21, "T")
+        _rect(g, x - 1, 22, x + 3, 22, "w")
+    return _outline(g)
+
+
+def seating_sheet():
+    return to_image(seating())
+
+
+# --- Floor litter ---------------------------------------------------------
+
+LITTER = 16
+
+
+def _litter(kind):
+    """16x16 decals drawn flat on the floor, showing the chickens moved in."""
+    g = _blank(LITTER, LITTER)
+    if kind == "feathers":
+        for x, y, tip in ((3, 4, 1), (9, 2, -1), (11, 9, 1), (5, 11, -1), (13, 13, -1)):
+            put(g, y, x, "C")
+            put(g, y, x + tip, "c")
+            put(g, y + 1, x + tip, "c")
+    elif kind == "chips":
+        # A burst bag of chips, pecked clean but for crumbs.
+        _rect(g, 3, 6, 9, 10, "R")
+        _rect(g, 3, 6, 9, 6, "W")
+        _rect(g, 4, 8, 8, 8, "Y")
+        put(g, 9, 9, "r")
+        for x, y in ((11, 7), (12, 9), (10, 11), (13, 12), (7, 12)):
+            put(g, y, x, "F")
+        g = _outline(g)
+        put(g, 3, 13, "C")
+        put(g, 3, 14, "c")
+    elif kind == "nest":
+        # Straw nest in an open suitcase lid, with an egg.
+        _rect(g, 1, 5, 14, 13, "g")
+        _rect(g, 1, 13, 14, 13, "j")
+        _rect(g, 3, 6, 12, 11, "a")
+        for x, y in ((3, 7), (6, 6), (10, 7), (12, 10), (4, 11), (8, 11)):
+            put(g, y, x, "F")
+        _rect(g, 6, 7, 9, 10, "m")
+        _rect(g, 7, 8, 8, 9, "C")
+        put(g, 8, 8, "L")
+        g = _outline(g)
+    elif kind == "footprints":
+        # A trail of chicken footprints.
+        for x, y in ((2, 12), (6, 9), (10, 7), (13, 3)):
+            put(g, y, x, "T")
+            put(g, y - 1, x - 1, "T")
+            put(g, y - 1, x + 1, "T")
+            put(g, y - 2, x, "T")
+    return g
+
+
+LITTER_KINDS = ("feathers", "chips", "nest", "footprints")
+
+
+def litter_sheet():
+    return _strip([_litter(k) for k in LITTER_KINDS], LITTER, LITTER)
 
 
 # --- Preview --------------------------------------------------------------

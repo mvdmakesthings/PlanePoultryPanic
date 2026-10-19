@@ -75,6 +75,8 @@ IMAGES = [
     ("security_door.png", security_door.sheet),
     ("signs.png", set_dressing.signs_sheet),
     ("maintenance_cart.png", set_dressing.maintenance_cart_sheet),
+    ("seating.png", set_dressing.seating_sheet),
+    ("floor_litter.png", set_dressing.litter_sheet),
 ]
 
 
