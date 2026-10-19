@@ -55,3 +55,18 @@ Outside the terminal, society has adapted to this new reality. Some humans have 
 **Survival and Adaptation**: Your character must navigate a world where the rules have fundamentally changed
 
 **Absurdist Horror**: The blend of genuinely apocalyptic consequences with utterly ridiculous causes creates a unique tone that’s both funny and unsettling
+
+### **How the Story Is Told**
+
+The game is about 30 minutes long and should never stop for long cutscenes. The story comes through:
+
+- **Opening**: A short scene of the stranded passenger at their cancelled gate, holding an expired boarding pass, hearing the PA announce the last flight out.
+- **PA announcements and flight displays**: The terminal still runs on autopilot. Announcements and departure boards get stranger as the chickens take over, delivering jokes, hints, and backstory.
+- **The environment**: Nests in luggage, pecked-up signs, feeding crowds at drug disposal boxes, and chicken graffiti show how far the takeover has gone in each area.
+- **Ending**: The passenger boards with their new boarding pass and the plane takes off. One last shot hints that a chicken may have stowed away.
+
+### **Tone Guardrails**
+
+- Chickens are menacing in a cartoon way, never gory. Defeated chickens vanish in a puff of feathers.
+- The jokes come from the absurd situation, not from mocking the player.
+- The drug disposal boxes stay cartoonish: glowing, rattling boxes that power chickens up, with no realistic drug use shown.

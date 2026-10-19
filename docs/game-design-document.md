@@ -1,547 +1,448 @@
 # PLANE POULTRY PANIC
-## Game Design Document v1.0
+## Game Design Document v1.1
+
+This is the single source of truth for how the game works. Related docs:
+
+- [storyline.md](storyline.md): world, backstory, and tone
+- [art-style-guide.md](art-style-guide.md): palette, sprite rules, and how art gets made
+- [roadmap.md](roadmap.md): milestones from prototype to Steam launch
+
+Numbers in this doc (speeds, durations, counts) are starting values. The prototype exists to tune them, so treat them as defaults, not promises.
 
 ---
 
 ## Table of Contents
 1. [Game Overview](#game-overview)
-2. [Core Gameplay](#core-gameplay)
-3. [Technical Specifications](#technical-specifications)
-4. [Art Direction](#art-direction)
-5. [Audio Direction](#audio-direction)
-6. [Level Design](#level-design)
-7. [Character Systems](#character-systems)
-8. [UI/UX Design](#uiux-design)
-9. [Progression Systems](#progression-systems)
-10. [Godot Implementation Notes](#godot-implementation-notes)
-11. [Development Timeline](#development-timeline)
-12. [Risk Assessment](#risk-assessment)
+2. [Core Loop](#core-loop)
+3. [Controls](#controls)
+4. [Player](#player)
+5. [Items and Inventory](#items-and-inventory)
+6. [Chickens](#chickens)
+7. [Environment](#environment)
+8. [Levels](#levels)
+9. [UI and UX](#ui-and-ux)
+10. [Progression and Replay](#progression-and-replay)
+11. [Art Direction](#art-direction)
+12. [Audio Direction](#audio-direction)
+13. [Technical Specifications](#technical-specifications)
+14. [Release and Business](#release-and-business)
+15. [Risks](#risks)
+16. [Decision Log](#decision-log)
 
 ---
 
 ## Game Overview
 
-### Concept Statement
-Plane Poultry Panic is a top-down action-adventure game where players navigate through a chicken-overrun airport terminal to catch the last flight to safety during a supernatural poultry apocalypse.
+### Concept
+Plane Poultry Panic is a 3/4-view action-adventure game. The player fights through a chicken-overrun airport terminal to catch the last flight to safety during a supernatural poultry apocalypse.
 
 ### Target Audience
-- **Primary**: Indie game enthusiasts aged 16-35
-- **Secondary**: Retro gaming fans who appreciate 16-bit aesthetics
-- **Tertiary**: Casual players seeking short, engaging experiences
+- **Primary**: Indie game fans aged 16-35
+- **Secondary**: Retro fans who love 16-bit games like *Zombies Ate My Neighbors*
+- **Tertiary**: Casual players who want a short game they can finish in one sitting
 
-### Platform & Distribution
-- **Primary Platform**: PC (Windows, Mac, Linux)
-- **Secondary Platforms**: Nintendo Switch (potential future port)
-- **Distribution**: Steam, itch.io, Epic Games Store
-- **Price Point**: $9.99 USD
+### Platforms
+- **Launch**: PC on Steam (Windows, macOS, Linux), Steam Deck verified
+- **Later, if the game does well**: itch.io, Epic Games Store, Nintendo Switch
+
+Steam Deck support means full gamepad support from the start, not as a late addition.
 
 ### Core Pillars
-1. **Absurd Humor**: Blend apocalyptic stakes with ridiculous chicken-based chaos
-2. **Strategic Survival**: Resource management and tactical movement over direct combat
-3. **Retro Charm**: Authentic 16-bit aesthetic with modern quality-of-life features
-4. **Tight Experience**: Complete, satisfying campaign in 30 minutes
+1. **Absurd Humor**: Apocalyptic stakes caused by ridiculous chickens
+2. **Outsmart, Don't Outfight**: The player has no direct attack. Chickens are beaten with distractions, items, and airport machinery.
+3. **Retro Charm**: An authentic 16-bit look with modern quality-of-life features
+4. **Tight Experience**: A complete, satisfying campaign in about 30 minutes, built for replays
 
 ### Key Features
-- 8-directional top-down movement with pixel-perfect collision
-- Dynamic chicken AI with supernatural power-up states
-- Strategic inventory management with multi-use items
-- Environmental puzzle-solving using airport infrastructure
-- Unique chicken totem boss formations
-- Authentic chiptune soundtrack
-- Multiple difficulty modes and replay incentives
+- 8-directional movement with stamina-limited running
+- Chicken AI that wanders, chases, gets distracted, and powers up
+- Six-slot inventory with dual-use snacks
+- Airport machinery used as traps and puzzles
+- Chicken totem bosses formed from stacked chickens
+- Commissioned chiptune soundtrack
+- Four difficulty modes, scoring, and achievements for replay value
 
 ---
 
-## Core Gameplay
+## Core Loop
 
-### Game Flow
-**Duration**: 30-minute linear campaign  
-**Structure**: 5 connected airport areas with increasing difficulty  
-**Victory Condition**: Board the final departure flight with required boarding pass
+**Moment to moment**: Spot chickens, plan a route, sneak or sprint past, throw a snack when cornered, and heal when it's safe.
 
-### Player Objectives
-1. **Primary Goal**: Reach the final departure gate alive
-2. **Secondary Goals**: Collect boarding pass, manage resources efficiently
-3. **Optional Goals**: Discover secrets, achieve perfect runs, speedrun challenges
+**Per level**: Find the key item that opens the exit, collect snacks and tools, survive or beat the set-piece encounter, and reach the exit checkpoint.
 
-### Core Mechanics
+**Whole game**: Five connected airport areas, about 30 minutes in total. Get the boarding pass in Security and present it at the Final Departure Gate to win.
 
-#### Movement System
-- **8-directional movement** using WASD or arrow keys
-- **Running mechanic** with limited stamina (Shift key)
-- **Collision detection** against walls, furniture, and chickens
-- **Smooth interpolation** for fluid pixel art movement
+### Victory
+Reach the Final Departure Gate alive, holding the boarding pass, and defeat or escape the final chicken totem to board the plane.
 
-#### Inventory Management
-- **Limited slots** (6 items maximum)
-- **Item cycling** using Q/E keys or mouse wheel
-- **Multi-use items**: Snacks heal player or distract chickens
-- **Key items**: Boarding pass, maintenance keys, fire extinguisher
-- **Strategic decisions**: Choose between healing and tactical advantages
-
-#### Combat System
-- **Non-lethal approach**: Distraction and avoidance over direct combat
-- **Snack throwing**: Creates temporary chicken distractions
-- **Fire extinguisher**: Freezes chickens temporarily (limited uses)
-- **Environmental kills**: Use airport machinery against chicken totems
-
-#### Health System
-- **3 health points** displayed as luggage icons
-- **Damage sources**: Chicken attacks, egg projectiles, environmental hazards
-- **Healing method**: Consume collected snacks
-- **Death penalty**: Restart from last checkpoint with hints
-
-### Enemy Design
-
-#### Base Chicken Types
-1. **Normal Chickens**
-   - Random wandering behavior
-   - Low threat level
-   - Easily distracted by snacks
-   - Can alert nearby chickens
-
-2. **Powered-Up Chickens** (Post drug-box consumption)
-   - **Flight Mode**: Brief aerial movement, ignores ground obstacles
-   - **Rage Mode**: Increased speed, aggressive pursuit
-   - **Egg Shooter Mode**: Ranged projectile attacks
-   - **Duration**: 30-60 seconds before returning to normal
-
-#### Chicken Totem Bosses
-- **Formation trigger**: 4+ chickens in proximity
-- **Vertical stacking**: Creates towering boss entity
-- **Enhanced abilities**: Sustained flight, area attacks, minion command
-- **Defeat methods**: Break formation using mass distraction or environmental hazards
-
-### Environmental Interactions
-
-#### Airport Infrastructure
-- **Baggage Carousels**: Redirect or trap enemies
-- **Moving Walkways**: Affect movement speed for all entities
-- **Security Scanners**: Create barriers requiring navigation
-- **PA Systems**: Provide narrative context and gameplay hints
-
-#### Interactive Elements
-- **Vending Machines**: Snack sources requiring coins or keys
-- **Drug Disposal Boxes**: Chicken power-up stations to avoid or manipulate
-- **Emergency Exits**: Potential shortcuts with risk/reward balance
-- **Hiding Spots**: Temporary safety in bathrooms and closets
+### Failure
+When health reaches zero, the player restarts from the last checkpoint with their inventory as it was when they reached it. A short hint about what went wrong appears on the retry screen.
 
 ---
 
-## Technical Specifications
+## Controls
 
-### Engine: Godot 4.x
-**Rationale**: Free, lightweight, excellent 2D tools, cross-platform deployment
+| Action | Keyboard | Gamepad |
+|---|---|---|
+| Move (8 directions) | WASD or arrow keys | Left stick or D-pad |
+| Run (uses stamina) | Shift | Right shoulder (RB/R1) |
+| Use selected item (throw, spray, eat) | Space | A / Cross |
+| Interact (pick up, open, hide) | F | B / Circle |
+| Eat a snack (quick heal) | E | X / Square |
+| Previous / next item | Q / R, or mouse wheel | LB / LT or D-pad left/right while holding Y |
+| Pause | Esc | Start / Options |
 
-### Performance Targets
-- **Target FPS**: 60 FPS consistent
-- **Resolution**: 1920x1080 native, scalable UI
-- **RAM Usage**: <512MB
-- **Storage**: <500MB installed
-- **Minimum CPU**: Dual-core 2.0GHz
+- All bindings can be remapped in Settings.
+- The prototype uses temporary bindings (R restarts); those change once menus exist.
+- Thrown items go in the direction the player is facing. Mouse aiming is not planned, so keyboard and gamepad play the same.
 
-### Core Systems Architecture
+---
 
-#### Scene Structure (Godot)
-```
-Main
-├── GameManager (Singleton)
-├── AudioManager (Singleton)
-├── SaveSystem (Singleton)
-└── Levels/
-    ├── Level01_Arrivals
-    ├── Level02_Security
-    ├── Level03_FoodCourt
-    ├── Level04_Gates
-    └── Level05_FinalGate
-```
+## Player
 
-#### Key Godot Nodes
-- **CharacterBody2D**: Player and chicken movement
-- **StaticBody2D**: Environmental obstacles and walls
-- **Area2D**: Interaction zones, item pickups, trigger areas
-- **RigidBody2D**: Projectiles (eggs, thrown items)
-- **NavigationRegion2D**: AI pathfinding
-- **AudioStreamPlayer2D**: Spatial audio effects
+### Identity
+A stranded connecting passenger. They start with a carry-on, a wallet, and an expired boarding pass from their cancelled flight.
 
-#### State Management
-- **Player States**: Idle, Moving, Running, Interacting, Damaged
-- **Chicken States**: Wandering, Patrolling, Alerted, Powered, Forming
-- **Game States**: Menu, Playing, Paused, GameOver, Victory
+### Attributes
+| Attribute | Starting value |
+|---|---|
+| Health | 3 (shown as luggage icons) |
+| Walk speed | 100 px/s |
+| Run speed | 150 px/s |
+| Stamina | Drains in about 2.5 s of running, refills in about 4 s |
+| Exhaustion | Running dry locks running until stamina is back to 30% |
+| Inventory | 6 slots |
+
+### Damage
+- Chicken pecks, egg projectiles, and environmental hazards deal 1 damage each.
+- After a hit, the player is briefly knocked back and is invincible for 1 second (the sprite blinks).
+
+### Healing
+Eating a snack restores 1 health. Snacks are the only way to heal, so every snack is a choice between healing now and distracting chickens later.
+
+### Hiding
+Bathroom stalls and supply closets are hiding spots. While hidden, chickens lose track of the player. Chickens that saw the player go in will wait outside and peck at the door, so hiding buys time but isn't a permanent escape.
+
+---
+
+## Items and Inventory
+
+### Rules
+- **6 slots** for usable items. Snacks stack up to 3 per slot, so a full bag is a real decision.
+- **Key items** (boarding pass, maintenance keys, airport map) sit in a separate key-item row and never take up slots.
+- Items can be dropped to make room.
+
+### Usable Items
+| Item | Use | Notes |
+|---|---|---|
+| Snack | Eat to heal 1, or throw as a distraction | Found in the food court, vending machines, and abandoned bags |
+| Fire extinguisher | Spray to freeze chickens in a cone for 4 seconds | 3 charges, then it's empty. Found at emergency stations. |
+
+More usable items may come out of prototyping, but every new item has to earn its slot. Fewer items that each do a lot fits the game better than many small ones.
+
+### Key Items
+| Item | Purpose |
+|---|---|
+| Boarding pass | Found in the security bins in Level 2. Required to enter the Final Departure Gate. |
+| Maintenance key | Opens one locked door, closet, or vending machine, then it's used up. Found on maintenance carts and in staff areas. |
+| Airport map | Unlocks a terminal map on the pause screen that shows the current level, exits, and key-item locations. |
+
+---
+
+## Chickens
+
+### How Chickens Are Defeated
+The player can't attack directly. A chicken is defeated when it's caught by airport machinery (baggage carousels, moving walkways at speed, closing security gates) or when a totem collapses on top of it. A defeated chicken bursts into a comic puff of feathers, squawks, and is gone. No blood or gore, ever.
+
+Fire extinguisher spray and distractions don't defeat chickens. They control them. That's what keeps the **Pacifist** run possible: get through without defeating a single chicken.
+
+### Normal Chickens
+- Wander and peck at the floor, or follow set patrol routes
+- Spot the player within sight range when no wall is in the way
+- Call nearby chickens when they spot the player
+- Give up the chase when they lose sight of the player for a couple of seconds
+- Drop everything to go after a thrown snack, then stop to eat it
+- Chase slower than the player walks, so a careful player can always escape a single normal chicken
+
+### Powered-Up Chickens
+Chickens that feed at a drug disposal box power up for 30-60 seconds, then return to normal. A chicken gets one of three modes:
+
+| Mode | Behavior | Visual cue |
+|---|---|---|
+| Flight | Short hops over furniture and low obstacles | Glowing wings, particle trail |
+| Rage | Faster than the player's walk, relentless chase | Red tint, puffed-up pose |
+| Egg Shooter | Stops and fires egg projectiles at range | Bulging throat, wind-up before each shot |
+
+Chickens head for drug disposal boxes when they can. Watching a box and timing a route while the chickens around it are still normal is a core tactic.
+
+### Chicken Totems (Bosses)
+- **Formation**: Totems form at designer-placed "roost" spots when 4 or more chickens gather there. Placing roosts by hand keeps totems feeling emergent while staying under level-design control.
+- **Buildup**: Stacking takes 2 seconds with clear sound and visual cues, so an alert player can break it up early with a thrown snack.
+- **Abilities**: Sustained flight, area-of-effect rage stomps, rapid egg barrages, and commanding nearby chickens
+- **Toppling**: Freeze the base chicken with the extinguisher, lure the totem onto machinery, or scatter it with a big enough distraction (several snacks at once). A toppled totem defeats the chickens it lands on and scatters the rest.
+
+### AI States
+Wander → Patrol → Investigate (snack or noise) → Pursue → Powered → Forming (totem)
+
+Behavior priority, highest first:
+1. Already eating or forming a totem: keep doing it
+2. Snack nearby: investigate it
+3. Player in sight: pursue
+4. Drug box reachable: go feed
+5. Otherwise: wander or patrol
+
+---
+
+## Environment
+
+### Machinery and Hazards
+| Element | Effect |
+|---|---|
+| Baggage carousel | Carries anything on it along its loop. Chickens dumped into the chute are defeated. |
+| Moving walkway | Speeds up or slows down anything on it. At full speed it can fling chickens into hazards. |
+| Security scanner and gates | Barriers to route around. Some gates can be closed with a switch. |
+| Drug disposal box | Powers up chickens that feed there. Some can be sealed with a maintenance key. |
+
+### Interactive Objects
+| Element | Effect |
+|---|---|
+| Vending machine | Opened with a maintenance key. Drops 2-3 snacks. |
+| Emergency exit | Shortcut. Some are blocked, and some lead past extra danger. |
+| Bathroom stall, supply closet | Hiding spot (see [Hiding](#hiding)) |
+| Gate seating | Blocks egg projectiles |
+| Flight information display, PA system | Story, jokes, and hints |
+
+---
+
+## Levels
+
+### Structure
+Five connected areas played in order, each introducing something new. Each level ends at a checkpoint. Level 4 also has a checkpoint between each gate section.
+
+### Level 1: Arrivals / Baggage Claim (about 5 minutes)
+- **Purpose**: Tutorial
+- **Layout**: A large central carousel with pickup areas around it
+- **Chickens**: Few, all normal
+- **Teaches**: Movement, running, snack throwing and eating, interacting, the carousel as a hazard
+- **Goal**: Find a maintenance key and unlock the door to Security
+
+### Level 2: Security Checkpoint (about 5 minutes)
+- **Purpose**: First powered chickens and the boarding pass
+- **Layout**: Security lines, scanners, and closable gates
+- **Chickens**: Medium density, first drug disposal box
+- **Teaches**: The fire extinguisher, powered chickens, hiding
+- **Goal**: Find the boarding pass in the security bins and reach the Food Court
+
+### Level 3: Food Court (about 5 minutes)
+- **Purpose**: Resource management and the first totem
+- **Layout**: Central seating surrounded by restaurant stalls
+- **Chickens**: High density, several drug boxes
+- **Teaches**: Totems, vending machines, choosing between stocking up and moving on
+- **Goal**: Topple or escape the first totem and reach the gates
+
+### Level 4: Gate Areas (about 10 minutes)
+- **Purpose**: Peak challenge using everything learned
+- **Layout**: Gates A, B, and C in sequence, each harder than the last, with moving walkways between them
+- **Chickens**: Very high density, regular totems
+- **Goal**: Get through all three gate sections
+
+### Level 5: Final Departure Gate (about 5 minutes)
+- **Purpose**: Climax
+- **Layout**: One large gate area with a central boss arena
+- **Chickens**: Maximum density, the supreme chicken totem
+- **Goal**: Present the boarding pass, beat the boss, and run for the plane in a short escape sequence
+
+### Level Design Principles
+- Clear sightlines so the player can plan
+- At least two routes through most rooms, one safer and one faster
+- Risk versus reward: shortcuts, optional loot rooms, drug boxes worth sealing
+- Show the takeover through the environment: nests in luggage, pecked signs, chicken graffiti
+
+---
+
+## UI and UX
+
+### HUD
+Kept minimal so the game stays readable at 320x180.
+- **Top left**: Health as luggage icons; stamina bar underneath
+- **Bottom**: The 6 inventory slots with the selected one highlighted and stack counts; key items shown as small icons next to them
+- **Near objects**: Context prompts showing the right button for the current input device (keyboard or gamepad)
+
+### Menus
+- **Main menu**: Departure-board style with flickering text over a looping airport scene. New Game, Continue, Settings, Credits, Quit.
+- **Pause menu**: Resume, Map (once the map is found), Settings, Quit to Menu
+- **Settings**: Controls (remapping), Audio (master, music, effects), Video (fullscreen, window scale), Accessibility. Changes apply immediately, and each category has Reset to Defaults.
+
+### Accessibility
+- Full remapping for keyboard and gamepad
+- Screen shake toggle
+- Colorblind-safe chicken states: every powered mode also has a shape or animation cue, never color alone
+- Text size option for menus and dialogue
+
+---
+
+## Progression and Replay
+
+### Saving
+- The game autosaves at every checkpoint. There's no manual save, which keeps the tension.
+- **Continue** resumes from the latest checkpoint.
+
+### Difficulty Modes
+| Mode | Changes |
+|---|---|
+| Easy | Calmer chickens, more snacks, longer extinguisher freeze |
+| Standard | As designed |
+| Hard | More chickens, powered modes trigger more often, fewer snacks |
+| Expert | Maximum chickens, instant power-ups at drug boxes, checkpoints only at the start of each level |
+
+### Scoring
+A score at the end of the run, made up of:
+- **Time**: Faster runs score more
+- **Efficiency**: Items used compared to items collected
+- **Stealth**: Chickens avoided compared to chickens that spotted you
+- **Discovery**: Secrets found and alternate routes taken
+
+### Achievements (Steam)
+| Achievement | Condition |
+|---|---|
+| Speed Runner | Finish in under 25 minutes |
+| Pacifist | Finish without defeating any chickens |
+| Hoarder | Finish with all 6 slots full |
+| Explorer | Find every secret area |
+| Perfect Run | Finish without taking damage |
+| One per level | Finish each level, to track how far players get |
+
+### Speedrun Mode
+An optional on-screen timer with split times per level. Unlocks after finishing the game once.
 
 ---
 
 ## Art Direction
 
-### Visual Style
-**Style**: 16-bit SNES aesthetic inspired by "Zombies Ate My Neighbors"  
-**Color Palette**: Limited palette with strategic color coding  
-**Resolution**: 320x240 base resolution, pixel-perfect scaling
+The full rules live in [art-style-guide.md](art-style-guide.md). In short:
 
-### Sprite Specifications
-- **Tile Size**: 16x16 pixels for environment
-- **Character Size**: 16x16 pixels (chickens), 16x24 pixels (player)
-- **Animation**: 4-6 frames per action, 8-12 FPS for retro feel
-- **Color Depth**: 16 colors per sprite maximum
-
-### Environment Design
-#### Airport Terminal Aesthetic
-- **Sterile whites and grays** for walls and floors
-- **Corporate blues and reds** for signage and branding
-- **Warm yellows** for food court areas
-- **Security checkpoint grays** with x-ray scanner blues
-- **Gate area teals** with departure board oranges
-
-#### Chicken Design Philosophy
-- **Normal State**: Traditional farm chicken appearance
-- **Powered States**: Visual effects indicating supernatural abilities
-  - Flight Mode: Glowing wings, particle trails
-  - Rage Mode: Red tint, aggressive postures
-  - Egg Shooter: Bulging throat, projectile indicators
-
-### UI Visual Design
-- **Pixel art consistency** throughout all interface elements
-- **Retro computer terminal** aesthetic for menus
-- **Airport departure board** styling for game information
-- **Luggage iconography** for health and inventory systems
+- **Style**: 16-bit SNES era, inspired by *Zombies Ate My Neighbors*
+- **View**: 3/4 view: floors seen from above, walls and characters seen from the front
+- **Resolution**: 320x180, scaled up by whole numbers (4x at 720p, 6x at 1080p, 4x on Steam Deck)
+- **Grid**: 16x16 tiles; player 16x24; chickens 16x16
+- **Palette**: One shared 32-color palette for the whole game
+- **Who makes it**: Claude makes the in-game pixel art with the user as art director. Steam store artwork is commissioned near launch.
 
 ---
 
 ## Audio Direction
 
-### Music Style
-**Genre**: Chiptune with 80s synth influences  
-**Instrumentation**: 8-bit synthesizers, drum machines, digital effects  
-**Composition**: 4-6 looping tracks, dynamic transitions between areas
+### Music
+Commissioned from a chiptune composer. Placeholder music is used until then.
 
-#### Track List
-1. **Main Theme**: Upbeat, adventurous, slight comedy undertone
-2. **Arrivals Area**: Calm, slightly ominous, building tension
-3. **Security/Food Court**: Mid-tempo, increasing urgency
-4. **Gate Areas**: High energy, survival tension
-5. **Boss Battles**: Intense, dramatic, chicken-themed musical jokes
-6. **Victory Theme**: Triumphant, relief, travel/journey motifs
+| # | Track | Mood |
+|---|---|---|
+| 1 | Main theme | Upbeat and adventurous with a comic edge |
+| 2 | Arrivals | Calm with a creeping unease |
+| 3 | Security and Food Court | Mid-tempo, growing urgency |
+| 4 | Gate Areas | High energy, survival tension |
+| 5 | Boss | Intense, with chicken-themed musical jokes |
+| 6 | Victory | Triumphant relief with a travel motif |
 
-### Sound Effects Philosophy
-#### Chicken Audio
-- **Authentic chicken sounds** with supernatural distortion for powered states
-- **Layered clucking** for totem formations
-- **Comedic timing** for egg-laying and projectile sounds
+Plus short stings for game over, checkpoint, and item fanfares.
 
-#### Environmental Audio
-- **Airport ambience**: Low-level terminal sounds, distant announcements
-- **Mechanical sounds**: Baggage carousels, security scanners, walkways
-- **Interactive feedback**: Satisfying pickup sounds, clear UI audio
+**Composer brief and timing**: Engage the composer once the vertical slice is playable, so they can hear and see the game. Ask for loopable tracks, stems if affordable, and a license covering the Steam release, trailers, and a possible soundtrack release.
 
-#### Spatial Audio Implementation
-- **Godot AudioStreamPlayer2D** for positional chicken sounds
-- **Bus effects** for environmental reverb and filtering
-- **Dynamic mixing** based on player proximity and game state
+### Sound Effects
+Generated in a retro "sfxr" style by Claude, with real chicken recordings (licensed or recorded) mixed in for the clucks.
+- **Chickens**: Natural clucks for normal chickens, distorted ones for powered states, layered clucking for totems, comic timing on eggs
+- **Airport**: Quiet terminal ambience, distant PA announcements, carousel and walkway machinery
+- **Feedback**: Satisfying pickup, throw, hit, and menu sounds
+
+### Mixing
+Positional audio for chickens and machinery, separate audio buses for music, effects, and ambience, and music that ducks under important cues.
 
 ---
 
-## Level Design
+## Technical Specifications
 
-### Overall Structure
-**Linear progression** through 5 distinct airport areas  
-**Escalating difficulty** with new mechanics and enemy types  
-**Environmental storytelling** showing progression of chicken takeover
+### Engine
+**Godot 4.x** (GDScript). Free, lightweight, strong 2D tools, and exports to Windows, macOS, and Linux.
 
-### Level Breakdown
+### Performance Targets
+- 60 FPS on Steam Deck and on a dual-core 2.0 GHz PC with integrated graphics
+- Under 512 MB of RAM and under 500 MB installed
 
-#### Level 1: Arrivals/Baggage Claim (5 minutes)
-**Purpose**: Tutorial and introduction  
-**Layout**: Large central carousel with surrounding pickup areas  
-**Chicken Density**: Low, mostly normal chickens  
-**Key Mechanics**: Movement, snack throwing, basic interactions  
-**Objectives**: Learn controls, find maintenance key, proceed to security
+### Display
+- Base resolution 320x180 with the viewport stretched by whole-number multiples only, for crisp pixels
+- Nearest-neighbor texture filtering, with 2D transforms snapped to pixels
 
-#### Level 2: Security Checkpoint (5 minutes)
-**Purpose**: Introduce boarding pass collection and powered chickens  
-**Layout**: Security lines with scanner obstacles  
-**Chicken Density**: Medium, first powered chickens appear  
-**Key Mechanics**: Fire extinguisher introduction, environmental navigation  
-**Objectives**: Locate boarding pass, navigate security, reach food court
-
-#### Level 3: Food Court (5 minutes)
-**Purpose**: Resource management and first boss encounter  
-**Layout**: Central seating with surrounding restaurant stalls  
-**Chicken Density**: High, multiple drug boxes present  
-**Key Mechanics**: First chicken totem encounter, resource planning  
-**Objectives**: Resupply snacks, defeat/avoid chicken totem, access gates
-
-#### Level 4: Gate Areas (10 minutes)
-**Purpose**: Peak challenge and skill demonstration  
-**Layout**: Connected gate sections (A, B, C) with increasing complexity  
-**Chicken Density**: Very high, regular totem formations  
-**Key Mechanics**: All systems combined, environmental puzzles  
-**Objectives**: Navigate three gate sections, manage all resources
-
-#### Level 5: Final Departure Gate (5 minutes)
-**Purpose**: Climax and resolution  
-**Layout**: Single large gate area with central boss arena  
-**Chicken Density**: Maximum, ultimate chicken totem boss  
-**Key Mechanics**: Boss battle mechanics, escape sequence  
-**Objectives**: Present boarding pass, defeat final boss, board plane
-
-### Design Principles
-- **Clear sightlines** for strategic planning
-- **Multiple paths** allowing different playstyles
-- **Meaningful choices** between risk and reward
-- **Environmental storytelling** through chicken-modified spaces
-
----
-
-## Character Systems
-
-### Player Character
-#### Core Attributes
-- **Health**: 3 points maximum
-- **Stamina**: Regenerating running ability
-- **Inventory**: 6 item slots
-- **Movement Speed**: Base 100 pixels/second, 150 when running
-
-#### Player Actions
-- **Movement**: 8-directional, collision-based
-- **Running**: Temporary speed boost with stamina cost
-- **Item Use**: Context-sensitive consumption or throwing
-- **Interaction**: Examine, pickup, activate environmental elements
-
-### Chicken AI System
-
-#### Behavior Tree Structure
+### Project Layout
+The Godot project lives in `game/`:
 ```
-Root
-├── Check Health/Status
-├── Evaluate Threats
-├── Seek Drug Boxes (if available)
-├── Form Totems (if enough chickens nearby)
-└── Default Behavior (Wander/Patrol)
+game/
+├── project.godot
+├── scenes/       characters/, levels/, objects/, ui/
+├── scripts/      characters/, levels/, managers/, objects/, ui/
+├── assets/       sprites/, audio/, fonts/
+└── data/         level and balance configs
 ```
 
-#### AI States and Transitions
-1. **Wandering**: Random movement, lowest priority
-2. **Patrolling**: Follow predefined paths
-3. **Investigating**: Check disturbances (thrown snacks)
-4. **Pursuing**: Chase detected player
-5. **Powered**: Enhanced abilities from drug consumption
-6. **Forming**: Participate in totem creation
+### Architecture
+- **Autoloads (singletons)**: GameManager (game state, checkpoints), AudioManager, SaveSystem, InputSetup (default bindings)
+- **Movement**: CharacterBody2D with `move_and_slide()` for the player and chickens
+- **AI**: A state machine per chicken, with NavigationAgent2D for pathfinding around furniture
+- **Triggers**: Area2D for pickups, hiding spots, checkpoints, and exits
+- **Levels**: TileMapLayer for floors and walls, one scene per level
+- **Communication**: Signals between systems instead of direct references
+- **Pooling**: Reuse egg projectiles and feather effects instead of creating new ones
 
-#### Chicken Totem Mechanics
-- **Formation Trigger**: 4+ chickens within 32-pixel radius
-- **Stacking Animation**: 2-second buildup with visual/audio cues
-- **Boss Behavior**: Coordinated movement, special attacks
-- **Destruction**: Target base chickens to topple formation
-
----
-
-## UI/UX Design
-
-### Interface Philosophy
-**Minimal HUD** to maintain immersion  
-**Clear visual hierarchy** for important information  
-**Retro computer terminal** aesthetic throughout
-
-### HUD Elements
-#### Health Display
-- **Location**: Top-left corner
-- **Visual**: Luggage suitcase icons
-- **States**: Full, damaged, empty
-- **Animation**: Smooth transitions, damage flash
-
-#### Inventory Display
-- **Location**: Bottom of screen
-- **Layout**: Horizontal row of item slots
-- **Interaction**: Mouse click or keyboard cycling
-- **Visual Feedback**: Selected item highlighting, quantity indicators
-
-#### Interaction Prompts
-- **Context-sensitive**: Appear near interactive objects
-- **Key binding display**: Show required input
-- **Priority system**: Most important action highlighted
-
-### Menu Systems
-#### Main Menu
-- **Background**: Static airport scene with subtle chicken movement
-- **Options**: New Game, Continue, Settings, Credits, Quit
-- **Style**: Departure board aesthetic with flickering text
-
-#### Pause Menu
-- **Overlay**: Semi-transparent with slight blur
-- **Quick access**: Resume, Settings, Main Menu
-- **No saving**: Progress auto-saves at checkpoints
-
-#### Settings Menu
-- **Categories**: Controls, Audio, Video, Accessibility
-- **Real-time preview**: Changes apply immediately
-- **Reset options**: Restore defaults for each category
+### Physics Layers
+| Layer | Name | Used by |
+|---|---|---|
+| 1 | world | Walls, furniture, machinery |
+| 2 | player | The player |
+| 3 | chickens | All chickens |
 
 ---
 
-## Progression Systems
+## Release and Business
 
-### Checkpoint System
-**Automatic saves** at area transitions  
-**No manual saving** to maintain tension  
-**Restart penalties**: Minor hints about enemy patterns
-
-### Difficulty Scaling
-#### Standard Mode
-- Normal chicken density and behavior
-- Standard health and resource availability
-- 30-minute target completion time
-
-#### Easy Mode
-- Reduced chicken aggression
-- Increased snack availability
-- Extended power-up durations for fire extinguisher
-
-#### Hard Mode
-- Increased chicken density
-- Faster power-up cycling
-- Reduced health regeneration options
-
-#### Expert Mode
-- Maximum chicken density
-- Instant power-up triggers at drug boxes
-- Limited save checkpoints
-
-### Replay Incentives
-#### Achievement System
-- **Speed Runner**: Complete under 25 minutes
-- **Pacifist**: Complete without defeating any chickens
-- **Hoarder**: Finish with maximum inventory
-- **Explorer**: Find all secret areas
-- **Perfect Run**: Complete without taking damage
-
-#### Score System
-- **Time bonus**: Faster completion = higher score
-- **Efficiency bonus**: Items used vs. items collected
-- **Stealth bonus**: Chickens avoided vs. chickens encountered
-- **Discovery bonus**: Secrets found, alternate paths taken
+- **Store**: Steam first. Requires a Steamworks account and the per-game Steam Direct fee (currently $100, refunded after $1,000 in sales).
+- **Store page timing**: Put a "Coming Soon" page up as early as the vertical slice allows, to collect wishlists. Wishlists drive Steam's launch visibility.
+- **Price**: $9.99 target. See the refund risk below before locking it in.
+- **Age rating**: Steam's content questionnaire asks about drug references, so answer it honestly about the drug disposal boxes.
+- **Store art**: Commission capsule images and key art from a pixel artist or illustrator. These matter more for clicks than any screenshot.
 
 ---
 
-## Godot Implementation Notes
+## Risks
 
-### Project Structure
-```
-res://
-├── scenes/
-│   ├── characters/
-│   ├── levels/
-│   ├── ui/
-│   └── objects/
-├── scripts/
-│   ├── managers/
-│   ├── characters/
-│   └── systems/
-├── assets/
-│   ├── sprites/
-│   ├── audio/
-│   └── fonts/
-└── data/
-    ├── levels/
-    └── configs/
-```
-
-### Key Godot Features to Utilize
-#### 2D Rendering
-- **CanvasLayer** for UI overlay management
-- **Sprite2D** with pixel-perfect import settings
-- **AnimationPlayer** for character and object animations
-- **TileMap** for efficient level construction
-
-#### Physics and Movement
-- **CharacterBody2D** with move_and_slide() for player/chicken movement
-- **NavigationAgent2D** for chicken pathfinding
-- **Area2D** for trigger zones and interaction detection
-- **PhysicsBody2D** for projectile physics
-
-#### Audio System
-- **AudioStreamPlayer** for music and global sounds
-- **AudioStreamPlayer2D** for positional effects
-- **AudioBus** setup for dynamic mixing and effects
-
-#### State Management
-- **Custom signals** for communication between systems
-- **Singleton pattern** for global managers
-- **State machines** using match statements or state pattern
-
-### Performance Considerations
-#### Optimization Strategies
-- **Object pooling** for projectiles and effects
-- **Level streaming** for seamless area transitions
-- **Sprite batching** for similar objects
-- **Update frequency management** for non-critical AI
-
-#### Memory Management
-- **Texture streaming** for large environments
-- **Audio compression** appropriate for retro aesthetic
-- **Scene instancing** for reusable components
+| Risk | Impact | Mitigation |
+|---|---|---|
+| **Steam's 2-hour refund window**: a 30-minute game can be finished and refunded | High | Make replay value obvious on the store page (difficulty modes, speedrun mode, scoring, achievements). Revisit price after playtesters show how long people actually play. |
+| **Scope vs. a few hours a week**: 5 levels with bosses is a long build | High | Build in milestones, not dates ([roadmap.md](roadmap.md)). Measure how long the Level 1 vertical slice takes and re-plan from real numbers. Cutting to 3 levels stays a fallback. |
+| **Chicken AI complexity** | Medium | Prototype the AI first. Simplify behaviors that don't add fun. |
+| **Pixel art consistency** | Medium | One palette, a written style guide, and a style test before production |
+| **Composer cost and schedule** | Medium | Budget early. Bring the composer in after the vertical slice, when the game's mood is clear. |
+| **Feature creep** | Medium | No new mechanics after the risk-prototype milestone unless something is cut to make room |
+| **Content rating from drug references** | Low | Answer Steam's questionnaire accurately. Tone stays cartoonish. |
 
 ---
 
-## Development Timeline
+## Decision Log
 
-### Phase 1: Foundation (Weeks 1-4)
-- Set up Godot project structure
-- Implement basic player movement and collision
-- Create core art pipeline and first sprite sets
-- Establish audio framework and first music tracks
+"You" means decided by the game's creator. "Proposed" means Claude chose it to fill a gap. Anything proposed is easy to change.
 
-### Phase 2: Core Systems (Weeks 5-12)
-- Complete inventory and item systems
-- Implement chicken AI and behavior trees
-- Build first two levels (Arrivals, Security)
-- Create UI systems and basic menus
-
-### Phase 3: Content Creation (Weeks 13-20)
-- Complete remaining three levels
-- Implement chicken totem boss mechanics
-- Polish all audio and visual effects
-- Create tutorial and onboarding systems
-
-### Phase 4: Polish & Testing (Weeks 21-26)
-- Comprehensive playtesting and balance adjustments
-- Performance optimization and bug fixing
-- Achievement system and replay features
-- Platform testing and distribution preparation
-
----
-
-## Risk Assessment
-
-### High-Risk Areas
-#### Technical Risks
-- **Chicken AI complexity**: May require simplification for performance
-- **Mitigation**: Prototype AI early, use Godot profiler extensively
-
-#### Design Risks
-- **Difficulty balance**: 30-minute target may be too ambitious
-- **Mitigation**: Extensive playtesting with diverse player groups
-
-#### Scope Risks
-- **Feature creep**: Additional mechanics may extend development
-- **Mitigation**: Strict feature lock after Phase 2
-
-### Medium-Risk Areas
-#### Art Production
-- **Pixel art consistency**: Maintaining quality across all assets
-- **Mitigation**: Establish clear style guide and regular art reviews
-
-#### Audio Integration
-- **Chiptune music production**: May require specialized tools/skills
-- **Mitigation**: Early prototyping, consider collaboration with chiptune artists
-
-### Contingency Plans
-- **Reduced level count**: Cut to 3 levels if timeline pressures
-- **Simplified AI**: Reduce chicken behavior complexity if performance issues
-- **Asset reuse**: Create modular components for efficient content creation
-- **Early Access**: Consider releasing partial version for feedback and funding
-
----
-
-**Document Version**: 1.0  
-**Last Updated**: [Current Date]  
-**Next Review**: [Two weeks from creation]
+| Date | Decision | By |
+|---|---|---|
+| 2026-10-19 | Engine is Godot 4.x | You (original GDD) |
+| 2026-10-19 | Base resolution 320x180 (16:9), replacing the conflicting 320x240 and 1080p | Proposed |
+| 2026-10-19 | Chickens can be defeated comically (feather poof, no gore), but only by the environment and totem collapses; the player has no direct attack | You |
+| 2026-10-19 | Launch with the full 5-level campaign | You |
+| 2026-10-19 | Music is commissioned from a chiptune composer | You |
+| 2026-10-19 | Docs consolidated: GDD is the source of truth, gameplay-mechanics merged in, todo replaced by roadmap, art style guide added | You |
+| 2026-10-19 | Claude makes the in-game pixel art; Steam store art is commissioned | You |
+| 2026-10-19 | 3/4 view, matching the *Zombies Ate My Neighbors* reference | Proposed |
+| 2026-10-19 | Coins removed; vending machines are opened with maintenance keys | Proposed |
+| 2026-10-19 | Key items don't use inventory slots; snacks stack 3 per slot | Proposed |
+| 2026-10-19 | Airport map shows on the pause screen; no mini-map on the HUD | Proposed |
+| 2026-10-19 | The optional flight-departure countdown becomes Speedrun Mode instead | Proposed |
+| 2026-10-19 | Totems form at designer-placed roost spots | Proposed |
+| 2026-10-19 | Throwing aims where the player faces; no mouse aiming | Proposed |
+| 2026-10-19 | Steam first, with Steam Deck support from the start | Proposed |
