@@ -510,6 +510,20 @@ func _inventory_tests() -> void:
 	await _wait(0.2)
 	_check(player.snacks == 7, "a dropped item can be picked up again after stepping away")
 
+	# E eats a snack from any slot, even with another item selected.
+	player.give_extinguisher(1)
+	_check(inventory.selected_item() == "extinguisher", "the extinguisher is selected after picking it up")
+	player._invincible_timer = 0.0
+	player.take_damage(Player.SUITCASE, player.global_position + Vector2.LEFT)
+	var hurt := player.health
+	var snacks_before := player.snacks
+	_tap("eat_snack")
+	await get_tree().physics_frame
+	_check(player.health == hurt + Player.SUITCASE and player.snacks == snacks_before - 1,
+		"E eats a snack even while the extinguisher is selected")
+	_check(inventory.selected_item() == "extinguisher", "eating doesn't change the selected item")
+	player.spray()  # use up the extinguisher so the slots below stay snacks
+
 	# Fill every slot: no more snacks fit, and the cabinet can't be used.
 	player.pick_up("snack", 18)
 	_check(not player.add_snack(), "a full inventory refuses more snacks")
@@ -811,6 +825,9 @@ func _tap(action: String) -> void:
 	event.action = action
 	event.pressed = true
 	Input.parse_input_event(event)
+	# Handle it now; otherwise it waits for a later frame, and a check right
+	# after the tap can run before the game has seen it.
+	Input.flush_buffered_events()
 
 
 func _wait(seconds: float) -> void:

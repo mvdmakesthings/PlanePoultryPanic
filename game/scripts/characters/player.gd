@@ -218,7 +218,12 @@ func throw_snack() -> void:
 ## Eats a snack from any slot (the selected one first) to heal a suitcase.
 func eat_snack() -> void:
 	var index := inventory.slot_with("snack")
-	if index < 0 or health >= max_health:
+	# Say why nothing happened, so a press never seems ignored.
+	if index < 0:
+		FloatText.spawn(self, "No snacks")
+		return
+	if health >= max_health:
+		FloatText.spawn(self, "Full!")
 		return
 	inventory.take_from(index)
 	health = mini(health + SUITCASE, max_health)
