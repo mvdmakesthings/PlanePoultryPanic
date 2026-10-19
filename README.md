@@ -28,7 +28,7 @@ Or open `game/project.godot` in the Godot editor and press F5.
 | Push a cart, take an extinguisher, pick up or put down a suitcase | F | B |
 | Restart (after winning or losing) | R | Start |
 
-Reach the green **GATE** without losing all three suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
+Reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
 
 ## Run the smoke test
 

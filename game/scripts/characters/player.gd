@@ -33,7 +33,7 @@ const SPRAY_AIM_RANGE := 64.0
 ## Walking speed while carrying a suitcase; running isn't possible then.
 @export var carry_speed := 75.0
 ## Health in suitcases, as shown on the HUD.
-@export var suitcases := 3
+@export var suitcases := 5
 @export var max_stamina := 100.0
 ## Stamina spent per second while running.
 @export var stamina_drain := 40.0

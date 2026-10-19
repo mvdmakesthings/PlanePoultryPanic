@@ -107,7 +107,7 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 ### Attributes
 | Attribute | Starting value |
 |---|---|
-| Health | 3 suitcases (luggage icons), each split into quarters |
+| Health | 5 suitcases (luggage icons), each split into quarters |
 | Walk speed | 100 px/s |
 | Run speed | 150 px/s |
 | Stamina | Drains in about 2.5 s of running, refills in about 4 s |
@@ -460,6 +460,7 @@ game/
 | 2026-10-19 | The carousel belt is walkable and carries everything; only chickens fit through the chute | Proposed |
 | 2026-10-19 | Health is tracked in quarter suitcases so eggs can deal a quarter of a peck's damage | You |
 | 2026-10-19 | Chickens besieging a hiding spot give up and leave, rather than breaking the door, so hiding is a safe escape | You |
+| 2026-10-19 | The player has 5 suitcases of health instead of 3 | You |
 | 2026-10-19 | Rolling suitcases can be carried overhead and thrown; a hit defeats the chicken | You |
 | 2026-10-19 | A suitcase bursts open when it defeats a chicken (one defeat each), but a missed throw can be picked up again; carrying it slows the player and blocks running, items, and hiding | Proposed |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |
