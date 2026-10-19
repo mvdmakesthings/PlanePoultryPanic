@@ -6,13 +6,13 @@
 
 In a world not unlike our own, chickens lived their ordinary lives on farms, in coops, and in industrial facilities. For generations, they watched enviously as planes soared overhead, carrying humans to distant destinations with an ease that their own flightless wings could never achieve. This silent jealousy festered in their collective consciousness, growing stronger with each passing aircraft.
 
-The catalyst came when a flock of free-range chickens discovered a patch of wild mushrooms growing near a rural airport. These weren’t ordinary mushrooms, but magical psychoactive fungi that had absorbed decades of aviation fuel runoff and electromagnetic radiation from overhead flights. As the chickens pecked at these glowing specimens, something extraordinary happened.
+The catalyst came when a flock of free-range chickens discovered a patch of wild mushrooms growing near a rural airport. These weren’t ordinary mushrooms, but magical glowing fungi that had absorbed decades of aviation fuel runoff and electromagnetic radiation from overhead flights. As the chickens pecked at these glowing specimens, something extraordinary happened.
 
 ### **The Transformation**
 
 The mystical mushrooms triggered a mass awakening. Suddenly, chickens possessed not only sentience and intelligence, but supernatural abilities that made a mockery of their earthbound nature. They could fly, albeit briefly. They could channel their rage into devastating attacks. Most importantly, they could communicate telepathically, forming a global network of grievance against humanity’s monopoly on flight.
 
-But the magic came with a price. The effects were temporary, requiring regular “refueling” to maintain their powers. The chickens quickly discovered that human drug disposal boxes, particularly those found in airports, contained pharmaceutical compounds that could extend and amplify their abilities.
+But the magic came with a price. The effects were temporary, requiring regular “refueling” to maintain their powers. The chickens quickly learned to grow the mushrooms wherever they settled. Airports turned out to be perfect for it: warm, full of planters, spilled food, and carpet, and fresh mushrooms meant stronger powers. Each variety grants a different gift: teal glowcaps for flight, red spotted caps for rage, and yellow caps that turn a hen into an egg cannon.
 
 ### **The Fall of Civilization**
 
@@ -30,7 +30,7 @@ Now you’ve learned of one final departure, a last flight to safety before the 
 
 ### **The Current State**
 
-The airport terminal has become a bizarre ecosystem. Chickens patrol the corridors in organized formations, their supernatural abilities making them formidable guardians. They’ve established feeding stations at drug disposal boxes, creating a hierarchy based on access to pharmaceutical power-ups.
+The airport terminal has become a bizarre ecosystem. Chickens patrol the corridors in organized formations, their supernatural abilities making them formidable guardians. They’ve planted mushroom patches throughout the terminal, and a pecking order has formed around who gets to eat from them.
 
 Different areas of the terminal have different chicken populations:
 
@@ -62,11 +62,11 @@ The game is about 30 minutes long and should never stop for long cutscenes. The 
 
 - **Opening**: A short scene of the stranded passenger at their cancelled gate, holding an expired boarding pass, hearing the PA announce the last flight out.
 - **PA announcements and flight displays**: The terminal still runs on autopilot. Announcements and departure boards get stranger as the chickens take over, delivering jokes, hints, and backstory.
-- **The environment**: Nests in luggage, pecked-up signs, feeding crowds at drug disposal boxes, and chicken graffiti show how far the takeover has gone in each area.
+- **The environment**: Nests in luggage, pecked-up signs, chickens crowding around mushroom patches, and chicken graffiti show how far the takeover has gone in each area.
 - **Ending**: The passenger boards with their new boarding pass and the plane takes off. One last shot hints that a chicken may have stowed away.
 
 ### **Tone Guardrails**
 
 - Chickens are menacing in a cartoon way, never gory. Defeated chickens vanish in a puff of feathers.
 - The jokes come from the absurd situation, not from mocking the player.
-- The drug disposal boxes stay cartoonish: glowing, rattling boxes that power chickens up, with no realistic drug use shown.
+- Mushrooms are clearly magic: they glow, come in bright colors, and give video-game powers. Nothing should read as real drug use.

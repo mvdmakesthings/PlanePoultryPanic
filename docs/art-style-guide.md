@@ -62,7 +62,7 @@ One shared palette for the whole game. No colors outside it, ever.
 | Greens (plants, exit signs, healing) | `#265c42` `#3e8948` `#63c74d` |
 | Browns (luggage, wood, carousels) | `#3e2731` `#733e39` `#b86f50` `#c28569` |
 | Skin tones | `#e8b796` `#c28569` `#b86f50` `#733e39` |
-| Purples and pinks (drug boxes, egg-shooter mode) | `#68386c` `#b55088` `#f6757a` |
+| Purples and pinks (the player's hair, spore effects) | `#68386c` `#b55088` `#f6757a` |
 | Light warm (chicken shading, paper) | `#ead4aa` |
 
 ### Color Rules
@@ -98,12 +98,15 @@ Every powered state has a color cue **and** a shape or animation cue, so it stil
 
 | Mode | Color cue | Shape / animation cue |
 |---|---|---|
-| Flight | `#2ce8f5` glow on wings | Wings spread, hovering bob, particle trail |
-| Rage | Red tint toward `#e43b44` | Puffed-up feathers, faster walk cycle, steam puffs |
-| Egg Shooter | Purple throat `#b55088` | Bulging throat, wind-up squash before each shot |
+| Flight | Teal glowing mushroom cap, `#2ce8f5` glow on wings | Wings spread, hovering bob, particle trail |
+| Rage | Red-and-white spotted mushroom cap, flames (`#f77622`, `#feae34`) | Puffed-up feathers, faster walk cycle, flickering flames |
+| Egg Shooter | Yellow mushroom cap (`#feae34`) | Bulging throat, wind-up squash before each shot |
 
 ### Totems
-Stacked chickens with a visible wobble. The bottom chicken looks strained, the top one looks smug. The final boss totem is taller with a crown-like comb.
+Stacked chickens with a visible wobble. The bottom chicken looks strained, the top one looks smug. The final boss totem is taller and crowned with a giant glowing mushroom.
+
+### Mushroom Patches
+Clusters of 3-5 mushrooms growing out of carpet, planters, and spilled food. Each patch is one variety, colored to match the cap its chickens wear: teal glowcaps (flight), red spotted caps (rage), yellow caps (egg shooter). Patches glow softly and puff spores so they're easy to spot from across a room.
 
 ## Animation
 

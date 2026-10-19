@@ -64,7 +64,7 @@ One room, colored shapes instead of art. Goal: find out whether the core loop is
 Still mostly gray-box. Each item should be playable in the prototype room.
 
 - [ ] Chicken pathfinding around furniture (NavigationAgent2D)
-- [ ] Drug disposal box and the three powered modes (flight, rage, egg shooter)
+- [ ] Mushroom patches and the three powered modes (flight, rage, egg shooter)
 - [ ] Fire extinguisher (freeze cone, charges)
 - [ ] Baggage carousel that carries and defeats chickens
 - [ ] Totem formation at a roost, its attacks, and toppling it

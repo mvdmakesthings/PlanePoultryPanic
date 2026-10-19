@@ -165,15 +165,15 @@ Fire extinguisher spray and distractions don't defeat chickens. They control the
 - Chase slower than the player walks, so a careful player can always escape a single normal chicken
 
 ### Powered-Up Chickens
-Chickens that feed at a drug disposal box power up for 30-60 seconds, then return to normal. A chicken gets one of three modes:
+Chickens that eat from a mushroom patch power up for 30-60 seconds, then return to normal. Each patch grows one kind of mushroom, and the kind decides the mode. A powered chicken wears a cap of the mushroom it ate, so the player can read its mode at a glance and can see which power a patch gives before going near it:
 
 | Mode | Behavior | Visual cue |
 |---|---|---|
-| Flight | Short hops over furniture and low obstacles | Glowing wings, particle trail |
-| Rage | Faster than the player's walk, relentless chase | Red tint, puffed-up pose |
-| Egg Shooter | Stops and fires egg projectiles at range | Bulging throat, wind-up before each shot |
+| Flight | Short hops over furniture and low obstacles | Glowing teal mushroom cap, glowing wings, particle trail |
+| Rage | Faster than the player's walk, relentless chase | Red spotted mushroom cap, flames, puffed-up pose |
+| Egg Shooter | Stops and fires egg projectiles at range | Yellow mushroom cap, bulging throat, wind-up before each shot |
 
-Chickens head for drug disposal boxes when they can. Watching a box and timing a route while the chickens around it are still normal is a core tactic.
+Chickens head for mushroom patches when they can. Watching a patch and timing a route while the chickens around it are still normal is a core tactic.
 
 ### Chicken Totems (Bosses)
 - **Formation**: Totems form at designer-placed "roost" spots when 4 or more chickens gather there. Placing roosts by hand keeps totems feeling emergent while staying under level-design control.
@@ -188,7 +188,7 @@ Behavior priority, highest first:
 1. Already eating or forming a totem: keep doing it
 2. Snack nearby: investigate it
 3. Player in sight: pursue
-4. Drug box reachable: go feed
+4. Mushroom patch reachable: go eat
 5. Otherwise: wander or patrol
 
 ---
@@ -201,7 +201,7 @@ Behavior priority, highest first:
 | Baggage carousel | Carries anything on it along its loop. Chickens dumped into the chute are defeated. |
 | Moving walkway | Speeds up or slows down anything on it. At full speed it can fling chickens into hazards. |
 | Security scanner and gates | Barriers to route around. Some gates can be closed with a switch. |
-| Drug disposal box | Powers up chickens that feed there. Some can be sealed with a maintenance key. |
+| Mushroom patch | Powers up chickens that eat there. Spraying it with the fire extinguisher (one charge) kills the patch for good. |
 
 ### Interactive Objects
 | Element | Effect |
@@ -229,14 +229,14 @@ Five connected areas played in order, each introducing something new. Each level
 ### Level 2: Security Checkpoint (about 5 minutes)
 - **Purpose**: First powered chickens and the boarding pass
 - **Layout**: Security lines, scanners, and closable gates
-- **Chickens**: Medium density, first drug disposal box
+- **Chickens**: Medium density, first mushroom patch
 - **Teaches**: The fire extinguisher, powered chickens, hiding
 - **Goal**: Find the boarding pass in the security bins and reach the Food Court
 
 ### Level 3: Food Court (about 5 minutes)
 - **Purpose**: Resource management and the first totem
 - **Layout**: Central seating surrounded by restaurant stalls
-- **Chickens**: High density, several drug boxes
+- **Chickens**: High density, several mushroom patches
 - **Teaches**: Totems, vending machines, choosing between stocking up and moving on
 - **Goal**: Topple or escape the first totem and reach the gates
 
@@ -255,7 +255,7 @@ Five connected areas played in order, each introducing something new. Each level
 ### Level Design Principles
 - Clear sightlines so the player can plan
 - At least two routes through most rooms, one safer and one faster
-- Risk versus reward: shortcuts, optional loot rooms, drug boxes worth sealing
+- Risk versus reward: shortcuts, optional loot rooms, mushroom patches worth spraying
 - Show the takeover through the environment: nests in luggage, pecked signs, chicken graffiti
 
 ---
@@ -293,7 +293,7 @@ Kept minimal so the game stays readable at 320x180.
 | Easy | Calmer chickens, more snacks, longer extinguisher freeze |
 | Standard | As designed |
 | Hard | More chickens, powered modes trigger more often, fewer snacks |
-| Expert | Maximum chickens, instant power-ups at drug boxes, checkpoints only at the start of each level |
+| Expert | Maximum chickens, instant power-ups at mushroom patches, checkpoints only at the start of each level |
 
 ### Scoring
 A score at the end of the run, made up of:
@@ -406,7 +406,7 @@ game/
 - **Store**: Steam first. Requires a Steamworks account and the per-game Steam Direct fee (currently $100, refunded after $1,000 in sales).
 - **Store page timing**: Put a "Coming Soon" page up as early as the vertical slice allows, to collect wishlists. Wishlists drive Steam's launch visibility.
 - **Price**: $9.99 target. See the refund risk below before locking it in.
-- **Age rating**: Steam's content questionnaire asks about drug references, so answer it honestly about the drug disposal boxes.
+- **Age rating**: Aim for a low rating: cartoon violence (feather poofs) and magic mushrooms that work like video-game power-ups. Answer Steam's content questionnaire accurately.
 - **Store art**: Commission capsule images and key art from a pixel artist or illustrator. These matter more for clicks than any screenshot.
 
 ---
@@ -421,7 +421,7 @@ game/
 | **Pixel art consistency** | Medium | One palette, a written style guide, and a style test before production |
 | **Composer cost and schedule** | Medium | Budget early. Bring the composer in after the vertical slice, when the game's mood is clear. |
 | **Feature creep** | Medium | No new mechanics after the risk-prototype milestone unless something is cut to make room |
-| **Content rating from drug references** | Low | Answer Steam's questionnaire accurately. Tone stays cartoonish. |
+| **Mushrooms read as a drug reference** | Low | Keep mushrooms clearly magical: glowing, colorful, and giving video-game powers. Answer Steam's questionnaire accurately. |
 
 ---
 
@@ -446,3 +446,5 @@ game/
 | 2026-10-19 | Totems form at designer-placed roost spots | Proposed |
 | 2026-10-19 | Throwing aims where the player faces; no mouse aiming | Proposed |
 | 2026-10-19 | Steam first, with Steam Deck support from the start | Proposed |
+| 2026-10-19 | Mushroom theme: power-ups come from mushroom patches instead of drug disposal boxes; powered chickens wear the cap of the mushroom they ate; the final totem is crowned with a giant mushroom | You |
+| 2026-10-19 | Mushroom patches can be destroyed with one fire extinguisher charge | Proposed |
