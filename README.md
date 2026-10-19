@@ -6,16 +6,22 @@ A 16-bit top-down action game: get through a chicken-overrun airport and catch t
 
 ![The player's walk cycle in all four directions](docs/images/player_walk.gif)
 
-## Play the prototype
+## Play
 
 1. Install Godot 4 (on macOS: `brew install --cask godot`).
-2. Run the game from the repo root:
+2. Run the game from the repo root. It starts in Level 1, Arrivals / Baggage Claim:
 
 ```bash
 /Applications/Godot.app/Contents/MacOS/Godot --path game
 ```
 
 Or open `game/project.godot` in the Godot editor and press F5.
+
+The one-room prototype is still there as a test bed for chicken behavior and items:
+
+```bash
+/Applications/Godot.app/Contents/MacOS/Godot --path game res://scenes/levels/prototype_room.tscn
+```
 
 | Action | Keyboard | Gamepad |
 |---|---|---|
@@ -26,17 +32,21 @@ Or open `game/project.godot` in the Godot editor and press F5.
 | Drop the selected slot | G | Back |
 | Eat a snack (heal) | E | X |
 | Push a cart, take an extinguisher, pick up or put down a suitcase | F | B |
-| Restart (after winning or losing) | R | Start |
+| Restart the prototype room (after winning or losing) | R | Start |
 
-Reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
+In Level 1, find the maintenance key and use it on the locked door to **SECURITY**. Hints at the top of the screen teach the controls as you go. In the prototype room, reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
 
-## Run the smoke test
+## Run the smoke tests
 
 ```bash
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/prototype_smoke.tscn
 ```
 
-It drives the player with simulated input and exits non-zero on failure. Godot script errors don't fail it on their own, so also check the output for any `ERROR` lines.
+```bash
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/level_01_smoke.tscn
+```
+
+The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1's layout and its path from the start to the Security door. Both drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
 
 ## Rebuild the sprites
 

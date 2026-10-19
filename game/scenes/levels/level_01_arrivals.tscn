@@ -1,0 +1,210 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/level_01_arrivals.gd" id="1_level"]
+[ext_resource type="PackedScene" path="res://scenes/characters/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/characters/chicken.tscn" id="3_chicken"]
+[ext_resource type="PackedScene" path="res://scenes/objects/item_pickup.tscn" id="4_pickup"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="5_hud"]
+[ext_resource type="PackedScene" path="res://scenes/objects/luggage_cart.tscn" id="6_cart"]
+[ext_resource type="PackedScene" path="res://scenes/objects/locked_door.tscn" id="7_door"]
+[ext_resource type="PackedScene" path="res://scenes/objects/hiding_spot.tscn" id="8_closet"]
+[ext_resource type="PackedScene" path="res://scenes/objects/potted_plant.tscn" id="9_plant"]
+[ext_resource type="PackedScene" path="res://scenes/objects/suitcase.tscn" id="10_suitcase"]
+[ext_resource type="PackedScene" path="res://scenes/objects/maintenance_cart.tscn" id="11_janitor"]
+[ext_resource type="Script" path="res://scripts/objects/flipbook_sprite.gd" id="12_flipbook"]
+[ext_resource type="Texture2D" path="res://assets/sprites/departure_board.png" id="13_board"]
+[ext_resource type="Texture2D" path="res://assets/sprites/window.png" id="14_window"]
+[ext_resource type="Texture2D" path="res://assets/sprites/welcome_banner.png" id="15_banner"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gate_door.png" id="16_gate"]
+[ext_resource type="Texture2D" path="res://assets/sprites/signs.png" id="17_signs"]
+
+[node name="Level01Arrivals" type="Node2D"]
+script = ExtResource("1_level")
+
+[node name="Floor" type="TileMapLayer" parent="."]
+
+[node name="Props" type="TileMapLayer" parent="."]
+
+[node name="WallDecor" type="Node2D" parent="."]
+
+[node name="ArrivalGate" type="Sprite2D" parent="WallDecor"]
+position = Vector2(32, 32)
+texture = ExtResource("16_gate")
+centered = false
+hframes = 4
+
+[node name="LoungeWindow" type="Sprite2D" parent="WallDecor"]
+position = Vector2(104, 34)
+texture = ExtResource("14_window")
+centered = false
+hframes = 3
+
+[node name="LoungeWindowNose" type="Sprite2D" parent="WallDecor"]
+position = Vector2(144, 34)
+texture = ExtResource("14_window")
+centered = false
+hframes = 3
+frame = 1
+
+[node name="LoungeWindowTail" type="Sprite2D" parent="WallDecor"]
+position = Vector2(184, 34)
+texture = ExtResource("14_window")
+centered = false
+hframes = 3
+frame = 2
+
+[node name="HallBoard" type="Sprite2D" parent="WallDecor"]
+position = Vector2(296, 33)
+texture = ExtResource("13_board")
+centered = false
+hframes = 4
+script = ExtResource("12_flipbook")
+
+[node name="WelcomeBanner" type="Sprite2D" parent="WallDecor"]
+position = Vector2(376, 35)
+texture = ExtResource("15_banner")
+centered = false
+
+[node name="HallWindow" type="Sprite2D" parent="WallDecor"]
+position = Vector2(448, 34)
+texture = ExtResource("14_window")
+centered = false
+hframes = 3
+
+[node name="HallWindowNose" type="Sprite2D" parent="WallDecor"]
+position = Vector2(488, 34)
+texture = ExtResource("14_window")
+centered = false
+hframes = 3
+frame = 1
+
+[node name="HallWindowTail" type="Sprite2D" parent="WallDecor"]
+position = Vector2(528, 34)
+texture = ExtResource("14_window")
+centered = false
+hframes = 3
+frame = 2
+
+[node name="BaggageClaimSign" type="Sprite2D" parent="WallDecor"]
+position = Vector2(576, 36)
+texture = ExtResource("17_signs")
+centered = false
+hframes = 4
+
+[node name="BaggageBoard" type="Sprite2D" parent="WallDecor"]
+position = Vector2(296, 225)
+texture = ExtResource("13_board")
+centered = false
+hframes = 4
+script = ExtResource("12_flipbook")
+
+[node name="StaffSign" type="Sprite2D" parent="WallDecor"]
+position = Vector2(72, 418)
+texture = ExtResource("17_signs")
+centered = false
+hframes = 4
+frame = 2
+
+[node name="SecurityDoor" parent="." instance=ExtResource("7_door")]
+position = Vector2(688, 224)
+
+[node name="SupplyCloset" parent="." instance=ExtResource("8_closet")]
+position = Vector2(864, 34)
+
+[node name="Entities" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="Entities" instance=ExtResource("2_player")]
+position = Vector2(64, 104)
+starting_snacks = 0
+
+[node name="Snack1" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(152, 128)
+
+[node name="Snack2" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(200, 160)
+
+[node name="Snack3" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(344, 170)
+
+[node name="Snack4" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(250, 300)
+
+[node name="Snack5" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(620, 490)
+
+[node name="Snack6" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(820, 520)
+
+[node name="Snack7" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(760, 120)
+
+[node name="Snack8" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(830, 150)
+
+[node name="Snack9" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(880, 110)
+
+[node name="MaintenanceKey" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(40, 482)
+item = "maintenance_key"
+
+[node name="HallChicken" parent="Entities" instance=ExtResource("3_chicken")]
+position = Vector2(440, 140)
+
+[node name="BaggageChicken1" parent="Entities" instance=ExtResource("3_chicken")]
+position = Vector2(310, 300)
+
+[node name="BaggageChicken2" parent="Entities" instance=ExtResource("3_chicken")]
+position = Vector2(470, 470)
+
+[node name="BaggageChicken3" parent="Entities" instance=ExtResource("3_chicken")]
+position = Vector2(760, 330)
+
+[node name="BaggageChicken4" parent="Entities" instance=ExtResource("3_chicken")]
+position = Vector2(290, 500)
+
+[node name="StaffChicken" parent="Entities" instance=ExtResource("3_chicken")]
+position = Vector2(120, 505)
+
+[node name="LostFoundChicken" parent="Entities" instance=ExtResource("3_chicken")]
+position = Vector2(800, 140)
+
+[node name="HallCart" parent="Entities" instance=ExtResource("6_cart")]
+position = Vector2(560, 150)
+
+[node name="BaggageCart1" parent="Entities" instance=ExtResource("6_cart")]
+position = Vector2(650, 300)
+
+[node name="BaggageCart2" parent="Entities" instance=ExtResource("6_cart")]
+position = Vector2(300, 455)
+
+[node name="Suitcase1" parent="Entities" instance=ExtResource("10_suitcase")]
+position = Vector2(690, 470)
+
+[node name="Suitcase2" parent="Entities" instance=ExtResource("10_suitcase")]
+position = Vector2(250, 355)
+
+[node name="LoungePlant" parent="Entities" instance=ExtResource("9_plant")]
+position = Vector2(232, 80)
+
+[node name="HallPlant" parent="Entities" instance=ExtResource("9_plant")]
+position = Vector2(650, 80)
+variety = 1
+
+[node name="WaitingPlant" parent="Entities" instance=ExtResource("9_plant")]
+position = Vector2(232, 272)
+
+[node name="BaggagePlant" parent="Entities" instance=ExtResource("9_plant")]
+position = Vector2(896, 272)
+variety = 1
+
+[node name="LostFoundPlant" parent="Entities" instance=ExtResource("9_plant")]
+position = Vector2(700, 80)
+
+[node name="MaintenanceCart" parent="Entities" instance=ExtResource("11_janitor")]
+position = Vector2(76, 474)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UI" instance=ExtResource("5_hud")]
