@@ -4,3 +4,6 @@ __pycache__/
 
 # Export output (web build etc.)
 /build/
+
+# Rendered music tests
+/tools/music/out/
