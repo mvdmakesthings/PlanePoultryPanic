@@ -152,7 +152,7 @@ More usable items may come out of prototyping, but every new item has to earn it
 ## Chickens
 
 ### How Chickens Are Defeated
-The player can't attack directly. A chicken is defeated when it's caught by airport machinery (the baggage carousel's chute, moving walkways at speed, closing security gates) or when a totem collapses on top of it. A defeated chicken bursts into a comic puff of feathers, squawks, and is gone. No blood or gore, ever.
+The player can't attack directly. A chicken is defeated when it's caught by airport machinery (the baggage carousel's chute, moving walkways at speed, closing security gates), flattened by a luggage cart the player shoves, or crushed when a totem collapses on top of it. A defeated chicken bursts into a comic puff of feathers, squawks, and is gone. No blood or gore, ever.
 
 Fire extinguisher spray and distractions don't defeat chickens. They control them. That's what keeps the **Pacifist** run possible: get through without defeating a single chicken.
 
@@ -206,6 +206,7 @@ Behavior priority, highest first:
 ### Interactive Objects
 | Element | Effect |
 |---|---|
+| Luggage cart | Shove it with Interact and it rolls about 4 tiles. A chicken it hits while rolling fast is defeated. Eggs splat against the whole cart, luggage included, so the player can hide behind one. |
 | Vending machine | Opened with a maintenance key. Drops 2-3 snacks. |
 | Emergency exit | Shortcut. Some are blocked, and some lead past extra danger. |
 | Bathroom stall, supply closet | Hiding spot (see [Hiding](#hiding)) |
@@ -451,5 +452,6 @@ game/
 | 2026-10-19 | Mushroom patches can be destroyed with one fire extinguisher charge | Proposed |
 | 2026-10-19 | Egg-shooter cap is purple instead of yellow, because yellow blended into the beak and legs at 16x16 | Proposed |
 | 2026-10-19 | Style test (M2) signed off: ENDESGA 32 palette, sprite sizes, and the Arrivals look are locked | You |
+| 2026-10-19 | Luggage carts are a second way to defeat chickens, alongside the carousel chute | You |
 | 2026-10-19 | The carousel belt is walkable and carries everything; only chickens fit through the chute | Proposed |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |

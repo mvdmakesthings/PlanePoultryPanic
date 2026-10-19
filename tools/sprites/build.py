@@ -47,6 +47,7 @@ IMAGES = [
     ("item_snack.png", items.snack),
     ("hud_luggage.png", items.luggage),
     ("egg.png", items.egg),
+    ("luggage_cart.png", items.cart),
     ("feather_poof.png", effects.poof),
 ]
 

@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/snack_pickup.tscn" id="4_snack"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="5_hud"]
 [ext_resource type="PackedScene" path="res://scenes/objects/mushroom_patch.tscn" id="6_patch"]
+[ext_resource type="PackedScene" path="res://scenes/objects/luggage_cart.tscn" id="7_cart"]
 
 [node name="PrototypeRoom" type="Node2D"]
 script = ExtResource("1_room")
@@ -69,6 +70,15 @@ variety = "flight"
 [node name="EggPatch" parent="Entities" instance=ExtResource("6_patch")]
 position = Vector2(312, 248)
 variety = "egg"
+
+[node name="Cart1" parent="Entities" instance=ExtResource("7_cart")]
+position = Vector2(104, 270)
+
+[node name="Cart2" parent="Entities" instance=ExtResource("7_cart")]
+position = Vector2(296, 200)
+
+[node name="Cart3" parent="Entities" instance=ExtResource("7_cart")]
+position = Vector2(400, 150)
 
 [node name="UI" type="CanvasLayer" parent="."]
 

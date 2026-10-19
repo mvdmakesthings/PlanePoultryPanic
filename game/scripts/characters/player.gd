@@ -82,6 +82,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		throw_snack()
 	elif event.is_action_pressed("eat_snack"):
 		eat_snack()
+	elif event.is_action_pressed("interact"):
+		interact()
 
 
 func take_damage(amount: int, from_position: Vector2) -> void:
@@ -123,6 +125,20 @@ func eat_snack() -> void:
 	health += 1
 	snacks_changed.emit(snacks)
 	health_changed.emit(health, max_health)
+
+
+## Uses the nearest thing in reach that can be interacted with, if any.
+func interact() -> void:
+	var nearest: Node2D = null
+	var best := INF
+	for node in get_tree().get_nodes_in_group("interactables"):
+		var target := node as Node2D
+		var distance := global_position.distance_to(target.global_position)
+		if target.can_interact(self) and distance < best:
+			best = distance
+			nearest = target
+	if nearest:
+		nearest.interact(self)
 
 
 ## Stops all player control, e.g. when the level is won.

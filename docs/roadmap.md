@@ -70,6 +70,7 @@ Still mostly gray-box. Each item should be playable in the prototype room.
 - [x] Mushroom patches and the three powered modes (flight, rage, egg shooter)
 - [ ] Fire extinguisher (freeze cone, charges)
 - [x] Baggage carousel that carries and defeats chickens
+- [x] Luggage carts the player shoves into chickens
 - [ ] Totem formation at a roost, its attacks, and toppling it
 - [ ] Hiding spots
 - [ ] 6-slot inventory with stacking, cycling, dropping, and key items

@@ -13,7 +13,7 @@ const STAMINA_BACK := Color("262b44")
 const STAMINA_FILL := Color("63c74d")
 const STAMINA_TIRED := Color("f77622")
 const FONT_SIZE := 8
-const CONTROLS_HINT := "WASD move  SHIFT run  SPACE throw  E eat"
+const CONTROLS_HINT := "SHIFT run  SPACE throw  E eat  F push"
 
 var _health := 0
 var _max_health := 0

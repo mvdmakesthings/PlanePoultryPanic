@@ -12,6 +12,7 @@ const KEY_BINDINGS := {
 	"run": [KEY_SHIFT],
 	"throw_snack": [KEY_SPACE],
 	"eat_snack": [KEY_E],
+	"interact": [KEY_F],
 	"restart": [KEY_R],
 }
 
@@ -23,6 +24,7 @@ const JOY_BUTTON_BINDINGS := {
 	"run": [JOY_BUTTON_RIGHT_SHOULDER],
 	"throw_snack": [JOY_BUTTON_A],
 	"eat_snack": [JOY_BUTTON_X],
+	"interact": [JOY_BUTTON_B],
 	"restart": [JOY_BUTTON_START],
 }
 

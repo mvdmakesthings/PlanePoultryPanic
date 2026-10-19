@@ -97,6 +97,7 @@ func _ready() -> void:
 	room.queue_free()
 	await _power_tests()
 	await _carousel_tests()
+	await _cart_tests()
 
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
@@ -195,6 +196,43 @@ func _carousel_tests() -> void:
 	if is_instance_valid(bait):
 		print("looping snack stuck at %s" % bait.global_position)
 	_check(not is_instance_valid(bait), "snack rides the full belt loop around the corners")
+	setup[0].queue_free()
+
+
+## Luggage carts: shove one with Interact and it flattens a chicken.
+func _cart_tests() -> void:
+	var setup := await _fresh_room(Vector2(230, 262), Vector2(150, 260))
+	var chicken: Chicken = setup[1]
+	var player: Player = setup[2]
+	chicken.state = Chicken.State.EATING
+	chicken._timer = 5.0
+	var defeated := [false]
+	chicken.defeated.connect(func() -> void: defeated[0] = true)
+	var cart: LuggageCart = preload("res://scenes/objects/luggage_cart.tscn").instantiate()
+	cart.position = Vector2(168, 262)
+	setup[0].get_node("Entities").add_child(cart)
+	await get_tree().physics_frame
+	player.facing = Vector2.RIGHT
+	_tap("interact")
+	await _wait(1.0)
+	print("cart rolled to %s" % cart.global_position)
+	_check(cart.global_position.x > 200.0, "Interact shoves a nearby cart")
+	_check(defeated[0], "a rolling cart defeats the chicken it hits")
+	setup[0].queue_free()
+
+	# Hiding: an egg shooter firing at a player crouched behind a cart hits
+	# the cart instead. Shots come in at a slight angle, as in real play.
+	setup = await _fresh_room(Vector2(214, 290), Vector2(200, 212))
+	chicken = setup[1]
+	player = setup[2]
+	cart = preload("res://scenes/objects/luggage_cart.tscn").instantiate()
+	cart.position = Vector2(203, 226)
+	setup[0].get_node("Entities").add_child(cart)
+	chicken.power_up("egg")
+	chicken.egg_keep_distance = 0.0  # stand still and keep shooting
+	await _wait(4.0)
+	print("player behind the cart has %d/%d health" % [player.health, player.max_health])
+	_check(player.health == player.max_health, "eggs splat on a cart the player hides behind")
 	setup[0].queue_free()
 
 

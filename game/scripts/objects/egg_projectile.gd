@@ -42,6 +42,10 @@ func _physics_process(delta: float) -> void:
 		_splat()
 		return
 	position += step
+	for node in get_tree().get_nodes_in_group("egg_cover"):
+		if node.blocks_egg(global_position):
+			_splat()
+			return
 
 	var player := get_tree().get_first_node_in_group("player") as Player
 	if player and not player.is_dead and global_position.distance_to(player.global_position) < 7.0:
