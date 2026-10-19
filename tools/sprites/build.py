@@ -28,6 +28,8 @@ from palette import to_image
 
 REPO = Path(__file__).resolve().parents[2]
 SPRITES = REPO / "game" / "assets" / "sprites"
+ICON = REPO / "game" / "icon.png"
+ICON_SIZE = 512
 DIRECTIONS = ("down", "up", "right", "left")
 PREVIEW_BG = (38, 43, 68, 255)
 
@@ -169,6 +171,8 @@ def main():
     for name, build in IMAGES:
         build().save(SPRITES / name)
         print(f"wrote {(SPRITES / name).relative_to(REPO)}")
+    to_image(chicken.SIDE).resize((ICON_SIZE, ICON_SIZE), Image.NEAREST).save(ICON)
+    print(f"wrote {ICON.relative_to(REPO)}")
     if args.preview:
         write_previews(args.preview)
         for name, build in IMAGES:
