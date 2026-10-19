@@ -6,6 +6,7 @@ extends Control
 
 const LUGGAGE := preload("res://assets/sprites/hud_luggage.png")
 const SNACK := preload("res://assets/sprites/item_snack.png")
+const EXTINGUISHER := preload("res://assets/sprites/item_extinguisher.png")
 const LUGGAGE_SIZE := Vector2(12, 10)
 const TEXT := Color("ffffff")
 const TEXT_OUTLINE := Color("181425")
@@ -13,12 +14,13 @@ const STAMINA_BACK := Color("262b44")
 const STAMINA_FILL := Color("63c74d")
 const STAMINA_TIRED := Color("f77622")
 const FONT_SIZE := 8
-const CONTROLS_HINT := "SHIFT run  SPACE throw  E eat  F push"
+const CONTROLS_HINT := "SHIFT run  SPACE throw  E eat  F use  Q spray"
 
 var _health := 0
 var _max_health := 0
 var _stamina_ratio := 1.0
 var _snacks := 0
+var _extinguisher_charges := 0
 var _message := ""
 
 
@@ -26,6 +28,7 @@ func bind_player(player: Player) -> void:
 	player.health_changed.connect(_on_health_changed)
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.snacks_changed.connect(_on_snacks_changed)
+	player.extinguisher_changed.connect(_on_extinguisher_changed)
 
 
 func show_message(text: String) -> void:
@@ -49,6 +52,11 @@ func _on_snacks_changed(count: int) -> void:
 	queue_redraw()
 
 
+func _on_extinguisher_changed(charges: int) -> void:
+	_extinguisher_charges = charges
+	queue_redraw()
+
+
 func _draw() -> void:
 	var font := get_theme_default_font()
 
@@ -65,6 +73,9 @@ func _draw() -> void:
 
 	draw_texture(SNACK, Vector2(4, size.y - 14))
 	_draw_text(font, Vector2(17, size.y - 5), "x%d" % _snacks, HORIZONTAL_ALIGNMENT_LEFT, -1)
+	if _extinguisher_charges > 0:
+		draw_texture(EXTINGUISHER, Vector2(34, size.y - 14))
+		_draw_text(font, Vector2(45, size.y - 5), "x%d" % _extinguisher_charges, HORIZONTAL_ALIGNMENT_LEFT, -1)
 	_draw_text(font, Vector2(0, size.y - 5), CONTROLS_HINT, HORIZONTAL_ALIGNMENT_RIGHT, size.x - 4)
 
 	if _message != "":

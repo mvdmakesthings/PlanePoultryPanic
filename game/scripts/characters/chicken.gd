@@ -11,7 +11,7 @@ extends CharacterBody2D
 ## Emitted just before a defeated chicken is removed.
 signal defeated
 
-enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP }
+enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN }
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
@@ -22,6 +22,8 @@ const POWER_SHEETS := {
 }
 const EGG_SCENE := preload("res://scenes/objects/egg_projectile.tscn")
 const POOF_SCENE := preload("res://scenes/objects/feather_poof.tscn")
+## Frozen chickens are tinted icy and boxed in an ice block.
+const FROZEN_TINT := Color(0.7, 0.95, 1.0)
 const FRAME_SIZE := Vector2i(16, 16)
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const WORLD_LAYER := 1
@@ -90,6 +92,7 @@ var _egg_ready_in := 0.0
 @onready var _hitbox: Area2D = $Hitbox
 @onready var _alert_label: Label = $AlertLabel
 @onready var _agent: NavigationAgent2D = $NavigationAgent2D
+@onready var _ice: Sprite2D = $Ice
 
 
 func _ready() -> void:
@@ -129,6 +132,8 @@ func _physics_process(delta: float) -> void:
 				_seek_mushroom()
 			State.WINDUP:
 				_windup()
+			State.FROZEN:
+				_frozen()
 		velocity += Carousel.push_for(get_tree(), global_position)
 	move_and_slide()
 	if not _is_hopping() and Carousel.in_any_chute(get_tree(), global_position):
@@ -146,6 +151,17 @@ func _physics_process(delta: float) -> void:
 func alert() -> void:
 	if state in [State.WANDER, State.SEEK_MUSHROOM]:
 		_start_pursuit(false)
+
+
+## Freezes the chicken solid. Frozen chickens can't move or peck, but the
+## carousel belt still carries them and carts still flatten them. Chickens
+## in mid-hop are out of reach.
+func freeze(seconds: float) -> void:
+	if _is_hopping():
+		return
+	state = State.FROZEN
+	_timer = seconds
+	velocity = Vector2.ZERO
 
 
 ## Bursts into feathers and leaves the game.
@@ -256,6 +272,13 @@ func _seek_mushroom() -> void:
 			state = State.WANDER
 		return
 	velocity = _direction_toward(_target_patch.global_position) * investigate_speed
+
+
+func _frozen() -> void:
+	velocity = Vector2.ZERO
+	if _timer <= 0.0:
+		state = State.WANDER
+		_pick_wander()
 
 
 func _windup() -> void:
@@ -399,7 +422,7 @@ func _start_pursuit(alert_others: bool) -> void:
 
 
 func _check_hit() -> void:
-	if state in [State.EATING, State.FEEDING] or _is_hopping():
+	if state in [State.EATING, State.FEEDING, State.FROZEN] or _is_hopping():
 		return
 	for body in _hitbox.get_overlapping_bodies():
 		if body is Player:
@@ -436,6 +459,11 @@ func _update_visuals() -> void:
 		var t := clampf(_hop_elapsed / hop_duration, 0.0, 1.0)
 		_sprite.position.y = -roundf(sin(t * PI) * hop_height) if t < 1.0 else -hop_height
 	_alert_label.visible = state in [State.PURSUE, State.WINDUP]
+	var frozen := state == State.FROZEN
+	_ice.visible = frozen
+	_sprite.modulate = FROZEN_TINT if frozen else Color.WHITE
+	if frozen:
+		_sprite.pause()
 	_alert_label.position.y = _sprite.position.y - 26.0
 
 

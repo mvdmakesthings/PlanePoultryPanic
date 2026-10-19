@@ -100,6 +100,7 @@ func _ready() -> void:
 	await _cart_tests()
 	await _cornered_cart_test()
 	await _gate_test()
+	await _extinguisher_tests()
 
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
@@ -271,6 +272,58 @@ func _cornered_cart_test() -> void:
 	await _wait(1.0)
 	print("cornered cart moved from %s to %s" % [start, cart.global_position])
 	_check(cart.global_position.distance_to(start) > 20.0, "a cart shoved into a corner slides out along the wall")
+	setup[0].queue_free()
+
+
+## Fire extinguisher: take it from the wall cabinet, freeze chickens, and
+## kill mushroom patches.
+func _extinguisher_tests() -> void:
+	var setup := await _fresh_room(Vector2(192, 110), Vector2(192, 68))
+	var room: Node = setup[0]
+	var chicken: Chicken = setup[1]
+	var player: Player = setup[2]
+	var cabinet: ExtinguisherCabinet = room.get_node("ExtinguisherCabinet")
+	_tap("interact")
+	await get_tree().physics_frame
+	_check(player.extinguisher_charges == 3 and cabinet.is_empty, "Interact takes the extinguisher from its cabinet")
+
+	player.facing = Vector2.DOWN
+	_tap("spray")
+	await get_tree().physics_frame
+	_check(chicken.state == Chicken.State.FROZEN, "spraying a chicken freezes it")
+	_check(player.extinguisher_charges == 2, "each spray uses a charge")
+	var health := player.health
+	chicken.global_position = player.global_position
+	await _wait(1.0)
+	_check(player.health == health, "frozen chickens can't peck")
+	chicken.global_position = Vector2(192, 110)
+	await _wait(3.5)
+	_check(chicken.state != Chicken.State.FROZEN, "frozen chickens thaw after a few seconds")
+	room.queue_free()
+
+	# Spraying a mushroom patch kills it for good.
+	setup = await _fresh_room(Vector2(40, 290), Vector2(232, 72))
+	room = setup[0]
+	setup[1].queue_free()
+	player = setup[2]
+	player.give_extinguisher(1)
+	var patch: MushroomPatch = room.get_node("Entities/RagePatch")
+	player.facing = Vector2.DOWN
+	player.spray()
+	await _wait(0.8)
+	_check(not is_instance_valid(patch), "spraying a mushroom patch destroys it")
+	player.spray()
+	_check(player.extinguisher_charges == 0, "an empty extinguisher does nothing")
+	room.queue_free()
+
+	# A frozen chicken on the belt rides into the chute.
+	setup = await _fresh_room(Vector2(84, 151), Vector2(400, 290))
+	chicken = setup[1]
+	var defeated := [false]
+	chicken.defeated.connect(func() -> void: defeated[0] = true)
+	chicken.freeze(4.0)
+	await _wait(2.0)
+	_check(defeated[0], "a frozen chicken on the belt rides into the chute")
 	setup[0].queue_free()
 
 

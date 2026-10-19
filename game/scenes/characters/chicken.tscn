@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/chicken.gd" id="1_chicken"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ice_block.png" id="2_ice"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 4.0
@@ -46,3 +47,9 @@ text = "!"
 path_desired_distance = 4.0
 target_desired_distance = 4.0
 radius = 6.0
+
+[node name="Ice" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0.85)
+texture = ExtResource("2_ice")
+offset = Vector2(0, -8)

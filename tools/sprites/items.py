@@ -132,3 +132,82 @@ def cart():
     for i in range(2):
         out.alpha_composite(to_image(cart_frame(i)), (i * CART_SIZE[0], 0))
     return out
+
+
+# Fire extinguisher HUD icon: 8x12, red canister, black hose, silver valve.
+EXTINGUISHER = [
+    "..OOO...",
+    ".OWWWO..",
+    "OOOWOOO.",
+    ".ORRROkO",
+    "OCRRRrOk",
+    "OCRRRrOk",
+    "ORRRRrO.",
+    "ORYYYrO.",
+    "ORYOYrO.",
+    "ORRRRrO.",
+    "OrrrrrO.",
+    ".OOOOO..",
+]
+
+
+def extinguisher():
+    return to_image(EXTINGUISHER)
+
+
+# Emergency cabinet on the wall: two 16x20 frames, full then empty.
+def cabinet_frame(full):
+    g = ["." * 16 for _ in range(20)]
+    _box(g, 0, 0, 15, 19, "R")
+    for x in range(1, 15):
+        _px(g, x, 18, "r")
+    for y in range(1, 19):
+        _px(g, 14, y, "r")
+    # Glass door with the extinguisher (or nothing) behind it.
+    _box(g, 3, 3, 12, 16, "k")
+    if full:
+        for y, row in enumerate(EXTINGUISHER[1:]):
+            for x, ch in enumerate(row):
+                if ch != ".":
+                    _px(g, 5 + x, 4 + y, ch)
+    # Glass shine and a white label strip.
+    _px(g, 4, 4, "W")
+    _px(g, 4, 5, "W")
+    _px(g, 5, 4, "W")
+    for x in range(4, 12):
+        _px(g, x, 1, "C")
+    return g
+
+
+def cabinet():
+    from PIL import Image as _Image
+    out = _Image.new("RGBA", (32, 20), (0, 0, 0, 0))
+    out.alpha_composite(to_image(cabinet_frame(True)), (0, 0))
+    out.alpha_composite(to_image(cabinet_frame(False)), (16, 0))
+    return out
+
+
+# Ice block drawn over a frozen chicken: 16x16, outline and highlights only,
+# so the chicken shows through the middle.
+ICE = [
+    "................",
+    "................",
+    "..qqqqqqqqqqqq..",
+    "..qCC.......Cq..",
+    "..qC.........q..",
+    "..q..........q..",
+    "..q..........q..",
+    "..q.........Cq..",
+    "..q..........q..",
+    "..q..........q..",
+    "..qC.........q..",
+    "..q..........q..",
+    "..q.........Cq..",
+    "..q........CCq..",
+    "..qqqqqqqqqqqq..",
+    "................",
+]
+
+
+def ice():
+    return to_image(ICE)

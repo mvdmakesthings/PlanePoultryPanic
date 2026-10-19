@@ -89,6 +89,7 @@ When health reaches zero, the player restarts from the last checkpoint with thei
 | Use selected item (throw, spray, eat) | Space | A / Cross |
 | Interact (pick up, open, hide) | F | B / Circle |
 | Eat a snack (quick heal) | E | X / Square |
+| Spray the extinguisher (prototype only, until the inventory exists) | Q | Y / Triangle |
 | Previous / next item | Q / R, or mouse wheel | LB / LT or D-pad left/right while holding Y |
 | Pause | Esc | Start / Options |
 
@@ -136,7 +137,7 @@ Bathroom stalls and supply closets are hiding spots. While hidden, chickens lose
 | Item | Use | Notes |
 |---|---|---|
 | Snack | Eat to heal 1, or throw as a distraction. A thrown snack nobody has eaten can be picked back up. | Found in the food court, vending machines, and abandoned bags |
-| Fire extinguisher | Spray to freeze chickens in a cone for 4 seconds | 3 charges, then it's empty. Found at emergency stations. |
+| Fire extinguisher | Spray a short cone of foam: chickens in it freeze in a block of ice for 4 seconds, and a mushroom patch in it is destroyed for good | 3 charges, then it's empty. Taken from red emergency cabinets on the walls. Frozen chickens can't peck, but the carousel still carries them and carts still flatten them. |
 
 More usable items may come out of prototyping, but every new item has to earn its slot. Fewer items that each do a lot fits the game better than many small ones.
 

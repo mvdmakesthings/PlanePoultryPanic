@@ -7,9 +7,11 @@ extends CharacterBody2D
 signal health_changed(current: int, maximum: int)
 signal stamina_changed(current: float, maximum: float)
 signal snacks_changed(count: int)
+signal extinguisher_changed(charges: int)
 signal died
 
 const THROWN_SNACK_SCENE := preload("res://scenes/objects/thrown_snack.tscn")
+const SPRAY_SCENE := preload("res://scenes/objects/extinguisher_spray.tscn")
 const WALK_SHEET := preload("res://assets/sprites/player_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/player_idle.png")
 const FRAME_SIZE := Vector2i(16, 32)
@@ -34,6 +36,8 @@ const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 var health: int
 var stamina: float
 var snacks: int
+## Fire extinguisher charges left; 0 means no extinguisher.
+var extinguisher_charges := 0
 var facing := Vector2.DOWN
 var is_dead := false
 
@@ -84,6 +88,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		eat_snack()
 	elif event.is_action_pressed("interact"):
 		interact()
+	elif event.is_action_pressed("spray"):
+		spray()
 
 
 func take_damage(amount: int, from_position: Vector2) -> void:
@@ -125,6 +131,24 @@ func eat_snack() -> void:
 	health += 1
 	snacks_changed.emit(snacks)
 	health_changed.emit(health, max_health)
+
+
+func give_extinguisher(charges: int) -> void:
+	extinguisher_charges += charges
+	extinguisher_changed.emit(extinguisher_charges)
+
+
+## Sprays a cone of foam ahead, freezing chickens and killing mushroom patches.
+func spray() -> void:
+	if extinguisher_charges <= 0:
+		return
+	extinguisher_charges -= 1
+	extinguisher_changed.emit(extinguisher_charges)
+	var foam := SPRAY_SCENE.instantiate() as ExtinguisherSpray
+	foam.direction = facing
+	# Spray from the nozzle at waist height, slightly ahead of the feet.
+	foam.position = position + facing * 4.0 + Vector2(0, -4)
+	get_parent().add_child(foam)
 
 
 ## Uses the nearest thing in reach that can be interacted with, if any.
@@ -190,6 +214,7 @@ func _emit_state() -> void:
 	health_changed.emit(health, max_health)
 	stamina_changed.emit(stamina, max_stamina)
 	snacks_changed.emit(snacks)
+	extinguisher_changed.emit(extinguisher_charges)
 
 
 func _draw() -> void:
