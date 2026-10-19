@@ -22,6 +22,7 @@ import items
 import mushrooms
 import player
 import roost
+import set_dressing
 import tiles
 from palette import to_image
 
@@ -62,6 +63,10 @@ IMAGES = [
     ("gate_door.png", gate.sheet),
     ("closet_door.png", closet.sheet),
     ("roost.png", roost.sheet),
+    ("departure_board.png", set_dressing.departure_board_sheet),
+    ("window.png", set_dressing.window_sheet),
+    ("potted_plant.png", set_dressing.potted_plant_sheet),
+    ("welcome_banner.png", set_dressing.welcome_banner_sheet),
 ]
 
 
@@ -171,6 +176,9 @@ def main():
             img.resize((img.width * 8, img.height * 8), Image.NEAREST).save(
                 args.preview / name.replace(".png", "_8x.png"))
         mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_arrivals_4x.png")
+        wall = set_dressing.wall_preview(tiles.by_name())
+        wall.resize((wall.width * 4, wall.height * 4), Image.NEAREST).save(
+            args.preview / "mock_wall_4x.png")
         frames = []
         for f in range(carousel.FRAMES):
             img = Image.new("RGBA", (6 * 16 + 16, 4 * 16 + 16), (90, 105, 136, 255))

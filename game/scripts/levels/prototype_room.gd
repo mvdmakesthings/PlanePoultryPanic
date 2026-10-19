@@ -20,6 +20,8 @@ const ATLAS := {
 	"wall_face_upper": Vector2i(3, 1), "wall_face_lower": Vector2i(4, 1),
 	"wall_edge_right": Vector2i(5, 1), "wall_edge_left": Vector2i(6, 1),
 	"wall_edge_bottom": Vector2i(7, 1),
+	"carpet_pattern_a": Vector2i(0, 2), "carpet_pattern_b": Vector2i(1, 2),
+	"carpet_pattern_shadow": Vector2i(2, 2),
 }
 ## Rows in carousel.png; each row has 4 belt animation frames.
 const CAROUSEL_ROWS := {
@@ -110,7 +112,7 @@ func _tile_name(x: int, y: int) -> String:
 		return "wall_edge_bottom"
 	if y < WALL_ROWS:
 		return ["wall_top", "wall_lip", "wall_face_upper", "wall_face_lower"][y]
-	var material := "carpet" if x < 12 else "tile" if x < 20 else "wood"
+	var material := "carpet_pattern" if x < 12 else "tile" if x < 20 else "wood"
 	if y == WALL_ROWS:
 		return material + "_shadow"
 	# Mix the two variants so the repetition is harder to spot.

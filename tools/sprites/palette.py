@@ -43,6 +43,8 @@ PALETTE = {
     "n": "b86f50",  # wood grain
     "m": "733e39",  # wood seam
     "v": "3e2731",  # deepest brown
+    "l": "63c74d",  # leaf light
+    "D": "d77643",  # dim departure-board orange
 }
 
 

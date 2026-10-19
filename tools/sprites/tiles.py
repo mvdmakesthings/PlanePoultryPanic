@@ -15,7 +15,8 @@ COLUMNS = 8
 
 # One shade darker, for shadows cast by walls onto the floor.
 DARKER = {"C": "W", "W": "w", "w": "T", "T": "p", "p": "k", "k": "O",
-          "a": "e", "e": "n", "n": "m", "m": "v", "v": "O", "B": "k", "b": "B"}
+          "a": "e", "e": "n", "n": "m", "m": "v", "v": "O", "B": "k", "b": "B",
+          "y": "M"}
 
 
 def fill(key):
@@ -72,6 +73,28 @@ def wood(joints, seed):
     return g
 
 
+def patterned_carpet(accent, seed):
+    """Classic airport carpet: a lattice of slate diamonds on a dark ground.
+
+    Diamonds sit at (4,4) and (12,12), so the lattice runs diagonally and
+    tiles seamlessly. accent colors the diamond centers; mixing two accents
+    breaks up the repetition without breaking the pattern.
+    """
+    g = speckle("p", "k", 0.05, seed)
+    for cx, cy in ((4, 4), (12, 12)):
+        for y in range(SIZE):
+            for x in range(SIZE):
+                d = abs(x - cx) + abs(y - cy)
+                if d == 3:
+                    put_px(g, x, y, "T")
+                elif d == 0:
+                    put_px(g, x, y, accent)
+    # Small orange flecks between the diamonds.
+    put_px(g, 12, 4, "y")
+    put_px(g, 4, 12, "B")
+    return g
+
+
 def shadowed(grid, rows=3):
     """Darken the top rows, as if a wall above casts a shadow."""
     g = list(grid)
@@ -124,6 +147,7 @@ def tiles():
     carpet_a, carpet_b = carpet(1), carpet(2)
     tile_a, tile_b = hard_tile(3), hard_tile(4)
     wood_a, wood_b = wood((5, None, 12, None), 5), wood((None, 3, None, 9), 6)
+    pattern_a, pattern_b = patterned_carpet("b", 7), patterned_carpet("y", 8)
     return [
         ("carpet_a", carpet_a), ("carpet_b", carpet_b),
         ("tile_a", tile_a), ("tile_b", tile_b),
@@ -134,6 +158,8 @@ def tiles():
         ("wall_face_upper", wall_face_upper()), ("wall_face_lower", wall_face_lower()),
         ("wall_edge_right", wall_edge("right")), ("wall_edge_left", wall_edge("left")),
         ("wall_edge_bottom", wall_edge("bottom")),
+        ("carpet_pattern_a", pattern_a), ("carpet_pattern_b", pattern_b),
+        ("carpet_pattern_shadow", shadowed(pattern_a)),
     ]
 
 

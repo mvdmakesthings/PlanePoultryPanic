@@ -11,7 +11,12 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/extinguisher_cabinet.tscn" id="9_cabinet"]
 [ext_resource type="PackedScene" path="res://scenes/objects/hiding_spot.tscn" id="10_closet"]
 [ext_resource type="PackedScene" path="res://scenes/objects/roost.tscn" id="11_roost"]
-[ext_resource type="PackedScene" path="res://scenes/objects/suitcase.tscn" id="12_suitcase"]
+[ext_resource type="PackedScene" path="res://scenes/objects/potted_plant.tscn" id="12_plant"]
+[ext_resource type="Script" path="res://scripts/objects/flipbook_sprite.gd" id="13_flipbook"]
+[ext_resource type="Texture2D" path="res://assets/sprites/departure_board.png" id="14_board"]
+[ext_resource type="Texture2D" path="res://assets/sprites/window.png" id="15_window"]
+[ext_resource type="Texture2D" path="res://assets/sprites/welcome_banner.png" id="16_banner"]
+[ext_resource type="PackedScene" path="res://scenes/objects/suitcase.tscn" id="17_suitcase"]
 
 [node name="PrototypeRoom" type="Node2D"]
 script = ExtResource("1_room")
@@ -19,6 +24,46 @@ script = ExtResource("1_room")
 [node name="Floor" type="TileMapLayer" parent="."]
 
 [node name="Props" type="TileMapLayer" parent="."]
+
+[node name="WallDecor" type="Node2D" parent="."]
+
+[node name="WindowWest" type="Sprite2D" parent="WallDecor"]
+position = Vector2(24, 34)
+texture = ExtResource("15_window")
+centered = false
+hframes = 3
+
+[node name="DepartureBoard" type="Sprite2D" parent="WallDecor"]
+position = Vector2(96, 33)
+texture = ExtResource("14_board")
+centered = false
+hframes = 4
+script = ExtResource("13_flipbook")
+
+[node name="WindowTarmac" type="Sprite2D" parent="WallDecor"]
+position = Vector2(208, 34)
+texture = ExtResource("15_window")
+centered = false
+hframes = 3
+
+[node name="WindowPlaneNose" type="Sprite2D" parent="WallDecor"]
+position = Vector2(248, 34)
+texture = ExtResource("15_window")
+centered = false
+hframes = 3
+frame = 1
+
+[node name="WindowPlaneTail" type="Sprite2D" parent="WallDecor"]
+position = Vector2(288, 34)
+texture = ExtResource("15_window")
+centered = false
+hframes = 3
+frame = 2
+
+[node name="WelcomeBanner" type="Sprite2D" parent="WallDecor"]
+position = Vector2(338, 35)
+texture = ExtResource("16_banner")
+centered = false
 
 [node name="Gate" parent="." instance=ExtResource("8_gate")]
 position = Vector2(400, 32)
@@ -95,10 +140,24 @@ position = Vector2(296, 200)
 [node name="Cart3" parent="Entities" instance=ExtResource("7_cart")]
 position = Vector2(400, 150)
 
-[node name="Suitcase1" parent="Entities" instance=ExtResource("12_suitcase")]
+[node name="PlantWest" parent="Entities" instance=ExtResource("12_plant")]
+position = Vector2(26, 80)
+variety = 1
+
+[node name="PlantGateLeft" parent="Entities" instance=ExtResource("12_plant")]
+position = Vector2(388, 80)
+
+[node name="PlantGateRight" parent="Entities" instance=ExtResource("12_plant")]
+position = Vector2(455, 80)
+
+[node name="PlantWindows" parent="Entities" instance=ExtResource("12_plant")]
+position = Vector2(328, 80)
+variety = 1
+
+[node name="Suitcase1" parent="Entities" instance=ExtResource("17_suitcase")]
 position = Vector2(72, 230)
 
-[node name="Suitcase2" parent="Entities" instance=ExtResource("12_suitcase")]
+[node name="Suitcase2" parent="Entities" instance=ExtResource("17_suitcase")]
 position = Vector2(344, 290)
 
 [node name="UI" type="CanvasLayer" parent="."]
