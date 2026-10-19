@@ -41,3 +41,31 @@ def luggage():
     out.alpha_composite(to_image(LUGGAGE_FULL), (0, 0))
     out.alpha_composite(to_image(LUGGAGE_EMPTY), (12, 0))
     return out
+
+
+# Egg projectile (6x7) and the splat it leaves (10x6).
+EGG = [
+    "..OO..",
+    ".OCCO.",
+    "OCCCcO",
+    "OCCCcO",
+    "OCCccO",
+    ".OccO.",
+    "..OO..",
+]
+SPLAT = [
+    "...OOOO...",
+    ".OOCCCCOO.",
+    "OCCCYYCCcO",
+    "OcCYyyYCCO",
+    ".OcCCCCcO.",
+    "..OOOOOO..",
+]
+
+
+def egg():
+    """Two frames side by side, each 10x7: egg (centered), then splat."""
+    out = Image.new("RGBA", (20, 7), (0, 0, 0, 0))
+    out.alpha_composite(to_image(EGG), (2, 0))
+    out.alpha_composite(to_image(SPLAT), (10, 1))
+    return out

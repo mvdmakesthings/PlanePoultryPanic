@@ -45,6 +45,7 @@ IMAGES = [
     ("carousel.png", carousel.sheet),
     ("item_snack.png", items.snack),
     ("hud_luggage.png", items.luggage),
+    ("egg.png", items.egg),
 ]
 
 
