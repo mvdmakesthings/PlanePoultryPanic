@@ -208,7 +208,9 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 | Sheet | Frame size | Frames | Notes |
 |---|---|---|---|
 | `player_walk.png` | 16x32 | 4 per direction | Contact, passing, contact, passing. The second (passing) frame doubles as the standing pose until idle frames exist. |
+| `player_idle.png` | 16x32 | 2 per direction | Breathing: the head sinks 1px on the second frame. Play slowly (about 2 FPS). |
 | `chicken_walk.png` | 16x16 | 4 per direction | Head bobs forward on side-view contact frames; front and back views waddle. |
+| `chicken_idle.png` | 16x16 | 3 per direction | Stand, dip, peck. Hold the first frame and play the peck now and then. |
 
 ### Import Settings (Godot)
 - Texture filter: Nearest

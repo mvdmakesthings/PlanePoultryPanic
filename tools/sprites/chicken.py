@@ -113,3 +113,34 @@ def walk_cycle():
         "right": right,
         "left": [mirror(f) for f in right],
     }
+
+
+# ---------- idle with peck ----------
+
+def dip_head(grid, rows, cols, dy, dx=0):
+    """Move the head block (rows x cols) down by dy and forward by dx."""
+    g = list(grid)
+    r0, r1 = rows
+    c0, c1 = cols
+    block = [g[r][c0:c1] for r in range(r0, r1)]
+    for r in range(r0, r1):
+        put(g, r, c0, "." * (c1 - c0))
+    for i, text in enumerate(block):
+        r = r0 + i + dy
+        for j, ch in enumerate(text):
+            c = c0 + j + dx
+            if ch != "." and 0 <= c < 16:
+                put(g, r, c, ch)
+    return g
+
+
+def idle_cycle():
+    """Stand, dip, peck. Keyed by direction: down, up, right, left."""
+    right = [SIDE, dip_head(SIDE, (0, 7), (8, 16), 2), dip_head(SIDE, (0, 7), (8, 16), 3)]
+    return {
+        "down": [FRONT, dip_head(FRONT, (0, 7), (3, 13), 1), dip_head(FRONT, (0, 7), (3, 13), 3)],
+        "up": [BACK, dip_head(BACK, (0, 6), (3, 13), 1), dip_head(BACK, (0, 6), (3, 13), 2)],
+        "right": right,
+        "left": [mirror(f) for f in right],
+    }
+

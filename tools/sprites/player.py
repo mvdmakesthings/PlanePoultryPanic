@@ -212,3 +212,19 @@ def walk_cycle():
         "right": right,
         "left": [mirror(f) for f in right],
     }
+
+
+def breathe(grid):
+    """Head and hair sink 1px by dropping the neck row (row 11)."""
+    return ["." * 16] + grid[:11] + grid[12:]
+
+
+def idle_cycle():
+    """Two-frame breathing idle keyed by direction: down, up, right, left."""
+    right = [SIDE, breathe(SIDE)]
+    return {
+        "down": [FRONT, breathe(FRONT)],
+        "up": [BACK, breathe(BACK)],
+        "right": right,
+        "left": [mirror(f) for f in right],
+    }

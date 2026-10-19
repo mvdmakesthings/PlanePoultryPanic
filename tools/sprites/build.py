@@ -22,10 +22,12 @@ SPRITES = REPO / "game" / "assets" / "sprites"
 DIRECTIONS = ("down", "up", "right", "left")
 PREVIEW_BG = (38, 43, 68, 255)
 
-# (file name, frames by direction, frame width, frame height)
+# (file name, frames by direction, frame width, frame height, preview FPS)
 SHEETS = [
-    ("player_walk.png", player.walk_cycle(), 16, 32),
-    ("chicken_walk.png", chicken.walk_cycle(), 16, 16),
+    ("player_walk.png", player.walk_cycle(), 16, 32, 8),
+    ("player_idle.png", player.idle_cycle(), 16, 32, 2),
+    ("chicken_walk.png", chicken.walk_cycle(), 16, 16, 8),
+    ("chicken_idle.png", chicken.idle_cycle(), 16, 16, 4),
 ]
 
 
@@ -48,34 +50,32 @@ def floor_shadow(width):
     return img
 
 
-def write_previews(out_dir, scale=6, fps=8):
-    """Animated GIF of every walk direction side by side, plus a static frame grid."""
+def write_previews(out_dir, scale=6):
+    """Per sheet: an animated GIF of all four directions and an 8x frame grid."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    walks = [(anims, w, h) for _, anims, w, h in SHEETS]
     cell = 24
-    canvas_h = max(h for _, _, h in walks) + 12
-    gif_frames = []
-    for i in range(4):
-        canvas = Image.new("RGBA", (cell * 4 * len(walks) + 8, canvas_h), PREVIEW_BG)
-        x = 4
-        for anims, w, h in walks:
-            for direction in DIRECTIONS:
-                y = canvas_h - 6 - h
+    for name, anims, w, h, fps in SHEETS:
+        stem = name.removesuffix(".png")
+        frames = len(anims["down"])
+        gif_frames = []
+        for i in range(frames):
+            canvas = Image.new("RGBA", (cell * 4 + 8, h + 12), PREVIEW_BG)
+            for k, direction in enumerate(DIRECTIONS):
+                x, y = 4 + k * cell, 6
                 canvas.alpha_composite(floor_shadow(w - 2), (x + 1, y + h - 2))
                 canvas.alpha_composite(to_image(anims[direction][i]), (x, y))
-                x += cell
-        gif_frames.append(canvas.resize((canvas.width * scale, canvas.height * scale), Image.NEAREST).convert("RGB"))
-    gif_frames[0].save(out_dir / "walk_preview.gif", save_all=True,
-                       append_images=gif_frames[1:], duration=1000 // fps, loop=0)
+            canvas = canvas.resize((canvas.width * scale, canvas.height * scale), Image.NEAREST)
+            gif_frames.append(canvas.convert("RGB"))
+        gif_frames[0].save(out_dir / f"{stem}.gif", save_all=True,
+                           append_images=gif_frames[1:], duration=1000 // fps, loop=0)
 
-    for name, anims, w, h in SHEETS:
         sheet = make_sheet(anims, w, h)
-        grid = Image.new("RGBA", (sheet.width + 4 * 5, sheet.height + 4 * 5), PREVIEW_BG)
+        grid = Image.new("RGBA", (4 + frames * (w + 4), 4 + len(DIRECTIONS) * (h + 4)), PREVIEW_BG)
         for row in range(len(DIRECTIONS)):
-            for col in range(4):
+            for col in range(frames):
                 tile = sheet.crop((col * w, row * h, (col + 1) * w, (row + 1) * h))
                 grid.alpha_composite(tile, (4 + col * (w + 4), 4 + row * (h + 4)))
-        grid.resize((grid.width * 8, grid.height * 8), Image.NEAREST).save(out_dir / name.replace(".png", "_8x.png"))
+        grid.resize((grid.width * 8, grid.height * 8), Image.NEAREST).save(out_dir / f"{stem}_8x.png")
 
 
 def main():
@@ -84,7 +84,7 @@ def main():
     args = parser.parse_args()
 
     SPRITES.mkdir(parents=True, exist_ok=True)
-    for name, anims, w, h in SHEETS:
+    for name, anims, w, h, _ in SHEETS:
         make_sheet(anims, w, h).save(SPRITES / name)
         print(f"wrote {(SPRITES / name).relative_to(REPO)}")
     if args.preview:
