@@ -35,16 +35,18 @@ How the game gets from design docs to a Steam launch. The design itself lives in
 
 ## M1: Gray-Box Prototype
 
-One room, colored shapes instead of art. Goal: find out whether the core loop is fun.
+One room built with the style-test art (the art came first, by choice). Goal: find out whether the core loop is fun.
 
-- [ ] Godot project in `game/` at 320x180 with pixel-perfect scaling
-- [ ] Keyboard and gamepad input bindings
-- [ ] Player: 8-directional movement, running with stamina, health with invincibility frames
-- [ ] Chickens: wander, spot the player, chase, alert neighbors, give up
-- [ ] Snacks: pick up, throw to distract, eat to heal
-- [ ] Simple HUD: health, stamina, snack count
-- [ ] Win (reach the exit) and lose (restart) states
-- [ ] Install Godot and play it; tune speeds, sight range, and stamina until it feels right
+- [x] Godot project in `game/` at 320x180 with pixel-perfect scaling
+- [x] Keyboard and gamepad input bindings
+- [x] Player: 8-directional movement, running with stamina, health with invincibility frames
+- [x] Chickens: wander, spot the player, chase, alert neighbors, give up
+- [x] Snacks: pick up, throw to distract, eat to heal
+- [x] Simple HUD: health, stamina, snack count
+- [x] Win (reach the exit) and lose (restart) states
+- [x] Automated smoke test (`game/tests/prototype_smoke.tscn`)
+- [x] Install Godot (4.7, via Homebrew)
+- [x] Play it; tune speeds, sight range, and stamina until it feels right (chickens slowed to 70 px/s with 64 px sight after the first play-test)
 
 **Done when** you've played it several times and want to keep playing, or you know exactly what's missing.
 
