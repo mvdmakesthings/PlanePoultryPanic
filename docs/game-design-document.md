@@ -173,7 +173,7 @@ Chickens that eat from a mushroom patch power up for 30-60 seconds, then return 
 |---|---|---|
 | Flight | Short hops over furniture and low obstacles | Glowing teal mushroom cap, glowing wings, particle trail |
 | Rage | Faster than the player's walk, relentless chase | Red spotted mushroom cap, flames, puffed-up pose |
-| Egg Shooter | Hangs back at range, winds up, and fires eggs; sees as far as it can shoot | Purple spotted mushroom cap, bulging throat, wind-up before each shot |
+| Egg Shooter | Hangs back at range, winds up, and fires eggs; sees as far as it can shoot | Purple spotted mushroom cap; a loaded throat that shows from every side (pink pouch from the front, bulging cheeks from behind, a bulge in profile); wind-up before each shot |
 
 Chickens head for mushroom patches when they can. Watching a patch and timing a route while the chickens around it are still normal is a core tactic.
 

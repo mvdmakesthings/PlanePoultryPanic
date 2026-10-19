@@ -214,7 +214,7 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 | `chicken_idle.png` | 16x16 | 3 per direction | Stand, dip, peck. Hold the first frame and play the peck now and then. |
 | `chicken_flight_walk.png` | 16x16 | 4 per direction | Teal glowcap, glowing wings, drifting sparkles |
 | `chicken_rage_walk.png` | 16x16 | 4 per direction | Red spotted cap, flickering flames behind the body |
-| `chicken_egg_walk.png` | 16x16 | 4 per direction | Purple spotted cap, bulging throat in side view |
+| `chicken_egg_walk.png` | 16x16 | 4 per direction | Purple spotted cap and a loaded throat: a pink pouch from the front, pink cheeks from behind, a bulge in profile |
 
 Powered chickens skip the side-view body bob so their caps fit inside the 16x16 frame. The cap is drawn in code over the comb, so any new chicken animation gets caps automatically.
 
