@@ -235,6 +235,8 @@ Sheets that aren't animations use their own layouts.
 | (4,1) | `wall_face_lower` | Lower wall panel with the baseboard |
 | (5,1) (6,1) | `wall_edge_right`, `wall_edge_left` | Side walls; the outline faces the room |
 | (7,1) | `wall_edge_bottom` | Bottom wall; the outline faces the room above |
+| (0,2) (1,2) | `carpet_pattern_a`, `carpet_pattern_b` | Classic patterned airport carpet: slate diamonds on a dark ground, blue or orange centers. Mix both; the diamond lattice stays continuous across them |
+| (2,2) | `carpet_pattern_shadow` | First patterned-carpet row under a wall |
 
 A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall_face_upper`, `wall_face_lower`, then a shadow floor tile.
 
@@ -261,6 +263,14 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 **`roost.png`**: one 24x14 straw nest with a lost luggage tag and a feather, drawn flat on the floor. Totems themselves are built in code from `chicken_idle.png` frames stacked 10 px apart, with a `chicken_rage_walk.png` frame (the red spotted cap) on top.
 
 **`feather_poof.png`**: six 24x24 frames of a defeated chicken bursting into feathers. Play once at 12 FPS.
+
+**`departure_board.png`**: four 64x28 frames of the flight information display that hangs on the wall face. A "DEPARTURES" title over three flights; the destinations stay put while the statuses flip and flicker like a split-flap board. Loop at about 3 FPS. Text uses a 3x5 pixel font (in `tools/sprites/set_dressing.py`) with yellow titles, orange destinations, and red for cancellations.
+
+**`window.png`**: three 32x24 frames of a window on the wall face, looking out at the tarmac: plain tarmac with the control tower, a parked plane's nose, then the same plane's tail. Hang the nose and tail windows 40 px apart (left edge to left edge) and the plane lines up across them. The bottom 3 rows are the sill.
+
+**`potted_plant.png`**: two 16x24 floor planters side by side: a leafy ficus in terracotta, then a snake plant in a chrome planter. They stand on the floor and block movement, with the pot's base (about 12x6) as the solid part.
+
+**`welcome_banner.png`**: one 48x18 banner hanging from a rod on the wall face: "WELCOME TO BAWKSTON!" The city name is **Proposed**, not final.
 
 **`carousel.png`**: modular baggage carousel, 16x16 tiles. Rows are pieces; columns are 4 animation frames of the belt moving clockwise (play at about 8 FPS so the slats creep along).
 
