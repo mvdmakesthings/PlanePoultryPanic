@@ -366,7 +366,7 @@ Positional audio for chickens and machinery, separate audio buses for music, eff
 ## Technical Specifications
 
 ### Engine
-**Godot 4.x** (GDScript). Free, lightweight, strong 2D tools, and exports to Windows, macOS, and Linux.
+**Godot 4.7** (GDScript), currently 4.7.2, the latest stable release. Free, lightweight, strong 2D tools, and exports to Windows, macOS, and Linux. Move to new stable releases (such as 4.8) once they ship and the smoke test passes on them; skip betas.
 
 ### Performance Targets
 - 60 FPS on Steam Deck and on a dual-core 2.0 GHz PC with integrated graphics
