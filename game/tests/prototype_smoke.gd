@@ -460,7 +460,8 @@ func _hiding_tests() -> void:
 	_check(not player.is_hidden and player.visible, "Interact again steps out of the closet")
 	room.queue_free()
 
-	# A chicken that was chasing waits at the door and pecks until it bursts.
+	# A chicken that was chasing waits at the door and pecks, then gives up
+	# and walks away, so the player can come out safely.
 	setup = await _fresh_room(Vector2(72, 120), Vector2(72, 72))
 	room = setup[0]
 	chicken = setup[1]
@@ -471,10 +472,14 @@ func _hiding_tests() -> void:
 	_check(chicken.state == Chicken.State.BESIEGE, "a chicken that was chasing besieges the closet")
 	await _wait(2.0)
 	_check(chicken.is_pecking_door(closet) and player.is_hidden, "the besieging chicken pecks at the door")
-	await _wait(closet.break_time)
-	print("after the siege, player hidden: %s at %s" % [player.is_hidden, player.global_position])
-	_check(not player.is_hidden and player.global_position.y > 75.0, "enough pecking bursts the door and throws the player out")
-	_check(not closet.can_interact(player), "a burst closet can't be used again right away")
+	await _wait(chicken.siege_patience + chicken.retreat_time)
+	var distance := chicken.global_position.distance_to(closet.base_point())
+	print("after giving up, the chicken is %.0f px from the door" % distance)
+	_check(player.is_hidden and distance > chicken.sight_range, "a besieging chicken gives up and walks out of sight")
+	_tap("interact")
+	await _wait(0.5)
+	_check(not player.is_hidden and is_instance_valid(chicken) and chicken.state != Chicken.State.PURSUE,
+		"the player comes out safely once it's gone")
 	room.queue_free()
 
 

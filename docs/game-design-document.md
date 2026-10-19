@@ -123,7 +123,7 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 Eating a snack restores one whole suitcase. Snacks are the only way to heal, so every snack is a choice between healing now and distracting chickens later.
 
 ### Hiding
-Bathroom stalls and supply closets are hiding spots. Press Interact at the door to slip inside and again to come out. While hidden, the player can't be hurt and chickens lose track of them. Chickens that were chasing the player when they went in wait outside and peck at the door, which shakes. After 6 seconds of pecking the door bursts open and throws the player out, and that hiding spot can't be used again for 10 seconds. Hiding buys time but is never a permanent escape.
+Bathroom stalls and supply closets are hiding spots. Press Interact at the door to slip inside and again to come out. While hidden, the player can't be hurt and chickens lose track of them. Chickens that were chasing the player when they went in wait outside and peck at the door, which shakes. After about 5 seconds they give up and walk off out of sight, so hiding is a real way to shake pursuers: once the door stops shaking, it's safe to come out.
 
 ---
 
@@ -458,4 +458,5 @@ game/
 | 2026-10-19 | Luggage carts are a second way to defeat chickens, alongside the carousel chute | You |
 | 2026-10-19 | The carousel belt is walkable and carries everything; only chickens fit through the chute | Proposed |
 | 2026-10-19 | Health is tracked in quarter suitcases so eggs can deal a quarter of a peck's damage | You |
+| 2026-10-19 | Chickens besieging a hiding spot give up and leave, rather than breaking the door, so hiding is a safe escape | You |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |

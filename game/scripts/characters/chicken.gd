@@ -47,6 +47,13 @@ const POWER_WARNING_TIME := 3.0
 @export var recoil_speed := 180.0
 @export var recoil_friction := 500.0
 @export var daze_time := 0.8
+## Seconds a chicken pecks at a closet door before giving up on the hidden
+## player and walking off, so hiding is a real way to shake chickens.
+@export var siege_patience := 5.0
+## Longest a chicken that gave up spends walking briskly away from the door.
+@export var retreat_time := 3.0
+## How far from the door it heads when it gives up (beyond sight range).
+@export var retreat_distance := 110.0
 
 @export_group("Mushrooms")
 @export var mushroom_notice_range := 112.0
@@ -103,6 +110,9 @@ var _slide_velocity := Vector2.ZERO
 var _recoil_velocity := Vector2.ZERO
 var _siege_spot: HidingSpot = null
 var _siege_offset := 0.0
+var _siege_time := 0.0
+var _retreat_left := 0.0
+var _retreat_target := Vector2.ZERO
 var _show_prompt := false
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -131,6 +141,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_timer -= delta
+	_retreat_left -= delta
 	_egg_ready_in -= delta
 	_hop_ready_in -= delta
 	_update_power(delta)
@@ -164,7 +175,7 @@ func _physics_process(delta: float) -> void:
 		return
 	if state == State.FROZEN:
 		_check_ice_hits()
-	if state == State.WANDER and get_slide_collision_count() > 0:
+	if state == State.WANDER and _retreat_left <= 0.0 and get_slide_collision_count() > 0:
 		_pick_wander()
 	if velocity.length() > 1.0:
 		_facing = velocity.normalized()
@@ -186,6 +197,7 @@ func besiege(spot: HidingSpot) -> void:
 	state = State.BESIEGE
 	_siege_spot = spot
 	_siege_offset = randf_range(-8.0, 8.0)
+	_siege_time = 0.0
 
 
 ## True while standing at that closet's door, pecking at it.
@@ -236,6 +248,13 @@ func power_up(mode: String) -> void:
 func _wander() -> void:
 	if _timer <= 0.0:
 		_pick_wander()
+	if _retreat_left > 0.0:
+		# Walking off after giving up at a closet door, around anything in the way.
+		if global_position.distance_to(_retreat_target) < 6.0:
+			_retreat_left = 0.0
+		else:
+			velocity = _direction_toward(_retreat_target) * pursue_speed
+			return
 	velocity = _wander_dir * wander_speed * (1.5 if power == "rage" else 1.0)
 	if _try_investigate():
 		return
@@ -359,8 +378,33 @@ func _besiege() -> void:
 	if global_position.distance_to(target) < 4.0:
 		velocity = Vector2.ZERO
 		_facing = Vector2.UP
+		_siege_time += get_physics_process_delta_time()
+		if _siege_time >= siege_patience:
+			_give_up_siege()
 		return
 	velocity = _direction_toward(target) * pursue_speed
+
+
+## Lose interest in the closet and walk away from it, out of sight range,
+## so the player can come out safely.
+func _give_up_siege() -> void:
+	state = State.WANDER
+	_wander_dir = Vector2.ZERO
+	_timer = retreat_time
+	_retreat_left = retreat_time
+	# Head somewhere walkable well away from the door and off any carousel
+	# belt, routing around furniture on the way.
+	var door := _siege_spot.base_point()
+	var map := get_world_2d().navigation_map
+	var angles := [90.0, 60.0, 120.0, 30.0, 150.0, 0.0, 180.0]
+	var offset := randf_range(-15.0, 15.0)
+	_retreat_target = door + Vector2.DOWN * retreat_distance
+	for angle: float in angles:
+		var spot := NavigationServer2D.map_get_closest_point(
+			map, door + Vector2.from_angle(deg_to_rad(angle + offset)) * retreat_distance)
+		if spot.distance_to(door) > sight_range and Carousel.push_for(get_tree(), spot) == Vector2.ZERO:
+			_retreat_target = spot
+			break
 
 
 func _siege_target() -> Vector2:

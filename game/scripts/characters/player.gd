@@ -256,12 +256,11 @@ func hide_in(spot: HidingSpot) -> void:
 	visible = false
 
 
-## Steps back out, optionally shoved (when chickens burst the door).
-func leave_hiding(push: Vector2) -> void:
+## Steps back out of the closet.
+func leave_hiding() -> void:
 	hidden_in = null
 	collision_layer = 2
 	visible = true
-	_knockback = push
 
 
 ## Stops all player control, e.g. when the level is won.

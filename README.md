@@ -32,7 +32,7 @@ Reach the green **GATE** without losing all three suitcases. Chickens chase you 
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/prototype_smoke.tscn
 ```
 
-It drives the player with simulated input and exits non-zero on failure.
+It drives the player with simulated input and exits non-zero on failure. Godot script errors don't fail it on their own, so also check the output for any `ERROR` lines.
 
 ## Rebuild the sprites
 
