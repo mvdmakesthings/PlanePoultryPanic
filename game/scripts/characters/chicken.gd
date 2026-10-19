@@ -34,7 +34,7 @@ const POWER_WARNING_TIME := 3.0
 @export_group("Normal")
 @export var wander_speed := 30.0
 ## Slower than the player's walk, so one normal chicken can always be escaped.
-@export var pursue_speed := 70.0
+@export var pursue_speed := 60.0
 @export var investigate_speed := 70.0
 @export var sight_range := 64.0
 ## Seconds without seeing the player before giving up the chase.
@@ -66,12 +66,12 @@ const POWER_WARNING_TIME := 3.0
 
 @export_group("Rage")
 ## Faster than the player's walk (100), slower than their run (150).
-@export var rage_speed := 115.0
+@export var rage_speed := 105.0
 @export var rage_sight_bonus := 32.0
 @export var rage_give_up_time := 4.0
 
 @export_group("Flight")
-@export var hop_speed := 110.0
+@export var hop_speed := 95.0
 @export var hop_duration := 0.7
 @export var hop_cooldown := 1.6
 @export var hop_height := 10.0

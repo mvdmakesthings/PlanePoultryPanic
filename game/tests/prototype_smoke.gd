@@ -503,13 +503,14 @@ func _spray_under_attack_tests() -> void:
 		chicken.power_up("rage")  # fast enough to catch a walking player
 		player.give_extinguisher(3)
 		Input.action_press("move_right")
+		await _wait(0.2)
+		Input.action_release("move_right")
 		var pecked := false
-		for i in 120:
+		for i in 180:
 			await get_tree().physics_frame
 			if player.health < player.max_health:
 				pecked = true
 				break
-		Input.action_release("move_right")
 		await _wait(delay)
 		var distance := chicken.global_position.distance_to(player.global_position)
 		_tap("use_item")
