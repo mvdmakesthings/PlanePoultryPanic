@@ -73,7 +73,7 @@ Still mostly gray-box. Each item should be playable in the prototype room.
 - [x] Luggage carts the player shoves into chickens
 - [ ] Totem formation at a roost, its attacks, and toppling it
 - [ ] Hiding spots
-- [ ] 6-slot inventory with stacking, cycling, dropping, and key items
+- [x] 6-slot inventory with stacking, cycling, dropping, and key items (key items are supported; the first real one, the maintenance key, arrives with Level 1)
 
 **Done when** each system works and is fun, or has been simplified or cut. **Feature lock**: no new mechanics after this unless something is cut to make room.
 

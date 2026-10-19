@@ -86,15 +86,15 @@ When health reaches zero, the player restarts from the last checkpoint with thei
 |---|---|---|
 | Move (8 directions) | WASD or arrow keys | Left stick or D-pad |
 | Run (uses stamina) | Shift | Right shoulder (RB/R1) |
-| Use selected item (throw, spray, eat) | Space | A / Cross |
-| Interact (pick up, open, hide) | F | B / Circle |
-| Eat a snack (quick heal) | E | X / Square |
-| Spray the extinguisher (prototype only, until the inventory exists) | Q | Y / Triangle |
-| Previous / next item | Q / R, or mouse wheel | LB / LT or D-pad left/right while holding Y |
+| Use selected item (throw a snack, spray the extinguisher) | Space | A / Cross |
+| Interact (shove, take, open, hide) | F | B / Circle |
+| Eat a snack (quick heal, from any slot) | E | X / Square |
+| Previous / next slot | Q / R, or mouse wheel | LB / Y (Triangle) |
+| Drop the selected slot | G | Back / Share |
 | Pause | Esc | Start / Options |
 
 - All bindings can be remapped in Settings.
-- The prototype uses temporary bindings (R restarts); those change once menus exist.
+- In the prototype, R also restarts, but only on the win or lose screen.
 - Thrown items go in the direction the player is facing. Mouse aiming is not planned, so keyboard and gamepad play the same.
 
 ---

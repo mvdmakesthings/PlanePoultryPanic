@@ -25,7 +25,7 @@ func _ready() -> void:
 	_check(player.stamina < stamina_before, "running spends stamina")
 
 	var snacks_before := player.snacks
-	_tap("throw_snack")
+	_tap("use_item")
 	await _wait(0.6)
 	_check(player.snacks == snacks_before - 1, "throwing uses a snack")
 	_check(get_tree().get_nodes_in_group("snack_lures").size() == 1, "thrown snack lands as a lure")
@@ -103,6 +103,7 @@ func _ready() -> void:
 	await _gate_test()
 	await _extinguisher_tests()
 	await _recoil_test()
+	await _inventory_tests()
 
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
@@ -291,7 +292,7 @@ func _extinguisher_tests() -> void:
 	_check(player.extinguisher_charges == 3 and cabinet.is_empty, "Interact takes the extinguisher from its cabinet")
 
 	player.facing = Vector2.DOWN
-	_tap("spray")
+	_tap("use_item")  # the extinguisher is selected once picked up
 	await get_tree().physics_frame
 	_check(chicken.state == Chicken.State.FROZEN, "spraying a chicken freezes it")
 	_check(player.extinguisher_charges == 2, "each spray uses a charge")
@@ -390,6 +391,51 @@ func _recoil_test() -> void:
 	await _wait(0.8)
 	_check(chicken.state == Chicken.State.PURSUE, "a dazed chicken resumes the chase")
 	setup[0].queue_free()
+
+
+## The six-slot inventory: stacking, cycling, dropping, and full bags.
+func _inventory_tests() -> void:
+	var setup := await _fresh_room(Vector2(40, 290), Vector2(232, 220))
+	var room: Node = setup[0]
+	setup[1].queue_free()
+	var player: Player = setup[2]
+	var inventory := player.inventory
+	_check(inventory.slots[0] == {"item": "snack", "count": 2}, "the player starts with 2 snacks in the first slot")
+
+	player.pick_up("snack", 5)
+	_check(inventory.slots[0]["count"] == 3 and inventory.slots[1]["count"] == 3 and inventory.slots[2]["count"] == 1,
+		"snacks stack 3 per slot")
+
+	_tap("next_item")
+	await get_tree().physics_frame
+	_check(inventory.selected == 1, "R selects the next slot")
+	_tap("prev_item")
+	_tap("prev_item")
+	await get_tree().physics_frame
+	_check(inventory.selected == Inventory.SLOT_COUNT - 1, "Q selects the previous slot, wrapping around")
+
+	# Drop the third slot's snack, then step away and back to pick it up.
+	inventory.selected = 2
+	player.facing = Vector2.RIGHT
+	_tap("drop_item")
+	await get_tree().physics_frame
+	var drops := room.get_node("Entities").get_children().filter(func(n: Node) -> bool: return n is ItemPickup and n.dropped)
+	_check(drops.size() == 1 and player.snacks == 6, "G drops the selected slot on the floor")
+	await _wait(0.3)
+	_check(player.snacks == 6, "a dropped item isn't picked straight back up")
+	player.global_position += Vector2(-40, 0)
+	await _wait(0.2)
+	player.global_position = drops[0].global_position
+	await _wait(0.2)
+	_check(player.snacks == 7, "a dropped item can be picked up again after stepping away")
+
+	# Fill every slot: no more snacks fit, and the cabinet can't be used.
+	player.pick_up("snack", 18)
+	_check(not player.add_snack(), "a full inventory refuses more snacks")
+	player.global_position = room.get_node("ExtinguisherCabinet").base_point() + Vector2(0, 4)
+	await get_tree().physics_frame
+	_check(not room.get_node("ExtinguisherCabinet").can_interact(player), "a full inventory can't take an extinguisher")
+	room.queue_free()
 
 
 ## Walking up through the gate's open doors wins the round.

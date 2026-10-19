@@ -1,18 +1,19 @@
 class_name Player
 extends CharacterBody2D
 ## The stranded passenger: 8-directional movement, stamina-limited running,
-## luggage-icon health with invincibility frames, and snacks that either heal
-## or get thrown to distract chickens.
+## luggage-icon health with invincibility frames, and a six-slot inventory.
+## Space uses the selected item (throw a snack, spray the extinguisher), Q
+## and R switch slots, E eats a snack, and G drops the selected item.
 
 ## Health is counted in quarter suitcases (see SUITCASE).
 signal health_changed(current: int, maximum: int)
 signal stamina_changed(current: float, maximum: float)
-signal snacks_changed(count: int)
-signal extinguisher_changed(charges: int)
+signal inventory_changed
 signal died
 
 const THROWN_SNACK_SCENE := preload("res://scenes/objects/thrown_snack.tscn")
 const SPRAY_SCENE := preload("res://scenes/objects/extinguisher_spray.tscn")
+const ITEM_PICKUP_SCENE := preload("res://scenes/objects/item_pickup.tscn")
 const WALK_SHEET := preload("res://assets/sprites/player_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/player_idle.png")
 const WALK_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_walk_extinguisher.png")
@@ -34,7 +35,6 @@ const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 @export var stamina_regen := 25.0
 ## After running dry, running is locked until stamina refills to this fraction.
 @export_range(0.0, 1.0) var exhausted_recover_ratio := 0.3
-@export var max_snacks := 6
 @export var starting_snacks := 2
 @export var invincibility_time := 1.5
 @export var knockback_strength := 160.0
@@ -44,9 +44,15 @@ const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 var health: int
 var max_health: int
 var stamina: float
-var snacks: int
-## Fire extinguisher charges left; 0 means no extinguisher.
-var extinguisher_charges := 0
+var inventory := Inventory.new()
+## Snacks held across all slots.
+var snacks: int:
+	get:
+		return inventory.count_of("snack")
+## Fire extinguisher charges held; 0 means no extinguisher.
+var extinguisher_charges: int:
+	get:
+		return inventory.count_of("extinguisher")
 var facing := Vector2.DOWN
 var is_dead := false
 ## The closest thing Interact would use right now, or null. Only this one
@@ -64,7 +70,8 @@ func _ready() -> void:
 	max_health = suitcases * SUITCASE
 	health = max_health
 	stamina = max_stamina
-	snacks = starting_snacks
+	inventory.add_stackable("snack", starting_snacks)
+	inventory.changed.connect(inventory_changed.emit)
 	var frames := SpriteFrames.new()
 	frames.remove_animation("default")
 	SpriteSheets.add_directional(frames, "walk", WALK_SHEET, FRAME_SIZE, 8.0)
@@ -98,14 +105,18 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if is_dead:
 		return
-	if event.is_action_pressed("throw_snack"):
-		throw_snack()
+	if event.is_action_pressed("use_item"):
+		use_item()
 	elif event.is_action_pressed("eat_snack"):
 		eat_snack()
 	elif event.is_action_pressed("interact"):
 		interact()
-	elif event.is_action_pressed("spray"):
-		spray()
+	elif event.is_action_pressed("prev_item"):
+		inventory.cycle(-1)
+	elif event.is_action_pressed("next_item"):
+		inventory.cycle(1)
+	elif event.is_action_pressed("drop_item"):
+		drop_item()
 
 
 ## Returns true if the hit landed (false while dead or invincible).
@@ -122,51 +133,85 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 	return true
 
 
-## Returns false when the snack bag is full, so the pickup stays in the world.
+## Picks up count of an item. Returns how many didn't fit, so pickups can
+## leave the rest lying where they were.
+func pick_up(item: String, count: int) -> int:
+	if is_dead:
+		return count
+	if Inventory.ITEMS[item]["stack"] > 1:
+		return count - inventory.add_stackable(item, count)
+	if not inventory.add_single(item, count):
+		return count
+	# A newly picked up tool goes straight into the player's hand.
+	if item == "extinguisher":
+		inventory.select_item(item)
+	return 0
+
+
+## Returns false when there's no room, so the snack stays in the world.
 func add_snack() -> bool:
-	if is_dead or snacks >= max_snacks:
-		return false
-	snacks += 1
-	snacks_changed.emit(snacks)
-	return true
+	return pick_up("snack", 1) == 0
+
+
+## Uses the selected item: throw a snack or spray the extinguisher.
+func use_item() -> void:
+	match inventory.selected_item():
+		"snack":
+			throw_snack()
+		"extinguisher":
+			spray()
 
 
 func throw_snack() -> void:
-	if snacks <= 0:
+	var index := inventory.slot_with("snack")
+	if index < 0:
 		return
-	snacks -= 1
-	snacks_changed.emit(snacks)
+	inventory.take_from(index)
 	var snack := THROWN_SNACK_SCENE.instantiate() as ThrownSnack
 	snack.direction = facing
 	snack.position = position
 	get_parent().add_child(snack)
 
 
+## Eats a snack from any slot (the selected one first) to heal a suitcase.
 func eat_snack() -> void:
-	if snacks <= 0 or health >= max_health:
+	var index := inventory.slot_with("snack")
+	if index < 0 or health >= max_health:
 		return
-	snacks -= 1
-	# A snack restores one whole suitcase.
+	inventory.take_from(index)
 	health = mini(health + SUITCASE, max_health)
-	snacks_changed.emit(snacks)
 	health_changed.emit(health, max_health)
 
 
-func give_extinguisher(charges: int) -> void:
-	extinguisher_charges += charges
-	extinguisher_changed.emit(extinguisher_charges)
+## Returns false if every slot is full.
+func give_extinguisher(charges: int) -> bool:
+	return pick_up("extinguisher", charges) == 0
 
 
-## Sprays a cone of foam ahead, freezing chickens and killing mushroom patches.
+## Sprays a cone of foam ahead, freezing chickens and killing mushroom
+## patches. An extinguisher that runs dry is thrown away.
 func spray() -> void:
-	if extinguisher_charges <= 0:
+	var index := inventory.slot_with("extinguisher")
+	if index < 0:
 		return
-	extinguisher_charges -= 1
-	extinguisher_changed.emit(extinguisher_charges)
+	inventory.take_from(index)
 	var foam := SPRAY_SCENE.instantiate() as ExtinguisherSpray
 	foam.direction = facing
 	foam.position = position
 	get_parent().add_child(foam)
+
+
+## Drops the whole selected slot on the floor just ahead, to make room.
+func drop_item() -> void:
+	var slot := inventory.remove_selected()
+	if slot.is_empty():
+		return
+	var pickup := ITEM_PICKUP_SCENE.instantiate() as ItemPickup
+	pickup.item = slot["item"]
+	pickup.count = slot["count"]
+	pickup.dropped = true
+	pickup.position = position + facing * 10.0
+	get_parent().add_child(pickup)
 
 
 ## Uses the nearest thing in reach that can be interacted with, if any.
@@ -212,8 +257,8 @@ func _update_stamina(running: bool, delta: float) -> void:
 func _update_animation(input: Vector2, running: bool) -> void:
 	var direction := SpriteSheets.direction_name(facing)
 	var animation := "walk" if input != Vector2.ZERO else "idle"
-	# Carry the extinguisher in hand while it has charges left.
-	if extinguisher_charges > 0:
+	# Carry the extinguisher in hand while it's the selected item.
+	if inventory.selected_item() == "extinguisher":
 		animation += "_ext"
 	animation += "_" + direction
 	if _sprite.animation != animation:
@@ -240,8 +285,7 @@ func _die() -> void:
 func _emit_state() -> void:
 	health_changed.emit(health, max_health)
 	stamina_changed.emit(stamina, max_stamina)
-	snacks_changed.emit(snacks)
-	extinguisher_changed.emit(extinguisher_charges)
+	inventory_changed.emit()
 
 
 func _draw() -> void:

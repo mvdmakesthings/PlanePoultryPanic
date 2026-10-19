@@ -10,10 +10,13 @@ const KEY_BINDINGS := {
 	"move_left": [KEY_A, KEY_LEFT],
 	"move_right": [KEY_D, KEY_RIGHT],
 	"run": [KEY_SHIFT],
-	"throw_snack": [KEY_SPACE],
+	"use_item": [KEY_SPACE],
 	"eat_snack": [KEY_E],
 	"interact": [KEY_F],
-	"spray": [KEY_Q],
+	"prev_item": [KEY_Q],
+	"next_item": [KEY_R],
+	"drop_item": [KEY_G],
+	# Shares R with next_item; the level only restarts once a round is over.
 	"restart": [KEY_R],
 }
 
@@ -23,10 +26,12 @@ const JOY_BUTTON_BINDINGS := {
 	"move_left": [JOY_BUTTON_DPAD_LEFT],
 	"move_right": [JOY_BUTTON_DPAD_RIGHT],
 	"run": [JOY_BUTTON_RIGHT_SHOULDER],
-	"throw_snack": [JOY_BUTTON_A],
+	"use_item": [JOY_BUTTON_A],
 	"eat_snack": [JOY_BUTTON_X],
 	"interact": [JOY_BUTTON_B],
-	"spray": [JOY_BUTTON_Y],
+	"prev_item": [JOY_BUTTON_LEFT_SHOULDER],
+	"next_item": [JOY_BUTTON_Y],
+	"drop_item": [JOY_BUTTON_BACK],
 	"restart": [JOY_BUTTON_START],
 }
 
@@ -36,6 +41,11 @@ const JOY_AXIS_BINDINGS := {
 	"move_down": [JOY_AXIS_LEFT_Y, 1.0],
 	"move_left": [JOY_AXIS_LEFT_X, -1.0],
 	"move_right": [JOY_AXIS_LEFT_X, 1.0],
+}
+
+const MOUSE_BUTTON_BINDINGS := {
+	"prev_item": [MOUSE_BUTTON_WHEEL_UP],
+	"next_item": [MOUSE_BUTTON_WHEEL_DOWN],
 }
 
 const STICK_DEADZONE := 0.2
@@ -54,6 +64,13 @@ func _ready() -> void:
 		_ensure_action(action)
 		for button: JoyButton in JOY_BUTTON_BINDINGS[action]:
 			var event := InputEventJoypadButton.new()
+			event.button_index = button
+			InputMap.action_add_event(action, event)
+
+	for action: String in MOUSE_BUTTON_BINDINGS:
+		_ensure_action(action)
+		for button: MouseButton in MOUSE_BUTTON_BINDINGS[action]:
+			var event := InputEventMouseButton.new()
 			event.button_index = button
 			InputMap.action_add_event(action, event)
 

@@ -35,7 +35,8 @@ func base_point() -> Vector2:
 
 
 func can_interact(player: Player) -> bool:
-	return not is_empty and player.global_position.distance_to(base_point()) <= reach
+	return not is_empty and player.inventory.first_empty_slot() >= 0 \
+		and player.global_position.distance_to(base_point()) <= reach
 
 
 func interact(player: Player) -> void:
