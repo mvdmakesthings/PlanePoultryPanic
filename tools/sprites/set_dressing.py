@@ -9,8 +9,8 @@
 - signs.png: 64x11 wayfinding signs for the wall face, one per frame.
 - maintenance_cart.png: a 24x24 janitor's cart, a floor prop.
 - seating.png: a 48x24 row of three airport seats, a floor prop.
-- floor_litter.png: 16x16 floor decals (feathers, pecked chips, a nest in
-  a suitcase lid, footprints) that show the chickens have moved in.
+- floor_litter.png: 16x16 floor decals (feathers, pecked chips, a cracked
+  egg, footprints) that show the chickens have moved in.
 """
 import math
 
@@ -512,16 +512,24 @@ def _litter(kind):
         g = _outline(g)
         put(g, 3, 13, "C")
         put(g, 3, 14, "c")
-    elif kind == "nest":
-        # Straw nest in an open suitcase lid, with an egg.
-        _rect(g, 1, 5, 14, 13, "g")
-        _rect(g, 1, 13, 14, 13, "j")
-        _rect(g, 3, 6, 12, 11, "a")
-        for x, y in ((3, 7), (6, 6), (10, 7), (12, 10), (4, 11), (8, 11)):
-            put(g, y, x, "F")
-        _rect(g, 6, 7, 9, 10, "m")
-        _rect(g, 7, 8, 8, 9, "C")
-        put(g, 8, 8, "L")
+    elif kind == "egg":
+        # A cracked egg: a runny yolk with clear white around it, and the
+        # two jagged shell halves rocking beside it.
+        for y in range(6, 13):
+            for x in range(2, 12):
+                d = ((x - 6.5) / 4.6) ** 2 + ((y - 9.2) / 3.0) ** 2
+                if d < 1.0:
+                    put(g, y, x, "C" if d > 0.35 else "Y")
+        put(g, 8, 5, "F")
+        put(g, 9, 5, "F")
+        put(g, 10, 8, "y")
+        put(g, 11, 9, "c")
+        # Shell halves: cupped, lit on the left, jagged on the open side.
+        for x0, y0 in ((10, 3), (12, 9)):
+            _rect(g, x0, y0 + 1, x0 + 2, y0 + 2, "C")
+            put(g, y0 + 2, x0 + 2, "c")
+            put(g, y0, x0, "C")
+            put(g, y0, x0 + 2, "C")
         g = _outline(g)
     elif kind == "footprints":
         # A trail of chicken footprints.
@@ -533,7 +541,7 @@ def _litter(kind):
     return g
 
 
-LITTER_KINDS = ("feathers", "chips", "nest", "footprints")
+LITTER_KINDS = ("feathers", "chips", "egg", "footprints")
 
 
 def litter_sheet():

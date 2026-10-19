@@ -289,7 +289,7 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`seating.png`**: one 48x24 row of three airport seats facing the viewer. A solid floor prop; its base is about 44x8.
 
-**`floor_litter.png`**: four 16x16 floor decals: feathers, a pecked bag of chips, a nest in a suitcase lid, chicken footprints. Drawn flat under everything, no collision.
+**`floor_litter.png`**: four 16x16 floor decals: feathers, a pecked bag of chips, a cracked egg, chicken footprints. Drawn flat under everything, no collision.
 
 **`carousel.png`**: modular baggage carousel, 16x16 tiles. Rows are pieces; columns are 4 animation frames of the belt moving clockwise (play at about 8 FPS so the slats creep along).
 
