@@ -71,7 +71,7 @@ Still mostly gray-box. Each item should be playable in the prototype room.
 - [x] Fire extinguisher (freeze cone, charges, kills mushroom patches)
 - [x] Baggage carousel that carries and defeats chickens
 - [x] Luggage carts the player shoves into chickens
-- [ ] Totem formation at a roost, its attacks, and toppling it
+- [x] Totem formation at a roost, its attacks (including sustained flight), and toppling it
 - [x] Hiding spots (supply closet)
 - [x] 6-slot inventory with stacking, cycling, dropping, and key items (key items are supported; the first real one, the maintenance key, arrives with Level 1)
 

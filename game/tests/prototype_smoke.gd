@@ -108,6 +108,7 @@ func _ready() -> void:
 	await _inventory_tests()
 	await _hiding_tests()
 	await _spray_under_attack_tests()
+	await _totem_tests()
 
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
@@ -580,13 +581,14 @@ func _spray_under_attack_tests() -> void:
 		chicken.power_up("rage")  # fast enough to catch a walking player
 		player.give_extinguisher(3)
 		Input.action_press("move_right")
+		await _wait(0.2)
+		Input.action_release("move_right")
 		var pecked := false
-		for i in 120:
+		for i in 180:
 			await get_tree().physics_frame
 			if player.health < player.max_health:
 				pecked = true
 				break
-		Input.action_release("move_right")
 		await _wait(delay)
 		var distance := chicken.global_position.distance_to(player.global_position)
 		_tap("use_item")
@@ -597,6 +599,161 @@ func _spray_under_attack_tests() -> void:
 		_check(pecked and chicken.state == Chicken.State.FROZEN,
 			"spraying %.1fs after being pecked from behind freezes the attacker" % delay)
 		setup[0].queue_free()
+
+
+## Chicken totems: forming at the roost (at (360, 260)), attacking, and
+## every way of bringing one down.
+func _totem_tests() -> void:
+	# Four chickens settling at the roost stack into a totem.
+	var setup := await _fresh_room(Vector2(330, 230), Vector2(60, 290))
+	var room: Node = setup[0]
+	var entities: Node = room.get_node("Entities")
+	setup[1].state = Chicken.State.WANDER
+	for offset: Vector2 in [Vector2(40, -20), Vector2(-30, 25), Vector2(20, 30)]:
+		var extra: Chicken = preload("res://scenes/characters/chicken.tscn").instantiate()
+		extra.position = Vector2(360, 260) + offset
+		entities.add_child(extra)
+	await _wait(5.0)
+	_check(_totems().size() == 1, "four chickens at the roost form a totem")
+	room.queue_free()
+
+	# A snack thrown at the forming stack breaks it up.
+	setup = await _fresh_room(Vector2(360, 262), Vector2(60, 290))
+	room = setup[0]
+	entities = room.get_node("Entities")
+	for offset: Vector2 in [Vector2(5, 0), Vector2(-5, 1), Vector2(0, -2)]:
+		var extra: Chicken = preload("res://scenes/characters/chicken.tscn").instantiate()
+		extra.position = Vector2(360, 260) + offset
+		entities.add_child(extra)
+	await _wait(1.6)  # settled and stacking
+	var bait: ThrownSnack = preload("res://scenes/objects/thrown_snack.tscn").instantiate()
+	bait.direction = Vector2.ZERO
+	bait.position = Vector2(300, 260)
+	entities.add_child(bait)
+	await _wait(2.5)
+	_check(_totems().is_empty(), "a snack thrown at a forming totem breaks it up")
+	room.queue_free()
+
+	# Spraying a totem topples it; it flattens a chicken in the fall line
+	# and its own chickens land dazed.
+	setup = await _fresh_room(Vector2(296, 230), Vector2(220, 230))
+	room = setup[0]
+	var bystander: Chicken = setup[1]
+	bystander.state = Chicken.State.EATING
+	bystander._timer = 5.0
+	var flattened := [false]
+	bystander.defeated.connect(func() -> void: flattened[0] = true)
+	var totem := _spawn_totem(room, Vector2(260, 230))
+	var player: Player = setup[2]
+	player.give_extinguisher(1)
+	player.spray()
+	await _wait(1.0)
+	_check(not is_instance_valid(totem), "spraying a totem topples it")
+	_check(flattened[0], "a toppling totem flattens the chicken it lands on")
+	_check(_room_chickens(room).size() == 4, "the totem's chickens survive the fall")
+	room.queue_free()
+
+	# A shoved cart topples a totem.
+	setup = await _fresh_room(Vector2(60, 290), Vector2(150, 260))
+	room = setup[0]
+	setup[1].queue_free()
+	totem = _spawn_totem(room, Vector2(230, 262))
+	var cart: LuggageCart = preload("res://scenes/objects/luggage_cart.tscn").instantiate()
+	cart.position = Vector2(168, 262)
+	room.get_node("Entities").add_child(cart)
+	await get_tree().physics_frame
+	setup[2].facing = Vector2.RIGHT
+	_tap("interact")
+	await _wait(1.5)
+	_check(not is_instance_valid(totem), "a rolling cart topples a totem")
+	room.queue_free()
+
+	# Three snacks beside a totem break it apart without any defeats.
+	setup = await _fresh_room(Vector2(60, 290), Vector2(440, 290))
+	room = setup[0]
+	setup[1].queue_free()
+	totem = _spawn_totem(room, Vector2(260, 230))
+	for offset: Vector2 in [Vector2(20, 0), Vector2(-20, 0), Vector2(0, 20)]:
+		var lure: ThrownSnack = preload("res://scenes/objects/thrown_snack.tscn").instantiate()
+		lure.direction = Vector2.ZERO
+		lure.position = Vector2(260, 230) + offset
+		room.get_node("Entities").add_child(lure)
+	await _wait(0.5)
+	_check(not is_instance_valid(totem) and _room_chickens(room).size() == 4,
+		"three snacks scatter a totem into its chickens")
+	room.queue_free()
+
+	# Up close it stomps; from range it fires egg barrages.
+	setup = await _fresh_room(Vector2(60, 290), Vector2(260, 254))
+	room = setup[0]
+	setup[1].queue_free()
+	player = setup[2]
+	totem = _spawn_totem(room, Vector2(260, 230))
+	await _wait(1.6)
+	_check(player.health <= player.max_health - Player.SUITCASE, "a totem stomps a nearby player")
+	room.queue_free()
+
+	setup = await _fresh_room(Vector2(60, 290), Vector2(340, 230))
+	room = setup[0]
+	setup[1].queue_free()
+	totem = _spawn_totem(room, Vector2(260, 230))
+	totem.speed = 0.0  # stay at range, out of stomping distance
+	await _wait(1.7)
+	var eggs := room.get_node("Entities").get_children().filter(func(n: Node) -> bool: return n is EggProjectile)
+	_check(eggs.size() >= 2, "a totem fires an egg barrage from range")
+	room.queue_free()
+
+	# Sustained flight: it flies straight over the carousel at the player
+	# and slams down beside them.
+	setup = await _fresh_room(Vector2(60, 290), Vector2(112, 224))
+	room = setup[0]
+	setup[1].queue_free()
+	player = setup[2]
+	totem = _spawn_totem(room, Vector2(112, 120))
+	totem._flight_ready_in = 0.0
+	totem.flight_min_range = 0.0
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_check(totem.state == Totem.State.FLYING, "a totem takes off toward a distant player")
+	await _wait(totem.flight_time + 0.5)
+	print("flying totem landed at %s; player health %d/%d" % [totem.global_position, player.health, player.max_health])
+	_check(is_instance_valid(totem) and totem.global_position.y > 200.0, "a flying totem crosses the carousel")
+	_check(player.health < player.max_health, "a landing totem slams the player")
+	room.queue_free()
+
+	# Its landing spot is fixed once marked: stepping out of it is safe.
+	setup = await _fresh_room(Vector2(60, 290), Vector2(112, 224))
+	room = setup[0]
+	setup[1].queue_free()
+	player = setup[2]
+	totem = _spawn_totem(room, Vector2(112, 120))
+	totem._flight_ready_in = 0.0
+	totem.flight_min_range = 0.0
+	await _wait(totem.flight_time - totem.landing_warning + 0.1)
+	Input.action_press("run")
+	Input.action_press("move_right")
+	await _wait(0.6)
+	Input.action_release("move_right")
+	Input.action_release("run")
+	await _wait(0.4)
+	_check(player.health == player.max_health, "stepping out of the marked landing spot dodges the slam")
+	room.queue_free()
+
+
+func _spawn_totem(room: Node, at: Vector2) -> Totem:
+	var totem: Totem = preload("res://scenes/characters/totem.tscn").instantiate()
+	totem.position = at
+	room.get_node("Entities").add_child(totem)
+	return totem
+
+
+func _totems() -> Array[Node]:
+	return get_tree().get_nodes_in_group("totems")
+
+
+func _room_chickens(room: Node) -> Array:
+	return get_tree().get_nodes_in_group("chickens").filter(
+		func(c: Node) -> bool: return room.is_ancestor_of(c) and not c.is_queued_for_deletion())
 
 
 ## Walking up through the gate's open doors wins the round.

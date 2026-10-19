@@ -238,12 +238,22 @@ def _sparkle(grid, i):
 
 
 def egg(grid, i, view):
-    if view != "side":
-        return grid
-    # Bulging throat just behind the wattle.
-    wattle = [(r, row.index("R")) for r, row in enumerate(grid) if "R" in row][-1]
-    r, c = wattle
-    return overlay(grid, [".CO", "ccO", "OO."], r, c, behind=False)
+    """An egg loaded in the throat, readable from every side."""
+    if view == "side":
+        # Bulging throat just behind the wattle.
+        wattle = [(r, row.index("R")) for r, row in enumerate(grid) if "R" in row][-1]
+        r, c = wattle
+        return overlay(grid, [".CO", "ccO", "OO."], r, c, behind=False)
+    if view == "front":
+        # A round pink throat pouch puffed out around the wattle.
+        r = [r for r, row in enumerate(grid) if "R" in row][-2]
+        c = grid[r].index("R")
+        return overlay(grid, [".OhhO.", "OhRRhO", "OhhhhO", ".OOOO."], r - 1, c - 2, behind=False)
+    # From behind: cheeks bulging out either side of the head.
+    row = grid[5]
+    left, right = row.index("O"), row.rindex("O")
+    g = overlay(grid, ["O", "h", "h", "O"], 3, left - 1, behind=True)
+    return overlay(g, ["O", "h", "h", "O"], 3, right + 1, behind=True)
 
 
 EFFECTS = {"flight": flight, "rage": rage, "egg": egg}

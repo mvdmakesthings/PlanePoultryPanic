@@ -73,6 +73,10 @@ func _apply() -> void:
 			continue
 		if in_cone(chicken.global_position) or in_burst(chicken.global_position):
 			chicken.freeze(freeze_time)
+	for node in get_tree().get_nodes_in_group("totems"):
+		var totem := node as Totem
+		if in_cone(totem.global_position) or in_burst(totem.global_position):
+			totem.hit_by_foam(global_position)
 	for node in get_tree().get_nodes_in_group("mushroom_patches"):
 		var patch := node as MushroomPatch
 		if in_cone(patch.global_position):

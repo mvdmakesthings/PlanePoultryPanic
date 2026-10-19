@@ -215,7 +215,7 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 | `chicken_idle.png` | 16x16 | 3 per direction | Stand, dip, peck. Hold the first frame and play the peck now and then. |
 | `chicken_flight_walk.png` | 16x16 | 4 per direction | Teal glowcap, glowing wings, drifting sparkles |
 | `chicken_rage_walk.png` | 16x16 | 4 per direction | Red spotted cap, flickering flames behind the body |
-| `chicken_egg_walk.png` | 16x16 | 4 per direction | Purple spotted cap, bulging throat in side view |
+| `chicken_egg_walk.png` | 16x16 | 4 per direction | Purple spotted cap and a loaded throat: a pink pouch from the front, pink cheeks from behind, a bulge in profile |
 
 Powered chickens skip the side-view body bob so their caps fit inside the 16x16 frame. The cap is drawn in code over the comb, so any new chicken animation gets caps automatically.
 
@@ -260,6 +260,8 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 **`ice_block.png`**: one 16x16 ice-block outline drawn over a frozen chicken, which is also tinted icy blue. The outline is the shape cue, so freezing reads without relying on color.
 
 **`closet_door.png`**: two 16x30 frames of the supply closet door on the wall face: closed, then open with a mop inside.
+
+**`roost.png`**: one 24x14 straw nest with a lost luggage tag and a feather, drawn flat on the floor. Totems themselves are built in code from `chicken_idle.png` frames stacked 10 px apart, with a `chicken_rage_walk.png` frame (the red spotted cap) on top.
 
 **`feather_poof.png`**: six 24x24 frames of a defeated chicken bursting into feathers. Play once at 12 FPS.
 

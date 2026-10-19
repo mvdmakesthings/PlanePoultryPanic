@@ -53,6 +53,8 @@ func _physics_process(delta: float) -> void:
 		for body in _hitbox.get_overlapping_bodies():
 			if body is Chicken:
 				(body as Chicken).defeat()
+			elif body is Totem:
+				(body as Totem).topple(velocity)
 
 
 func can_interact(player: Player) -> bool:

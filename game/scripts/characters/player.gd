@@ -254,6 +254,12 @@ func _spray_aim() -> Vector2:
 		if chicken.state != Chicken.State.FROZEN and distance < best and distance > 0.5:
 			best = distance
 			aim = global_position.direction_to(chicken.global_position)
+	for node in get_tree().get_nodes_in_group("totems"):
+		var totem := node as Node2D
+		var distance := global_position.distance_to(totem.global_position)
+		if distance < best and distance > 0.5:
+			best = distance
+			aim = global_position.direction_to(totem.global_position)
 	return aim
 
 

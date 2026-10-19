@@ -173,15 +173,15 @@ Chickens that eat from a mushroom patch power up for 30-60 seconds, then return 
 |---|---|---|
 | Flight | Short hops over furniture and low obstacles | Glowing teal mushroom cap, glowing wings, particle trail |
 | Rage | Faster than the player's walk, relentless chase | Red spotted mushroom cap, flames, puffed-up pose |
-| Egg Shooter | Hangs back at range, winds up, and fires eggs; sees as far as it can shoot | Purple spotted mushroom cap, bulging throat, wind-up before each shot |
+| Egg Shooter | Hangs back at range, winds up, and fires eggs; sees as far as it can shoot | Purple spotted mushroom cap; a loaded throat that shows from every side (pink pouch from the front, bulging cheeks from behind, a bulge in profile); wind-up before each shot |
 
 Chickens head for mushroom patches when they can. Watching a patch and timing a route while the chickens around it are still normal is a core tactic.
 
 ### Chicken Totems (Bosses)
-- **Formation**: Totems form at designer-placed "roost" spots when 4 or more chickens gather there. Placing roosts by hand keeps totems feeling emergent while staying under level-design control.
-- **Buildup**: Stacking takes 2 seconds with clear sound and visual cues, so an alert player can break it up early with a thrown snack.
-- **Abilities**: Sustained flight, area-of-effect rage stomps, rapid egg barrages, and commanding nearby chickens
-- **Toppling**: Freeze the base chicken with the extinguisher, lure the totem onto machinery, or scatter it with a big enough distraction (several snacks at once). A toppled totem defeats the chickens it lands on and scatters the rest.
+- **Formation**: Totems form at designer-placed roosts (straw nests) when 4 chickens settle there. Wandering chickens within about 7 tiles head for a roost; once settled they ignore the player. Placing roosts by hand keeps totems feeling emergent while staying under level-design control.
+- **Buildup**: Stacking takes 2 seconds, with the settled chickens hopping and a flashing "!!" over the nest, so an alert player can break it up early with a thrown snack.
+- **Abilities**: Lumbers after the player (slower than a walk); a ground stomp around itself after a shaking wind-up with a "!"; 3-egg barrages from range; calling nearby chickens into the chase when it spots the player; and sustained flight. Every 7 seconds or so, or whenever the player is in range behind furniture, it lifts off and flies straight at them for a few seconds, trailing teal sparks. A red zone marks the landing spot 0.7 seconds before it slams down with a stomp; the spot is fixed once marked, so the player can step out of it. In the air it's out of reach of carts and the belt, but spraying it still brings it down.
+- **Toppling**: Freeze its base with the extinguisher, ram it with a luggage cart, or lure it onto the carousel belt. It falls away from the hit, flattening any chicken where its members land; its own chickens land dazed along the fall line. Three snacks lying beside it break it apart instead, with no defeats. The roost then rests for 20 seconds.
 
 ### AI States
 Wander → Patrol → Investigate (snack or noise) → Pursue → Powered → Forming (totem)
