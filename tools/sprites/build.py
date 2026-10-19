@@ -90,6 +90,44 @@ def write_previews(out_dir, scale=6):
         grid.resize((grid.width * 8, grid.height * 8), Image.NEAREST).save(out_dir / f"{stem}_8x.png")
 
 
+def mock_screen():
+    """A 320x180 Arrivals scene built from the real tiles and sprites."""
+    t = tiles.by_name()
+    scr = Image.new("RGBA", (320, 192), PREVIEW_BG)
+    floor = lambda col: "carpet" if col < 8 else "tile" if col < 14 else "wood"
+    for row in range(12):
+        for col in range(20):
+            if col == 0:
+                name = "wall_edge_right"
+            elif col == 19:
+                name = "wall_edge_left"
+            elif row < 4:
+                name = ("wall_top", "wall_lip", "wall_face_upper", "wall_face_lower")[row]
+            elif row == 4:
+                name = f"{floor(col)}_shadow"
+            else:
+                name = f"{floor(col)}_{'ab'[(row * 7 + col * 3) % 2]}"
+            scr.alpha_composite(to_image(t[name]), (col * 16, row * 16))
+
+    walk = chicken.walk_cycle()
+    things = [
+        (to_image(player.FRONT), 150, 92),
+        (to_image(walk["right"][0]), 70, 120),
+        (to_image(walk["left"][1]), 112, 150),
+        (to_image(chicken.idle_cycle()["down"][2]), 40, 150),
+        (to_image(chicken.powered_walk("flight")["left"][0]), 200, 104),
+        (to_image(chicken.powered_walk("rage")["down"][1]), 250, 140),
+        (to_image(chicken.powered_walk("egg")["right"][2]), 190, 158),
+        (to_image(mushrooms.patch("flight", 1)), 240, 84),
+        (to_image(mushrooms.patch("rage", 2)), 280, 120),
+        (to_image(mushrooms.patch("egg", 0)), 30, 90),
+    ]
+    for img, x, y in sorted(things, key=lambda it: it[2] + it[0].height):
+        scr.alpha_composite(floor_shadow(img.width - 2), (x + 1, y + img.height - 2))
+        scr.alpha_composite(img, (x, y))
+    return scr.crop((0, 0, 320, 180))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--preview", type=Path, help="also write enlarged previews to this folder")
@@ -108,6 +146,7 @@ def main():
             img = build()
             img.resize((img.width * 8, img.height * 8), Image.NEAREST).save(
                 args.preview / name.replace(".png", "_8x.png"))
+        mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_arrivals_4x.png")
         print(f"wrote previews to {args.preview}")
 
 

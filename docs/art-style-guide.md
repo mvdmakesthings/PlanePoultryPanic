@@ -247,9 +247,10 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 ## Style Test Checklist (M2)
 
-- [ ] Palette confirmed or swapped
-- [ ] Player: idle and walk, 4 directions
-- [ ] Normal chicken: idle and walk, plus one powered mode as a color and shape test
-- [ ] Arrivals floor and wall tiles, one carousel piece
-- [ ] Mock screenshot at 320x180, viewed at 4x
+- [x] Palette confirmed (ENDESGA 32)
+- [x] Player: idle and walk, 4 directions
+- [x] Normal chicken: idle and walk, plus all three powered modes
+- [x] Arrivals floor and wall tiles
+- [ ] One carousel piece
+- [x] Mock screenshot at 320x180, viewed at 4x (`build.py --preview` writes `mock_arrivals_4x.png`)
 - [ ] Your sign-off, and any changes to this guide recorded

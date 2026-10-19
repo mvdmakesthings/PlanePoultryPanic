@@ -50,11 +50,12 @@ One room, colored shapes instead of art. Goal: find out whether the core loop is
 
 ## M2: Style Test
 
-- [ ] Lock the palette ([art-style-guide.md](art-style-guide.md))
-- [ ] Player sprite: idle and walk in 4 directions (run cycle comes in M4)
-- [ ] Normal chicken sprite: idle and walk
-- [ ] Airport floor and wall tiles, one carousel piece
-- [ ] Mock screenshot at real size (320x180, shown at 4x)
+- [x] Lock the palette ([art-style-guide.md](art-style-guide.md))
+- [x] Player sprite: idle and walk in 4 directions (run cycle comes in M4)
+- [x] Normal chicken sprite: idle and walk, plus the three powered mushroom modes
+- [x] Airport floor and wall tiles, and a mushroom patch
+- [ ] One carousel piece
+- [x] Mock screenshot at real size (320x180, shown at 4x)
 - [ ] Adjust until you're happy; update the style guide with what we learned
 
 **Done when** the mock screenshot looks like the game you imagine.
