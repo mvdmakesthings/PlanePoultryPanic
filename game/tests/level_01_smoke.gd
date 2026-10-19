@@ -15,6 +15,7 @@ func _ready() -> void:
 	await _critical_path_test()
 	await _chicken_path_test()
 
+	await AudioManager.silence()
 	if _failures.is_empty():
 		print("LEVEL 1 SMOKE TEST PASSED")
 		get_tree().quit(0)
@@ -29,6 +30,15 @@ func _layout_tests() -> void:
 	var player: Player = level.get_node("Entities/Player")
 	var hud: Hud = level.get_node("UI/HUD")
 	_check(player.snacks == 0, "the player arrives with no snacks")
+	for bus in AudioManager.BUSES:
+		_check(AudioServer.get_bus_index(bus) >= 0, "the %s audio bus exists" % bus)
+	_check(AudioManager.music_playing() == "arrivals", "Level 1 plays the Arrivals music")
+	var hums := AudioManager.playing_loops()
+	_check(hums.size() == 1 and hums[0].bus == "Ambience", "the carousel hums on the Ambience bus")
+	for sound in ["step", "pickup", "key", "throw", "eat", "hurt", "peck", "splat", "poof",
+			"cluck", "spray", "shove", "locked", "unlock", "door", "closet", "death",
+			"checkpoint", "level_clear", "ui_move", "ui_confirm", "ui_back"]:
+		_check(ResourceLoader.exists(AudioManager.SFX_DIR + sound + ".wav"), "the %s sound exists" % sound)
 	await get_tree().physics_frame
 	_check(hud._hint.contains("WASD"), "the first hint teaches moving")
 

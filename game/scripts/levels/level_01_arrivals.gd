@@ -114,6 +114,7 @@ func _ready() -> void:
 	_door.interacted_locked.connect(func() -> void: _show_event_hint(LOCKED_HINT))
 	for i in HINT_ZONES.size():
 		_hint_time_left.append(HINT_TIME)
+	AudioManager.play_music("arrivals")
 
 
 func _physics_process(delta: float) -> void:
@@ -162,6 +163,7 @@ func _on_door_entered() -> void:
 		return
 	_level_over = true
 	_player.freeze()
+	AudioManager.play("level_clear")
 	_hud.show_message("ARRIVALS CLEARED!\nNext stop: Security\n(coming soon)")
 
 

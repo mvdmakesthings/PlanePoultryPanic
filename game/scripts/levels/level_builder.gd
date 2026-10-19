@@ -94,6 +94,8 @@ static func add_carousel(parent: Node, rect: Rect2i, chute_column: int) -> Carou
 	var carousel := Carousel.new()
 	carousel.setup(outer, island, chute)
 	parent.add_child(carousel)
+	# The belt's motor hums wherever the carousel is.
+	AudioManager.play_loop("carousel_hum", carousel, c.get_center())
 	return carousel
 
 

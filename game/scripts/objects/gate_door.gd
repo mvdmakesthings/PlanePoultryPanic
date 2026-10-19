@@ -15,6 +15,7 @@ const DOORWAY := Rect2(8, 18, 32, 14)
 
 var _open_amount := 0.0
 var _entered := false
+var _target := 0.0
 
 @onready var _sprite: Sprite2D = $Sprite2D
 
@@ -26,6 +27,9 @@ func _physics_process(delta: float) -> void:
 	var threshold := global_position + Vector2(24, 32)
 	var near := player.global_position.distance_to(threshold) < open_distance
 	var target := float(FRAMES - 1) if near else 0.0
+	if target != _target:
+		_target = target
+		AudioManager.play("door", threshold)
 	_open_amount = move_toward(_open_amount, target, frames_per_second * delta)
 	_sprite.frame = int(roundf(_open_amount))
 

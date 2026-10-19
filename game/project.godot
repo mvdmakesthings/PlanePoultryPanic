@@ -18,6 +18,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 [autoload]
 
 InputSetup="*res://scripts/managers/input_setup.gd"
+AudioManager="*res://scripts/managers/audio_manager.gd"
 
 [display]
 

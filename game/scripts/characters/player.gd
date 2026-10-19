@@ -126,6 +126,7 @@ func _ready() -> void:
 	_hair.vframes = SpriteSheets.DIRECTIONS.size()
 	_sprite.add_child(_hair)
 	_sprite.frame_changed.connect(_update_hair)
+	_sprite.frame_changed.connect(_play_footstep)
 	_sprite.animation_changed.connect(_update_hair)
 	health_changed.connect(func(_current: int, _maximum: int) -> void: _update_hair())
 	_sprite.play("idle_down")
@@ -191,6 +192,7 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 		return false
 	health = maxi(health - amount, 0)
 	health_changed.emit(health, max_health)
+	AudioManager.play("hurt")
 	_knockback = (global_position - from_position).normalized() * knockback_strength
 	put_down_suitcase()
 	if health == 0:
@@ -208,11 +210,16 @@ func pick_up(item: String, count: int) -> int:
 	if Inventory.KEY_ITEMS.has(item):
 		inventory.add_key_item(item, count)
 		FloatText.spawn(self, "Got it!")
+		AudioManager.play("key")
 		return 0
 	if Inventory.ITEMS[item]["stack"] > 1:
-		return count - inventory.add_stackable(item, count)
+		var added := inventory.add_stackable(item, count)
+		if added > 0:
+			AudioManager.play("pickup")
+		return count - added
 	if not inventory.add_single(item, count):
 		return count
+	AudioManager.play("pickup")
 	# A newly picked up tool goes straight into the player's hand.
 	if item == "extinguisher":
 		inventory.select_item(item)
@@ -242,6 +249,7 @@ func throw_snack() -> void:
 	snack.direction = facing
 	snack.position = position
 	get_parent().add_child(snack)
+	AudioManager.play("throw")
 
 
 ## Eats a snack from any slot (the selected one first) to heal a suitcase.
@@ -255,6 +263,7 @@ func eat_snack() -> void:
 		FloatText.spawn(self, "Full!")
 		return
 	inventory.take_from(index)
+	AudioManager.play("eat")
 	health = mini(health + SUITCASE, max_health)
 	health_changed.emit(health, max_health)
 
@@ -276,6 +285,7 @@ func spray() -> void:
 	foam.direction = facing
 	foam.position = position
 	get_parent().add_child(foam)
+	AudioManager.play("spray")
 
 
 ## Aim at the nearest threatening chicken in range, or straight ahead.
@@ -309,6 +319,7 @@ func throw_suitcase() -> void:
 		return
 	carrying.throw(facing)
 	carrying = null
+	AudioManager.play("throw")
 
 
 ## Sets the carried suitcase down at the player's feet, if holding one.
@@ -452,6 +463,13 @@ func _head_top(texture: Texture2D) -> int:
 	return top
 
 
+## A footstep on each contact frame of the walk and run cycles.
+func _play_footstep() -> void:
+	var animation := String(_sprite.animation)
+	if (animation.begins_with("walk") or animation.begins_with("run")) and _sprite.frame % 2 == 0:
+		AudioManager.play("step")
+
+
 func _update_invincibility(delta: float) -> void:
 	if _invincible_timer <= 0.0:
 		return
@@ -467,6 +485,7 @@ func _die() -> void:
 	_sprite.offset = Vector2(0, -KO_FRAME_SIZE.y / 2.0)
 	_sprite.play("ko")
 	_update_hair()
+	AudioManager.play("death")
 	queue_redraw()
 	died.emit()
 

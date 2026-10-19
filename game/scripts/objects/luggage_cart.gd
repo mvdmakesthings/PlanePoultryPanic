@@ -66,6 +66,7 @@ func interact(player: Player) -> void:
 	if direction == Vector2.ZERO:
 		return
 	velocity = direction * shove_speed
+	AudioManager.play("shove", global_position)
 	if absf(direction.x) > 0.1:
 		_sprite.flip_h = direction.x < 0.0
 	_show_prompt = false

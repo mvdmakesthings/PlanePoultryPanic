@@ -33,6 +33,7 @@ var _open_amount := 0.0
 var _entered := false
 var _show_prompt := false
 var _barrier: StaticBody2D
+var _target_frame := float(FRAME_CLOSED)
 
 @onready var _sprite: Sprite2D = $Sprite2D
 
@@ -71,6 +72,7 @@ func can_interact(player: Player) -> bool:
 func interact(player: Player) -> void:
 	if not player.inventory.use_key_item(key_item):
 		FloatText.spawn(player, "It's locked")
+		AudioManager.play("locked")
 		interacted_locked.emit()
 		return
 	unlock()
@@ -82,6 +84,7 @@ func unlock() -> void:
 		return
 	is_locked = false
 	_barrier.queue_free()
+	AudioManager.play("unlock")
 	_sprite.frame = FRAME_CLOSED
 	_show_prompt = false
 	queue_redraw()
@@ -105,6 +108,9 @@ func _physics_process(delta: float) -> void:
 		return
 	var near := player.global_position.distance_to(base_point()) < open_distance
 	var target := float(FRAME_OPEN) if near else float(FRAME_CLOSED)
+	if target != _target_frame:
+		_target_frame = target
+		AudioManager.play("door", base_point())
 	_open_amount = move_toward(maxf(_open_amount, FRAME_CLOSED), target, frames_per_second * delta)
 	_sprite.frame = int(roundf(_open_amount))
 	if not _entered and doorway_rect().has_point(player.global_position):

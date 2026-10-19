@@ -354,6 +354,8 @@ Commissioned from a chiptune composer. Placeholder music is used until then.
 
 Plus short stings for game over, checkpoint, and item fanfares.
 
+Until the composer's tracks arrive, two generated chiptune loops stand in: Arrivals (A minor, calm with a creeping unease) and the main theme for the menu (`tools/audio/music.py`).
+
 **Composer brief and timing**: Engage the composer once the vertical slice is playable, so they can hear and see the game. Ask for loopable tracks, stems if affordable, and a license covering the Steam release, trailers, and a possible soundtrack release.
 
 ### Sound Effects

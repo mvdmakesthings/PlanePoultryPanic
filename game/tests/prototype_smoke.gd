@@ -116,6 +116,7 @@ func _ready() -> void:
 	await _spray_under_attack_tests()
 	await _totem_tests()
 
+	await AudioManager.silence()
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
 		get_tree().quit(0)
