@@ -184,6 +184,14 @@ SOUNDS = {
                           tone("square", 90, slide=-0.5, attack=0.001, sustain=0.03,
                                decay=0.06, lowpass=0.3, volume=0.3)),
     "carousel_hum": lambda: carousel_hum(),
+    # Food Court: a vending machine's clunk, then bags dropping.
+    "vend": lambda: mix(tone("noise", 200, attack=0.001, sustain=0.05, decay=0.15,
+                             lowpass=0.25, volume=0.6, seed=41),
+                        tone("square", 80, slide=-1.0, attack=0.001, sustain=0.04, decay=0.1,
+                             lowpass=0.3, volume=0.35),
+                        *[tone("noise", 1400, attack=0.001, sustain=0.01, decay=0.05,
+                               lowpass=0.5, volume=0.35, seed=42 + k) for k in range(3)],
+                        gaps=[0.0, 0.0, 0.22, 0.31, 0.38]),
     # Security
     "beep": lambda: mix(*[tone("square", 1760, duty=0.5, attack=0.001, sustain=0.06, decay=0.02,
                                lowpass=0.6, volume=0.22) for _ in range(2)], gaps=[0.0, 0.12]),

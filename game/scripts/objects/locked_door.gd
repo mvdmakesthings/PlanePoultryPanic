@@ -29,6 +29,8 @@ const DOORWAY := Rect2(8, 18, 32, 14)
 @export var unlock_prompt := "{interact} unlock"
 @export var locked_prompt := "{interact} locked"
 @export var unlocked_text := "Unlocked!"
+## Starts unlocked, for an exit that needs no key.
+@export var start_unlocked := false
 @export var reach := 26.0
 @export var open_distance := 56.0
 @export var frames_per_second := 12.0
@@ -58,6 +60,9 @@ func _ready() -> void:
 		if child is StaticBody2D:
 			child.position = -global_position
 	_sprite.frame = FRAME_LOCKED
+	add_to_group("unlockables")
+	if start_unlocked:
+		unlock(true)
 
 
 ## The wall tiles (in tile coordinates) this door replaces: its lower face row.

@@ -251,9 +251,9 @@ func _save_checkpoint(id: String) -> void:
 		if checkpoint.is_active:
 			reached.append(checkpoint.id)
 	var unlocked: Array[String] = []
-	for door in _doors():
-		if not door.is_locked:
-			unlocked.append(str(get_path_to(door)))
+	for node in get_tree().get_nodes_in_group("unlockables"):
+		if is_ancestor_of(node) and not node.is_locked:
+			unlocked.append(str(get_path_to(node)))
 	GameManager.checkpoint_reached({
 		"level": scene_file_path,
 		"checkpoint": id,
@@ -277,7 +277,7 @@ func _restore(data: Dictionary) -> void:
 			get_node(path).free()
 	for path: String in data.get("unlocked", []):
 		if has_node(path):
-			(get_node(path) as LockedDoor).unlock(true)
+			get_node(path).unlock(true)
 	# Don't announce key items the player already had.
 	for item: String in key_hints:
 		_shown_key_hints[item] = true
