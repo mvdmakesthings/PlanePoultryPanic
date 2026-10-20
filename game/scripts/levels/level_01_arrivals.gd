@@ -6,7 +6,9 @@ extends Node2D
 ## staff room on the far side of the carousel.
 ##
 ## The layout is the text map below (see LevelBuilder for the legend). Props,
-## chickens and pickups are placed in the scene.
+## chickens, pickups and checkpoints are placed in the scene. Reaching a
+## checkpoint autosaves; after a knockout the player retries from the latest
+## one with their inventory as it was then.
 
 const TILE := LevelBuilder.TILE
 const MAP := [
@@ -70,6 +72,17 @@ const EVENT_HINT_TIME := 5.0
 const HURT_HINT := "Ouch! {eat_snack} eats a snack\nto heal a suitcase"
 const LOCKED_HINT := "Locked. Find a maintenance\nkey: try the staff room"
 const KEY_HINT := "Got the maintenance key!\nBack to the SECURITY door"
+## Shown on the retry screen, by what landed the last hit.
+const RETRY_HINTS := {
+	"peck": [
+		"Chickens stop for a thrown snack.\nToss one ({use_item}) and slip past.",
+		"Chickens are slower than you walk.\nKeep moving and don't get cornered.",
+		"Hold {run} to sprint out of trouble,\nbut keep an eye on your stamina.",
+		"Low on suitcases? {eat_snack} eats a snack\nto heal one.",
+	],
+	"egg": ["Egg shooters wind up before they fire.\nStep aside, or duck behind a cart."],
+	"stomp": ["A red zone marks where the totem\nwill land. Get out of it!"],
+}
 
 var _level_over := false
 var _hint_time_left: Array[float] = []
@@ -78,12 +91,16 @@ var _event_hint_left := 0.0
 var _shown_hurt_hint := false
 var _shown_key_hint := false
 var _last_health := -1
+var _start_position: Vector2
+## The scene's item pickups, to tell which have been picked up.
+var _pickups: Array[String] = []
 
 @onready var _floor: TileMapLayer = $Floor
 @onready var _props: TileMapLayer = $Props
 @onready var _door: LockedDoor = $SecurityDoor
 @onready var _player: Player = $Entities/Player
 @onready var _hud: Hud = $UI/HUD
+@onready var _menus: GameMenus = $UI/GameMenus
 
 
 func _ready() -> void:
@@ -112,8 +129,20 @@ func _ready() -> void:
 	_player.inventory_changed.connect(_on_inventory_changed)
 	_door.player_entered.connect(_on_door_entered)
 	_door.interacted_locked.connect(func() -> void: _show_event_hint(LOCKED_HINT))
+	_menus.chosen.connect(_on_menu_chosen)
 	for i in HINT_ZONES.size():
 		_hint_time_left.append(HINT_TIME)
+
+	_start_position = _player.global_position
+	_pickups = LevelState.pickup_paths(self)
+	for node in get_tree().get_nodes_in_group("checkpoints"):
+		if is_ancestor_of(node):
+			(node as Checkpoint).reached.connect(_on_checkpoint_reached)
+	var restore := GameManager.take_pending(scene_file_path)
+	if restore.is_empty():
+		_save_checkpoint("start")
+	else:
+		_restore(restore)
 
 
 func _physics_process(delta: float) -> void:
@@ -161,16 +190,83 @@ func _on_door_entered() -> void:
 	if _level_over:
 		return
 	_level_over = true
+	_menus.can_pause = false
 	_player.freeze()
 	AudioManager.play("level_clear")
-	_hud.show_message("ARRIVALS CLEARED!\nNext stop: Security\n(coming soon)")
+	var rows: Array[Dictionary] = [
+		{"id": "security", "label": "ON TO SECURITY", "kind": "button", "status": "COMING SOON", "disabled": true},
+		{"id": "again", "label": "PLAY AGAIN", "kind": "button", "status": "BOARDING"},
+	]
+	_menus.open_level_clear("ARRIVALS CLEARED!", rows)
+
+
+func _on_menu_chosen(id: String) -> void:
+	if id == "again":
+		GameManager.new_game()
 
 
 func _on_player_died() -> void:
 	if _level_over:
 		return
 	_level_over = true
-	_hud.show_message("GROUNDED.\nBack to the gate...")
-	# Until checkpoints arrive, start the level over.
-	await get_tree().create_timer(2.5).timeout
-	get_tree().reload_current_scene()
+	_menus.can_pause = false
+	# Let the knockout land before the retry screen comes up.
+	await get_tree().create_timer(1.5).timeout
+	var hints: Array = RETRY_HINTS.get(_player.last_hit, RETRY_HINTS["peck"])
+	_menus.open_retry(hints.pick_random())
+
+
+# ---------- checkpoints ----------
+
+func _on_checkpoint_reached(checkpoint: Checkpoint) -> void:
+	_save_checkpoint(checkpoint.id)
+	AudioManager.play("checkpoint")
+	FloatText.spawn(_player, "Checkpoint!")
+
+
+## Snapshots the run at this checkpoint and autosaves it.
+func _save_checkpoint(id: String) -> void:
+	var reached: Array[String] = []
+	for checkpoint in _checkpoints():
+		if checkpoint.is_active:
+			reached.append(checkpoint.id)
+	var unlocked: Array[String] = []
+	if not _door.is_locked:
+		unlocked.append(str(get_path_to(_door)))
+	GameManager.checkpoint_reached({
+		"level": scene_file_path,
+		"checkpoint": id,
+		"reached": reached,
+		"inventory": LevelState.capture_inventory(_player.inventory),
+		"collected": LevelState.collected(self, _pickups),
+		"unlocked": unlocked,
+	})
+
+
+## Puts the level back the way it was at a checkpoint.
+func _restore(data: Dictionary) -> void:
+	for checkpoint in _checkpoints():
+		if checkpoint.id in data.get("reached", []):
+			checkpoint.activate(true)
+		if checkpoint.id == data.get("checkpoint", ""):
+			_player.global_position = checkpoint.spawn_point()
+	for path: String in data.get("collected", []):
+		if has_node(path):
+			get_node(path).free()
+	for path: String in data.get("unlocked", []):
+		if has_node(path):
+			(get_node(path) as LockedDoor).unlock(true)
+	# Don't announce a key the player already had.
+	_shown_key_hint = true
+	LevelState.restore_inventory(_player.inventory, data.get("inventory", {}))
+	_shown_key_hint = _player.inventory.has_key_item(_door.key_item) or not _door.is_locked
+	# The run carries on from here, so this is the latest checkpoint again.
+	GameManager.last_checkpoint = data
+
+
+func _checkpoints() -> Array[Checkpoint]:
+	var found: Array[Checkpoint] = []
+	for node in get_tree().get_nodes_in_group("checkpoints"):
+		if is_ancestor_of(node):
+			found.append(node as Checkpoint)
+	return found

@@ -78,6 +78,9 @@ var is_dead := false
 ## The closest thing Interact would use right now, or null. Only this one
 ## shows its prompt, so overlapping prompts never stack up.
 var interact_target: Node2D = null
+## What landed the last hit: "peck", "egg" or "stomp" (anything heavier),
+## so the retry screen can say what went wrong.
+var last_hit := ""
 ## The suitcase held overhead, or null.
 var carrying: Suitcase = null
 ## The closet the player is hiding in, or null.
@@ -190,6 +193,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func take_damage(amount: int, from_position: Vector2) -> bool:
 	if is_dead or is_hidden or _invincible_timer > 0.0:
 		return false
+	last_hit = "peck" if amount == PECK else "egg" if amount < PECK else "stomp"
 	health = maxi(health - amount, 0)
 	health_changed.emit(health, max_health)
 	AudioManager.play("hurt")

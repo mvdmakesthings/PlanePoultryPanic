@@ -10,11 +10,23 @@ var _failures: Array[String] = []
 
 
 func _ready() -> void:
+	# Never touch the player's own save or settings, and don't really
+	# change scenes (that would replace this test).
+	SaveSystem.save_path = "user://test_save.json"
+	SaveSystem.settings_path = "user://test_settings.cfg"
+	SaveSystem.delete_game()
+	SaveSystem.reset_controls()
+	GameManager.dry_run = true
 	await _layout_tests()
 	await _hair_test()
 	await _critical_path_test()
 	await _chicken_path_test()
+	await _pause_test()
+	await _checkpoint_tests()
+	SaveSystem.delete_game()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(SaveSystem.settings_path))
 
+	get_tree().paused = false
 	await AudioManager.silence()
 	if _failures.is_empty():
 		print("LEVEL 1 SMOKE TEST PASSED")
@@ -116,6 +128,8 @@ func _critical_path_test() -> void:
 	await _hold(["move_up"], 1.0)
 	_check(entered[0], "walking into the open doorway leaves for Security")
 	_check(level._level_over, "going through the door ends the level")
+	var menus: GameMenus = level.get_node("UI/GameMenus")
+	_check(menus.is_open() and menus._mode == "clear", "the level-clear screen comes up")
 	level.queue_free()
 
 
@@ -141,7 +155,82 @@ func _chicken_path_test() -> void:
 	level.queue_free()
 
 
+## Esc pauses the game behind the pause menu; Esc again resumes.
+func _pause_test() -> void:
+	var level := await _fresh_level()
+	var menus: GameMenus = level.get_node("UI/GameMenus")
+	_tap("pause")
+	await get_tree().process_frame
+	_check(menus.is_open() and get_tree().paused, "Esc pauses the game and opens the pause menu")
+	_tap("pause")
+	await get_tree().process_frame
+	_check(not menus.is_open() and not get_tree().paused, "Esc again resumes")
+	level.queue_free()
+
+
+## Checkpoints autosave; a knockout offers a retry that restores the run
+## as it was at the latest checkpoint.
+func _checkpoint_tests() -> void:
+	SaveSystem.delete_game()
+	var level := await _fresh_level()
+	var player: Player = level.get_node("Entities/Player")
+	_kill_chickens()
+	var save := SaveSystem.load_game()
+	_check(save.get("checkpoint") == "start", "starting the level autosaves at its start")
+
+	var baggage: Checkpoint = level.get_node("Entities/CheckpointBaggageClaim")
+	player.global_position = baggage.spawn_point()
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_check(baggage.is_active and SaveSystem.load_game().get("checkpoint") == "baggage_claim",
+		"reaching the Baggage Claim map stand autosaves there")
+
+	# Take the key, then reach the staff room's checkpoint.
+	player.global_position = Vector2(40, 482)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var staff_spawn: Vector2 = level.get_node("Entities/CheckpointStaffRoom").spawn_point()
+	player.global_position = staff_spawn
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	save = SaveSystem.load_game()
+	_check(save.get("checkpoint") == "staff_room", "the staff room checkpoint autosaves")
+	_check("Entities/MaintenanceKey" in save.get("collected", []), "the save knows the key was picked up")
+	_check(save.get("inventory", {}).get("key_items", {}).has("maintenance_key"), "the save holds the key")
+
+	# Knocked out: the retry screen comes up with a hint.
+	player.global_position = Vector2(300, 300)
+	while not player.is_dead:
+		player._invincible_timer = 0.0
+		player.take_damage(Player.PECK, player.global_position + Vector2.LEFT)
+	await _wait(1.8)
+	var menus: GameMenus = level.get_node("UI/GameMenus")
+	_check(menus.is_open() and menus._mode == "retry" and menus._hint != "", "a knockout shows the retry screen with a hint")
+	var requested := [""]
+	var on_change := func(path: String) -> void: requested[0] = path
+	GameManager.scene_change_requested.connect(on_change)
+	_tap("ui_accept")
+	await get_tree().process_frame
+	GameManager.scene_change_requested.disconnect(on_change)
+	_check(requested[0] == level.scene_file_path, "Retry reloads the level")
+	_check(GameManager.pending.get("checkpoint") == "staff_room", "Retry starts from the latest checkpoint")
+	level.queue_free()
+
+	# The reloaded level puts everything back as it was at the checkpoint.
+	level = await _fresh_level()
+	player = level.get_node("Entities/Player")
+	await get_tree().physics_frame
+	print("restored player at %s" % player.global_position)
+	_check(player.global_position.distance_to(staff_spawn) < 2.0, "the retry starts at the checkpoint")
+	_check(player.inventory.has_key_item("maintenance_key"), "the retry keeps the key")
+	_check(not level.has_node("Entities/MaintenanceKey"), "the key isn't lying in the staff room again")
+	_check(player.health == player.max_health, "the retry starts with full health")
+	_check(level.get_node("Entities/CheckpointBaggageClaim").is_active, "checkpoints already reached stay lit")
+	level.queue_free()
+
+
 func _fresh_level() -> Node:
+	get_tree().paused = false
 	await get_tree().process_frame
 	var level := LEVEL.instantiate()
 	add_child(level)

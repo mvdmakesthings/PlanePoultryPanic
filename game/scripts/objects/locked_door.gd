@@ -79,12 +79,14 @@ func interact(player: Player) -> void:
 	FloatText.spawn(player, "Unlocked!")
 
 
-func unlock() -> void:
+## Unlocks the door. quiet skips the sound, for restoring a save.
+func unlock(quiet := false) -> void:
 	if not is_locked:
 		return
 	is_locked = false
 	_barrier.queue_free()
-	AudioManager.play("unlock")
+	if not quiet:
+		AudioManager.play("unlock")
 	_sprite.frame = FRAME_CLOSED
 	_show_prompt = false
 	queue_redraw()
