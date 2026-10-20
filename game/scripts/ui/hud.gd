@@ -17,6 +17,11 @@ const SLOT_SELECTED := Color("feae34")
 const SLOT_SIZE := 14.0
 const SLOT_GAP := 1.0
 const FONT_SIZE := 8
+## How long the suitcases shake after a hit, and a slot pops after a change.
+const HURT_SHAKE_TIME := 0.35
+const POP_TIME := 0.15
+## The stamina bar flashes between these while she's out of breath.
+const STAMINA_FLASH := [Color("e43b44"), Color("ffffff")]
 const CONTROLS_HINT := "{use_item}use {prev_item}{next_item}switch {eat_snack}eat {interact}act {drop_item}drop"
 ## Tutorial hints use the departure-board look: dark panel, yellow text.
 const HINT_BACK := Color("181425")
@@ -41,6 +46,16 @@ var _boss_hits := 0
 var _boss_max := 0
 ## The PA announcement on screen, or "".
 var _pa := ""
+## Feedback timers (seconds left): the suitcases shaking after a hit, and
+## each inventory slot popping after it changes.
+var _hurt_left := 0.0
+var _pop_left: Array[float] = []
+## The slots and selection as last drawn, to spot which slot changed.
+var _last_slots: Array = []
+var _last_selected := -1
+## True from running dry until running is allowed again; the bar flashes.
+var _exhausted := false
+var _flash_time := 0.0
 
 
 func _ready() -> void:
@@ -48,6 +63,8 @@ func _ready() -> void:
 		_icons[item] = load(Inventory.ITEMS[item]["icon"])
 	for item: String in Inventory.KEY_ITEMS:
 		_icons[item] = load(Inventory.KEY_ITEMS[item]["icon"])
+	_pop_left.resize(Inventory.SLOT_COUNT)
+	_pop_left.fill(0.0)
 
 
 func _enter_tree() -> void:
@@ -66,7 +83,7 @@ func bind_player(player: Player) -> void:
 	_player = player
 	player.health_changed.connect(_on_health_changed)
 	player.stamina_changed.connect(_on_stamina_changed)
-	player.inventory_changed.connect(queue_redraw)
+	player.inventory_changed.connect(_on_inventory_changed)
 
 
 func show_message(text: String) -> void:
@@ -104,6 +121,8 @@ func show_hint(text: String) -> void:
 
 
 func _on_health_changed(current: int, maximum: int) -> void:
+	if current < _health:
+		_hurt_left = HURT_SHAKE_TIME
 	_health = current
 	_max_health = maximum
 	queue_redraw()
@@ -111,7 +130,40 @@ func _on_health_changed(current: int, maximum: int) -> void:
 
 func _on_stamina_changed(current: float, maximum: float) -> void:
 	_stamina_ratio = current / maximum
+	if current <= 0.0:
+		_exhausted = true
+	elif _player and _stamina_ratio >= _player.exhausted_recover_ratio:
+		_exhausted = false
 	queue_redraw()
+
+
+## Pops each slot whose item or count changed, and the newly selected one.
+func _on_inventory_changed() -> void:
+	var slots := _player.inventory.slots
+	# The first update is the inventory she arrived with: nothing pops.
+	var first := _last_selected < 0
+	for i in mini(slots.size(), _pop_left.size()):
+		if first:
+			break
+		var before: Variant = _last_slots[i] if i < _last_slots.size() else {}
+		var changed: bool = before != slots[i] and not slots[i].is_empty()
+		if changed or (i == _player.inventory.selected and i != _last_selected and _last_selected >= 0):
+			_pop_left[i] = POP_TIME
+	_last_slots = slots.duplicate(true)
+	_last_selected = _player.inventory.selected
+	queue_redraw()
+
+
+func _process(delta: float) -> void:
+	_flash_time += delta
+	var busy := _exhausted or _hurt_left > 0.0
+	_hurt_left = maxf(_hurt_left - delta, 0.0)
+	for i in _pop_left.size():
+		if _pop_left[i] > 0.0:
+			busy = true
+			_pop_left[i] = maxf(_pop_left[i] - delta, 0.0)
+	if busy:
+		queue_redraw()
 
 
 func _draw() -> void:
@@ -122,6 +174,10 @@ func _draw() -> void:
 	draw_rect(bar.grow(1), TEXT_OUTLINE)
 	draw_rect(bar, STAMINA_BACK)
 	var fill_color := STAMINA_FILL if _stamina_ratio > 0.3 else STAMINA_TIRED
+	if _exhausted:
+		# Out of breath: the bar blinks until running is allowed again.
+		fill_color = STAMINA_FLASH[int(_flash_time * 8.0) % 2]
+		draw_rect(bar.grow(1), fill_color if int(_flash_time * 8.0) % 2 == 0 else TEXT_OUTLINE, false, 1.0)
 	draw_rect(Rect2(bar.position, Vector2(roundf(bar.size.x * _stamina_ratio), bar.size.y)), fill_color)
 
 	if _player:
@@ -204,8 +260,12 @@ func _draw_board_box(font: Font, label: String, value: String, flash := false) -
 ## One suitcase per Player.SUITCASE health units; partly lost suitcases are
 ## drawn partly filled, emptying from the right.
 func _draw_health() -> void:
+	# Shaken by a hit: each suitcase jitters a pixel, in whole pixels.
+	var shaking := _hurt_left > 0.0
 	for i in _max_health / Player.SUITCASE:
 		var pos := Vector2(4 + i * 14, 4)
+		if shaking:
+			pos += Vector2(randi_range(-1, 1), randi_range(-1, 1))
 		var fill := clampi(_health - i * Player.SUITCASE, 0, Player.SUITCASE)
 		var empty := Rect2(Vector2(LUGGAGE_SIZE.x, 0), LUGGAGE_SIZE)
 		draw_texture_rect_region(LUGGAGE, Rect2(pos, LUGGAGE_SIZE), empty)
@@ -222,6 +282,9 @@ func _draw_inventory(font: Font) -> void:
 	var origin := Vector2(4, size.y - SLOT_SIZE - 3)
 	for i in Inventory.SLOT_COUNT:
 		var rect := Rect2(origin + Vector2(i * (SLOT_SIZE + SLOT_GAP), 0), Vector2(SLOT_SIZE, SLOT_SIZE))
+		if i < _pop_left.size() and _pop_left[i] > 0.0:
+			# Pops up two pixels, then settles back.
+			rect.position.y -= 2.0 if _pop_left[i] > POP_TIME / 2.0 else 1.0
 		draw_rect(rect, SLOT_BACK)
 		draw_rect(rect, SLOT_OUTLINE, false, 1.0)
 		var slot := inventory.slots[i]

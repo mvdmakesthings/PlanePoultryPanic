@@ -296,8 +296,13 @@ func _juice_test() -> void:
 	var player: Player = level.get_node("Entities/Player")
 	_kill_chickens()
 	await get_tree().physics_frame
+	var hud: Hud = level.get_node("UI/HUD")
+	_check(hud._pop_left.all(func(t: float) -> bool: return t == 0.0), "no slot pops on arrival")
+	player.add_snack()
+	_check(hud._pop_left[0] > 0.0, "picking up a snack pops its slot")
 	player._invincible_timer = 0.0
 	player.take_damage(Player.PECK, player.global_position + Vector2.LEFT)
+	_check(hud._hurt_left > 0.0, "a hit shakes the suitcases on the HUD")
 	_check(Engine.time_scale < 1.0, "a hit briefly slows time (hit-stop)")
 	_check(player._sprite.scale != Vector2.ONE, "a hit squashes her")
 	var material := player._sprite.material as ShaderMaterial
@@ -334,6 +339,11 @@ func _juice_test() -> void:
 	Input.action_release("run")
 	Input.action_release("move_right")
 	_check(dusty, "running kicks up dust")
+	player.stamina = 1.0
+	player._update_stamina(true, 0.1)
+	_check(hud._exhausted, "the stamina bar flashes when she runs out of breath")
+	player._update_stamina(false, 10.0)
+	_check(not hud._exhausted, "it stops flashing once she can run again")
 	level.queue_free()
 
 
