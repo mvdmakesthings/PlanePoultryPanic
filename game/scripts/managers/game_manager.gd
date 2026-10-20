@@ -57,6 +57,28 @@ func continue_game() -> void:
 	change_scene(save["level"])
 
 
+## Called by a level when the player leaves through its exit: autosaves at
+## the start of the next level (by scene path), carrying the inventory over.
+func level_cleared(next_level: String, inventory: Dictionary) -> void:
+	checkpoint_reached({
+		"level": next_level,
+		"checkpoint": "start",
+		"reached": [],
+		"inventory": inventory,
+		"collected": [],
+		"unlocked": [],
+	})
+
+
+## Carries on from the latest checkpoint, for example into the next level
+## after one is cleared.
+func continue_run() -> void:
+	if last_checkpoint.is_empty():
+		return
+	pending = last_checkpoint
+	change_scene(last_checkpoint["level"])
+
+
 ## Reloads a level (by scene path) from its latest checkpoint.
 func retry(level: String) -> void:
 	if last_checkpoint.get("level", "") == level:
