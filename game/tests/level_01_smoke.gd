@@ -19,6 +19,7 @@ func _ready() -> void:
 	GameManager.dry_run = true
 	await _layout_tests()
 	await _hair_test()
+	await _juice_test()
 	await _critical_path_test()
 	await _chicken_path_test()
 	await _chicken_animation_test()
@@ -285,6 +286,33 @@ func _checkpoint_tests() -> void:
 	_check(not level.has_node("Entities/MaintenanceKey"), "the key isn't lying in the staff room again")
 	_check(player.health == player.max_health, "the retry starts with full health")
 	_check(level.get_node("Entities/CheckpointBaggageClaim").is_active, "checkpoints already reached stay lit")
+	level.queue_free()
+
+
+## A hit shakes the camera by whole pixels, holds the moment, flashes and
+## squashes her, and everything settles back afterward.
+func _juice_test() -> void:
+	var level := await _fresh_level()
+	var player: Player = level.get_node("Entities/Player")
+	_kill_chickens()
+	await get_tree().physics_frame
+	player._invincible_timer = 0.0
+	player.take_damage(Player.PECK, player.global_position + Vector2.LEFT)
+	_check(Engine.time_scale < 1.0, "a hit briefly slows time (hit-stop)")
+	_check(player._sprite.scale != Vector2.ONE, "a hit squashes her")
+	var material := player._sprite.material as ShaderMaterial
+	_check(material != null and material.get_shader_parameter("flash") > 0.5, "a hit flashes her")
+	var offsets: Array[Vector2] = []
+	for i in 6:
+		await get_tree().process_frame
+		offsets.append(Juice.shake_offset())
+	_check(offsets.any(func(o: Vector2) -> bool: return o != Vector2.ZERO), "a hit shakes the screen")
+	_check(offsets.all(func(o: Vector2) -> bool: return o == o.round()), "the shake moves by whole pixels")
+	await _wait(0.6)
+	_check(Engine.time_scale == 1.0, "time runs normally again after the hit-stop")
+	_check(Juice.shake_offset() == Vector2.ZERO and level.get_node("Entities/Player/Camera2D").offset == Vector2.ZERO,
+		"the camera settles back after shaking")
+	_check(player._sprite.scale == Vector2.ONE, "she springs back from the squash")
 	level.queue_free()
 
 

@@ -100,6 +100,8 @@ var _hits_taken := 0
 ## After a hit, a moment when it can't be hit again.
 var _reeling := 0.0
 var _crown: Sprite2D
+## Squash and stretch for the whole stack (see Juice.squash).
+var stack_squash := Vector2.ONE
 
 @onready var _agent: NavigationAgent2D = $NavigationAgent2D
 @onready var _hitbox: Area2D = $Hitbox
@@ -109,6 +111,9 @@ func _ready() -> void:
 	add_to_group("totems")
 	_player = get_tree().get_first_node_in_group("player") as Player
 	_build_layers()
+	# The stack drops into place.
+	Juice.squash(self, Vector2(1.3, 0.6), 0.35, "stack_squash")
+	Juice.shake(2.0)
 
 
 func _build_layers() -> void:
@@ -186,6 +191,8 @@ func topple(direction: Vector2) -> void:
 	state = State.TOPPLING
 	_timer = topple_time
 	_topple_dir = direction.normalized() if direction != Vector2.ZERO else Vector2.RIGHT
+	_flash_layers()
+	Juice.shake(3.0)
 
 
 ## A hit that doesn't finish a boss: the bottom chickens are knocked out
@@ -208,6 +215,9 @@ func _stagger(direction: Vector2) -> void:
 	state = State.STALK
 	_shockwave = 0.3
 	AudioManager.play("boss_hit", global_position)
+	_flash_layers()
+	Juice.hitstop(0.12)
+	Juice.shake(6.0)
 	var poof := POOF_SCENE.instantiate() as Node2D
 	poof.position = position + dir * 10.0
 	get_parent().add_child(poof)
@@ -301,6 +311,8 @@ func _stomp() -> void:
 	state = State.STALK
 	_stomp_ready_in = stomp_cooldown
 	_shockwave = 0.3
+	Juice.squash(self, Vector2(1.3, 0.7), 0.25, "stack_squash")
+	Juice.shake(4.0)
 	if _player and global_position.distance_to(_player.global_position) <= stomp_radius:
 		_player.take_damage(Player.SUITCASE, global_position)
 
@@ -349,6 +361,9 @@ func _finish_topple() -> void:
 			var chicken := node as Chicken
 			if chicken.global_position.distance_to(spot) <= crush_radius:
 				chicken.defeat()
+	# The boss coming down is the biggest moment in the game.
+	Juice.hitstop(0.25 if crowned else 0.1)
+	Juice.shake(8.0 if crowned else 5.0)
 	_break_apart(true)
 
 
@@ -400,8 +415,9 @@ func _update_layers() -> void:
 			# A visible wobble, worse further up; the base looks strained.
 			var sway := sin(_time * 3.0 + i * 0.8) * (i * 0.6)
 			var shake := (randi() % 3 - 1) if state == State.STOMP_WINDUP else 0
-			layer.position = Vector2(roundf(sway) + shake, -i * LAYER_HEIGHT - _altitude())
-			layer.scale = Vector2(1.1, 0.9) if i == 0 and members > 1 else Vector2.ONE
+			var height := roundf(i * LAYER_HEIGHT * stack_squash.y)
+			layer.position = Vector2(roundf(sway) + shake, -height - _altitude())
+			layer.scale = (Vector2(1.1, 0.9) if i == 0 and members > 1 else Vector2.ONE) * stack_squash
 		layer.flip_h = _player != null and _player.global_position.x < global_position.x
 		# Flicker while reeling from a hit.
 		layer.visible = _reeling <= 0.0 or int(_reeling * 12.0) % 2 == 0
@@ -410,6 +426,14 @@ func _update_layers() -> void:
 		_crown.position = top + Vector2(0, -12)
 		_crown.frame = int(_time * 3.0) % 2
 		_crown.visible = state != State.TOPPLING
+
+
+## Every chicken in the stack flashes white as a hit lands.
+func _flash_layers() -> void:
+	for layer in _layers:
+		Juice.flash(layer, Juice.WHITE, 0.2)
+	if _crown:
+		Juice.flash(_crown, Juice.WHITE, 0.2)
 
 
 func _draw() -> void:

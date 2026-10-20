@@ -208,6 +208,11 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 	health = maxi(health - amount, 0)
 	health_changed.emit(health, max_health)
 	AudioManager.play("hurt")
+	# A heavier hit shakes harder and holds the moment longer.
+	Juice.shake(1.5 + amount * 0.75)
+	Juice.hitstop(0.04 + 0.01 * amount)
+	Juice.flash(_sprite, Juice.DANGER, 0.2)
+	Juice.squash(_sprite, Vector2(1.25, 0.8))
 	_knockback = (global_position - from_position).normalized() * knockback_strength
 	put_down_suitcase()
 	if health == 0:
