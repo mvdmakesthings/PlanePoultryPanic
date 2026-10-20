@@ -80,6 +80,8 @@ const RETRY_HINTS := {
 	],
 }
 
+const ENDING := "res://scenes/ui/ending.tscn"
+
 var boss: Totem
 var boss_beaten := false
 var escape_left := -1.0
@@ -101,8 +103,7 @@ func _setup() -> void:
 	key_hints = {"maintenance_key": "A maintenance key! The vending\nmachine is in the lounge"}
 	locked_hints = {"BoardingDoor": "Sealed while the chickens\nhold the gate!"}
 	exit_door = $PlaneDoor
-	clear_title = "YOU MADE YOUR FLIGHT!"
-	next_label = "THE END"
+	# Boarding the plane goes straight on to the ending (_on_exit_entered).
 	next_level = ""
 
 
@@ -229,10 +230,18 @@ func _on_boarding_door_entered() -> void:
 		($Entities/Player/Camera2D as Camera2D).reset_smoothing())
 
 
+## Aboard: no level-clear screen, straight on to the ending.
 func _on_exit_entered() -> void:
+	if _level_over:
+		return
+	_level_over = true
 	escape_left = -1.0
 	_hud.show_countdown(-1.0)
-	super()
+	_menus.can_pause = false
+	_player.freeze()
+	AudioManager.play("level_clear")
+	await get_tree().create_timer(1.2).timeout
+	GameManager.change_scene(ENDING)
 
 
 func _on_player_died() -> void:

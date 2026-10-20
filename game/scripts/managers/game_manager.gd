@@ -103,6 +103,15 @@ func take_pending(level_path: String) -> Dictionary:
 	return snapshot if snapshot.get("level", "") == level_path else {}
 
 
+## The run is over (the ending has played): the save is cleared, since
+## there's nothing left to continue, and it's back to the main menu.
+func finish_game() -> void:
+	SaveSystem.delete_game()
+	last_checkpoint = {}
+	pending = {}
+	change_scene(MAIN_MENU)
+
+
 func quit_to_menu() -> void:
 	change_scene(MAIN_MENU)
 

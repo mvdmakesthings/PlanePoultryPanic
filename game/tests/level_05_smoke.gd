@@ -23,6 +23,7 @@ func _ready() -> void:
 	await _layout_tests()
 	await _boss_and_escape_test()
 	await _time_out_test()
+	await _ending_test()
 	SaveSystem.delete_game()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SaveSystem.settings_path))
 
@@ -149,11 +150,15 @@ func _boss_and_escape_test() -> void:
 	print("player along the jet bridge at %s" % player.global_position)
 	_check(player.global_position.x > 1000.0, "the jet bridge walkway rushes her toward the plane")
 	var plane: LockedDoor = level.get_node("PlaneDoor")
+	var requested := [""]
+	var on_change := func(path: String) -> void: requested[0] = path
+	GameManager.scene_change_requested.connect(on_change)
 	player.global_position = plane.base_point() + Vector2(0, 6)
 	await _hold(["move_up"], 1.0)
-	var menus: GameMenus = level.get_node("UI/GameMenus")
-	_check(level._level_over and menus.is_open() and menus._mode == "clear", "the plane door ends the level")
-	_check(level.escape_left < 0.0, "the countdown stops")
+	_check(level._level_over and level.escape_left < 0.0, "the plane door ends the level and the countdown")
+	await _wait(1.4)
+	GameManager.scene_change_requested.disconnect(on_change)
+	_check(requested[0] == "res://scenes/ui/ending.tscn", "boarding the plane plays the ending")
 	level.queue_free()
 
 
@@ -174,6 +179,30 @@ func _time_out_test() -> void:
 	_check(menus.is_open() and (menus._hint.contains("doors") or menus._hint.contains("time")),
 		"the retry screen says the doors closed")
 	level.queue_free()
+
+
+## The ending plays through to THE END (skippable), and from there goes
+## back to the main menu with the finished run's save cleared.
+func _ending_test() -> void:
+	get_tree().paused = false
+	SaveSystem.save_game({"level": LEVEL_PATH, "checkpoint": "escape"})
+	var ending: Ending = preload("res://scenes/ui/ending.tscn").instantiate()
+	add_child(ending)
+	await get_tree().process_frame
+	_check(AudioManager.music_playing() == "victory", "the ending plays the victory music")
+	_check(ending.shot == "boarding", "it opens on Amanda boarding")
+	_tap("ui_accept")
+	await _wait(1.6)
+	_check(ending.shot == "end", "a press skips ahead to THE END")
+	var requested := [""]
+	var on_change := func(path: String) -> void: requested[0] = path
+	GameManager.scene_change_requested.connect(on_change)
+	_tap("ui_accept")
+	await get_tree().process_frame
+	GameManager.scene_change_requested.disconnect(on_change)
+	_check(requested[0] == GameManager.MAIN_MENU and not SaveSystem.has_save(),
+		"THE END goes back to the main menu, and the finished run's save is cleared")
+	ending.queue_free()
 
 
 func _path_length(map_rid: RID, from: Vector2, to: Vector2) -> float:
