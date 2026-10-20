@@ -243,6 +243,8 @@ func _pass_gate_test() -> void:
 	var menus: GameMenus = level.get_node("UI/GameMenus")
 	_check(level._level_over and menus.is_open() and menus._mode == "clear",
 		"walking through the gate clears the level")
+	_check(SaveSystem.load_game().get("level") == "res://scenes/levels/level_03_food_court.tscn",
+		"clearing Security autosaves at the start of the Food Court")
 	level.queue_free()
 
 
