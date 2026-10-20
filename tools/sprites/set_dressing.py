@@ -9,6 +9,8 @@
 - signs.png: 64x11 wayfinding signs for the wall face, one per frame.
 - maintenance_cart.png: a 24x24 janitor's cart, a floor prop.
 - seating.png: a 48x24 row of three airport seats, a floor prop.
+- map_stand.png: a 16x28 "YOU ARE HERE" map on a post, the checkpoint,
+  3 frames: off, lit, lit with the dot blinking.
 - floor_litter.png: 16x16 floor decals (feathers, pecked chips, a cracked
   egg, footprints) that show the chickens have moved in.
 """
@@ -546,6 +548,57 @@ LITTER_KINDS = ("feathers", "chips", "egg", "footprints")
 
 def litter_sheet():
     return _strip([_litter(k) for k in LITTER_KINDS], LITTER, LITTER)
+
+
+# --- Checkpoint map stand ------------------------------------------------
+
+STAND_W, STAND_H = 16, 28
+
+
+def map_stand(frame):
+    """A "YOU ARE HERE" terminal map on a post, the game's checkpoint.
+    Frame 0: switched off (dark screen). Frames 1-2: lit, with the red
+    "you are here" dot blinking. Its base (about 8x4) is the solid part."""
+    g = _blank(STAND_W, STAND_H)
+    lit = frame > 0
+    # Screen in a slate frame, lit on its top edge.
+    _rect(g, 1, 1, 14, 13, "p")
+    _rect(g, 1, 1, 14, 1, "T")
+    _rect(g, 2, 2, 13, 12, "W" if lit else "k")
+    if lit:
+        # A tiny floor plan: blue walls with a partition and a doorway, a
+        # brown carousel ring, a green exit on the right wall.
+        _rect(g, 3, 3, 12, 3, "B")
+        _rect(g, 3, 3, 3, 11, "B")
+        _rect(g, 12, 3, 12, 11, "B")
+        _rect(g, 3, 11, 12, 11, "B")
+        _rect(g, 3, 6, 6, 6, "B")
+        _rect(g, 9, 6, 12, 6, "B")
+        _rect(g, 8, 8, 11, 10, "n")
+        _rect(g, 9, 9, 10, 9, "W")
+        _rect(g, 12, 4, 12, 5, "l")
+        if frame == 1:
+            _rect(g, 4, 8, 5, 9, "R")
+        else:
+            put(g, 9, 4, "R")
+    else:
+        # A faint reflection on the dark glass.
+        put(g, 3, 3, "p")
+        put(g, 4, 3, "p")
+        put(g, 3, 4, "p")
+    # "YOU ARE HERE" strip under the screen: a yellow bar with a red dot.
+    _rect(g, 2, 14, 13, 15, "F" if lit else "y")
+    put(g, 14, 3, "R" if lit else "r")
+    # Post and base plate.
+    _rect(g, 7, 16, 8, 24, "w")
+    _rect(g, 7, 16, 7, 24, "W")
+    _rect(g, 4, 25, 11, 26, "T")
+    _rect(g, 4, 25, 11, 25, "w")
+    return _outline(g)
+
+
+def map_stand_sheet():
+    return _strip([map_stand(f) for f in range(3)], STAND_W, STAND_H)
 
 
 # --- Preview --------------------------------------------------------------
