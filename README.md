@@ -128,17 +128,20 @@ cd build/web && zip -r ../plane-poultry-panic-web.zip . && cd -
 
 5. On itch.io, create or edit the project, set **Kind of project** to **HTML**, upload the zip and tick **This file will be played in the browser**. Set the embed size to 1280 × 720 (16:9, a clean multiple of the 320 × 180 game) and turn on the **Fullscreen button**. Leave **SharedArrayBuffer support** off; this build doesn't need it.
 
-### Publish to GitHub Pages
+### Publish the browser build
 
-The latest browser build is playable at **https://mvdmakesthings.github.io/plane-poultry-panic-play/**. That page is served from a separate public repo, [plane-poultry-panic-play](https://github.com/mvdmakesthings/plane-poultry-panic-play), which holds only the exported files, so this repo (code, tools and docs) stays private.
+The latest browser build is playable at **https://planepoultrypanic.mvdmakesthings.com/** and on itch.io at **https://mvdmakesthings.itch.io/plane-poultry-panic**.
 
-To publish a new version, set `config/version` in `game/project.godot`, then run from the repo root:
+- The website is GitHub Pages, served from a separate public repo, [plane-poultry-panic-play](https://github.com/mvdmakesthings/plane-poultry-panic-play), which holds only the exported files, so this repo (code, tools and docs) stays private. The domain is a CNAME record (`planepoultrypanic` → `mvdmakesthings.github.io`) in Vercel's DNS for `mvdmakesthings.com`, and the play repo's `CNAME` file tells GitHub to use it.
+- itch.io uploads go through [butler](https://itch.io/docs/butler/), installed at `~/.local/share/butler/butler` from itch.io's own download server (the Homebrew package called "butler" is an unrelated app). Log it in once with `~/.local/share/butler/butler login`.
+
+To publish a new version to both, set `config/version` in `game/project.godot`, then run from the repo root:
 
 ```bash
 tools/publish_web.sh
 ```
 
-It exports the Web build, copies it into the play repo, and pushes; GitHub Pages updates a minute or two later. If the build hasn't changed, it says so and publishes nothing.
+It exports the Web build, copies it into the play repo (keeping its README, `.nojekyll` and `CNAME`) and pushes, then pushes the same build to itch.io's `html5` channel. GitHub Pages updates a minute or two later. Set `SKIP_ITCH=1` to publish only the website. If the build hasn't changed, GitHub Pages is left alone and itch.io receives an almost empty patch.
 
 Browser build notes:
 
