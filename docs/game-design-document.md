@@ -355,7 +355,7 @@ Commissioned from a chiptune composer. Placeholder music is used until then.
 
 Plus short stings for game over, checkpoint, and item fanfares.
 
-For now the game has no music; it waits for the composer. Generated placeholder loops exist in `tools/audio/music.py` (two takes on Arrivals in E Phrygian, one driving and one sparse, with tuned chicken clucks as an instrument, and a menu theme) but aren't used.
+Until the composer's tracks arrive, Level 1 plays a placeholder built from real chicken recordings (two CC0 recordings by JarredGibb on Freesound): a spooky-surf groove in E minor at 112 BPM with cluck percussion and a melody played on a repitched cluck, through an SNES-style output stage (`tools/music/arrivals.py`). The main menu is silent for now.
 
 **Composer brief and timing**: Engage the composer once the vertical slice is playable, so they can hear and see the game. Ask for loopable tracks, stems if affordable, and a license covering the Steam release, trailers, and a possible soundtrack release.
 
@@ -475,4 +475,5 @@ game/
 | 2026-10-19 | The player character is named Amanda (she/her) | You |
 | 2026-10-19 | Retrying from a checkpoint restores full health (the inventory is as it was) | Proposed |
 | 2026-10-19 | Checkpoints are "YOU ARE HERE" map stands | Proposed |
-| 2026-10-19 | Arrivals music should be energetic and dystopian, not slow and sad; until the composer's tracks arrive, the game plays no music | You |
+| 2026-10-19 | Arrivals music should be energetic and dystopian, not slow and sad | You |
+| 2026-10-19 | Level 1's placeholder music is built from the cluck groove (real chicken recordings as percussion and melody) | You |

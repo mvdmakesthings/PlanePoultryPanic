@@ -271,7 +271,9 @@ MENU = {
 
 def tracks(rate):
     """Track name -> samples, one loop each."""
-    chosen = {"arrivals": ARRIVALS, "arrivals_sparse": ARRIVALS_SPARSE, "menu": MENU}
+    # Named chip_* so they never overwrite the real Arrivals track, which
+    # tools/music/arrivals.py builds from the cluck groove.
+    chosen = {"chip_arrivals": ARRIVALS, "chip_arrivals_sparse": ARRIVALS_SPARSE, "chip_menu": MENU}
     for name, track in chosen.items():
         lengths = {len(track[k]) for k in ("lead", "bass", "chords", "drums", "clucks") if k in track}
         assert len(lengths) == 1, f"{name}: channels differ in length {lengths}"

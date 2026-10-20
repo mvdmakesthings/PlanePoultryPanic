@@ -130,6 +130,8 @@ func _ready() -> void:
 	_door.player_entered.connect(_on_door_entered)
 	_door.interacted_locked.connect(func() -> void: _show_event_hint(LOCKED_HINT))
 	_menus.chosen.connect(_on_menu_chosen)
+	# Keeps playing across retries, since it's already the track playing.
+	AudioManager.play_music("arrivals")
 	for i in HINT_ZONES.size():
 		_hint_time_left.append(HINT_TIME)
 

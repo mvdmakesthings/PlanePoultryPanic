@@ -24,6 +24,7 @@ var _confirm_new_game := false
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	AudioManager.stop_music()
 	_build_chase()
 	_board = BoardMenu.new()
 	_board.panel_top = 56.0
