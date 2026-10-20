@@ -137,11 +137,12 @@ func _tracking_test() -> void:
 	player.eat_snack()
 	_check(RunStats.used == 3 and RunStats.hits == 1, "eating a snack uses it and doesn't count as a hit")
 
-	# Secrets are GameManager's (from the secrets work); 0 of 0 until then.
-	var found: Variant = GameManager.get("secrets_found")
-	var total: int = GameManager.get_script().get_script_constant_map().get("SECRETS_TOTAL", 0)
-	_check(RunStats.summary()["secrets"] == (found.size() if found is Array else 0)
-		and RunStats.summary()["secret_total"] == total, "discovery counts GameManager's secrets found and total")
+	GameManager.secrets_found.clear()
+	GameManager.find_secret(GameManager.SECRETS[0])
+	GameManager.find_secret(GameManager.SECRETS[0])
+	_check(RunStats.summary()["secrets"] == 1 and RunStats.summary()["secret_total"] == GameManager.SECRETS_TOTAL,
+		"discovery counts the secrets found (once each) against all of them")
+	GameManager.secrets_found.clear()
 	level.queue_free()
 	await get_tree().process_frame
 

@@ -298,16 +298,13 @@ func summary() -> Dictionary:
 	}
 
 
-## Secrets are kept by GameManager (secrets_found, saved with the run, and
-## SECRETS_TOTAL), which the secrets work adds. Until it's there, these
-## read 0 of 0.
+## Secrets are kept by GameManager (found this run, saved with the run).
 static func secrets_found() -> int:
-	var found: Variant = GameManager.get("secrets_found")
-	return (found as Array).size() if found is Array else 0
+	return GameManager.secrets_found.size()
 
 
 static func secrets_total() -> int:
-	return int(GameManager.get_script().get_script_constant_map().get("SECRETS_TOTAL", 0))
+	return GameManager.SECRETS_TOTAL
 
 
 ## Scores a run's summary: points per category, bonuses, total and rank.
