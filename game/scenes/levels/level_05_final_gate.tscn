@@ -22,6 +22,11 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/checkpoint.tscn" id="20_r"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="21_r"]
 [ext_resource type="Script" path="res://scripts/ui/game_menus.gd" id="22_r"]
+[ext_resource type="Script" path="res://scripts/objects/secret_room.gd" id="s1_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mural.png" id="s2_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/captain_hat.png" id="s3_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/pilot_cap.tscn" id="s4_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/secret_door.tscn" id="s5_secret"]
 
 [node name="Level05FinalGate" type="Node2D"]
 script = ExtResource("1_r")
@@ -207,6 +212,48 @@ totem_snack_proof = true
 dormant = true
 once = true
 
+[node name="CrewRoom" type="Node2D" parent="."]
+position = Vector2(1600, 0)
+script = ExtResource("s1_secret")
+floor_char = ","
+
+[node name="Mural" type="Sprite2D" parent="CrewRoom"]
+position = Vector2(72, 36)
+texture = ExtResource("s2_secret")
+centered = false
+hframes = 5
+frame = 4
+
+[node name="CaptainHat" type="Sprite2D" parent="CrewRoom"]
+position = Vector2(32, 40)
+texture = ExtResource("s3_secret")
+centered = false
+
+[node name="PilotCap" parent="CrewRoom" instance=ExtResource("s4_secret")]
+position = Vector2(148, 112)
+secret_id = "final_pilot_cap"
+
+[node name="CrewSeats" parent="CrewRoom" instance=ExtResource("16_r")]
+position = Vector2(72, 96)
+
+[node name="Extinguisher" parent="CrewRoom" instance=ExtResource("14_r")]
+position = Vector2(40, 132)
+item = "extinguisher"
+count = 3
+
+[node name="Snack1" parent="CrewRoom" instance=ExtResource("14_r")]
+position = Vector2(96, 136)
+
+[node name="Snack2" parent="CrewRoom" instance=ExtResource("14_r")]
+position = Vector2(124, 136)
+
+[node name="PeckedVent" parent="." node_paths=PackedStringArray("room") instance=ExtResource("s5_secret")]
+position = Vector2(960, 32)
+secret_id = "final_crew_room"
+kind = "vent"
+room = NodePath("../CrewRoom")
+open_prompt = "{interact} crawl in"
+
 [node name="Entities" type="Node2D" parent="."]
 y_sort_enabled = true
 
@@ -349,3 +396,4 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("22_r")
+

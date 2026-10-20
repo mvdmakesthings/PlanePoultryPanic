@@ -131,6 +131,9 @@ Bathroom stalls and supply closets are hiding spots. Press Interact at the door 
 
 ## Items and Inventory
 
+### How They Work
+Each secret room is entered by interacting with its door: the first time opens it (that's the find), the next steps through, and the screen fades to the room. Walking down through the gap in the room's bottom wall fades back out in front of the door. Rooms are built off to the side of the level, so they can't be seen from the terminal, and no chicken follows Amanda in. Stashes are searched with Interact and spill their snacks at Amanda's feet.
+
 ### Rules
 - **6 slots** for usable items. Snacks stack up to 3 per slot, so a full bag is a real decision.
 - **Key items** (boarding pass, maintenance keys, airport map) sit in a separate key-item row and never take up slots.
@@ -286,7 +289,7 @@ Secrets reward players who poke around, and they carry most of the mushroom lore
 ### Rules
 - **Fair tells**: every secret has something visible that gives it away to a player who looks: a cracked wall panel with feathers poking out, a crooked sign, a crumb trail, an odd luggage tag. Nothing is hidden behind a blank wall.
 - **Stashes help**: a secret's stash is worth the detour, but no secret is needed to finish the game.
-- **Stays found**: a secret found before a checkpoint stays found after a retry, like other pickups.
+- **Stays found**: once found, a secret stays found for the rest of the run, even after a knockout (its door stays open, its stash stays searched). Quitting and choosing Continue keeps what the last checkpoint saved.
 - **Jokes can be meta**: PA lines and signs may break the fourth wall now and then ("Passengers are reminded that walls are not usually doors. Except that one.").
 - **No new mechanics**: secrets reuse what's already in the game (interacting, hidden doors, suitcases, the extinguisher), keeping the feature lock.
 
@@ -307,13 +310,13 @@ A fourth, hidden mushroom: gold and white with a little propeller-shaped frill, 
 | 1 Arrivals | **Amanda's bag** | A suitcase tagged "PP404 / 13C" (her flight and seat from the opening) riding the carousel | Grab it off the belt before the chute | Snacks |
 | 1 Arrivals | **Lost & Found nest** (mural 1) | A cracked panel with feathers poking out at the back of Lost & Found | Interact opens it onto a tiny closet the chickens have nested in | Snacks |
 | 2 Security | **CONFISCATED bin** | One screening bin table has a bin stamped CONFISCATED | Search it: a rubber chicken, a "suspicious" egg, a tiny hat | Snacks |
-| 2 Security | **Confiscation storage** (mural 2) | A crooked STAFF ONLY sign beside the supply closet by the queue's exit | A door into a storeroom in the wall between the queue hall and the scanner hall | Extinguisher, snacks |
+| 2 Security | **Confiscation storage** (mural 2) | A STAFF ONLY sign hanging crooked on a door beside the scanner hall's supply closet | A storeroom behind it | Extinguisher, snacks |
 | 3 Food Court | **Cluck Shack freezer** (mural 3) | Frost creeping out from under a panel in the staff kitchen | Opens onto a walk-in freezer with the "secret recipe" pinned up: "1. RUN." | Snacks |
-| 3 Food Court | **The snack hoard** | A crumb-and-noodle trail leading behind Noodle Gate's counter | A nest stuffed with stolen snacks | Snacks |
-| 4 Gates | **Platinum Pluck Lounge** (mural 4) | An emergency exit in Gate A's north wall, propped open with a feather | Opens into an old VIP lounge (in the wall block above the A-B corridor) turned into a mushroom nursery | Extinguisher, snacks |
+| 3 Food Court | **The snack hoard** | A crumb trail leading to the corner past Noodle Gate's counter | A nest stuffed with stolen snacks | Snacks |
+| 4 Gates | **Platinum Pluck Lounge** (mural 4) | An emergency exit in Gate A's back wall, between gate A2 and the windows, a feather wedged in it | Opens into an old VIP lounge turned into a mushroom nursery | Extinguisher, snacks |
 | 4 Gates | **Pilot Cap nursery** | A gold glow among the nursery's trays | Spray the Pilot Cap patch in the Platinum Pluck Lounge | None (the charge is the cost) |
 | 4 Gates | **FRAGILE suitcase** | A suitcase in Gate A covered in FRAGILE stickers | Throw it: it bursts open in a shower of snacks instead of clothes | Snacks |
-| 5 Final Gate | **Crew room** (mural 5) | A pecked-open vent cover low on the boarding area's east wall | Opens into a crew room (in the solid block east of the arena) with a captain's hat on a hook | Extinguisher, snacks |
+| 5 Final Gate | **Crew room** (mural 5) | A pecked-through vent low on the boarding area's back wall, just east of the BOARDING door | Crawl in to a crew room with a captain's hat on a hook | Extinguisher, snacks |
 | 5 Final Gate | **Pilot Cap stash** | A gold glow in the crew room's corner | Spray the Pilot Cap patch in the crew room | None |
 
 ### Gags
