@@ -21,6 +21,14 @@ const WALK_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_walk_extin
 const IDLE_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_idle_extinguisher.png")
 const RUN_SHEET := preload("res://assets/sprites/player_run.png")
 const RUN_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_run_extinguisher.png")
+const THROW_SHEET := preload("res://assets/sprites/player_throw.png")
+const HURT_SHEET := preload("res://assets/sprites/player_hurt.png")
+const EAT_SHEET := preload("res://assets/sprites/player_eat.png")
+const DEFEAT_SHEET := preload("res://assets/sprites/player_defeat.png")
+## The defeat frames are wide enough for her to fall flat, like the KO pose.
+const DEFEAT_FRAME_SIZE := Vector2i(32, 32)
+## How long each action plays over the walk or idle, in seconds.
+const ACTION_TIMES := {"throw": 0.3, "eat": 0.45, "hurt": 0.35}
 const KO_SHEET := preload("res://assets/sprites/player_ko.png")
 ## Flyaway hair drawn over every animation, messier as health drops. Rows
 ## are directions, columns are mess levels 1-3; each frame reaches
@@ -92,6 +100,10 @@ var is_hidden: bool:
 var _invincible_timer := 0.0
 var _exhausted := false
 var _knockback := Vector2.ZERO
+## An action animation playing over walking and idling ("throw", "eat",
+## "hurt"), and how much longer it plays.
+var _action := ""
+var _action_left := 0.0
 var _hair: Sprite2D
 ## Top opaque row of each animation frame, so the hair follows the head.
 var _head_tops := {}
@@ -114,13 +126,12 @@ func _ready() -> void:
 	SpriteSheets.add_directional(frames, "idle_ext", IDLE_EXTINGUISHER_SHEET, FRAME_SIZE, 2.0)
 	SpriteSheets.add_directional(frames, "run", RUN_SHEET, FRAME_SIZE, 12.0)
 	SpriteSheets.add_directional(frames, "run_ext", RUN_EXTINGUISHER_SHEET, FRAME_SIZE, 12.0)
-	frames.add_animation("ko")
-	frames.set_animation_speed("ko", 3.0)
-	for column in KO_SHEET.get_width() / KO_FRAME_SIZE.x:
-		var atlas := AtlasTexture.new()
-		atlas.atlas = KO_SHEET
-		atlas.region = Rect2(Vector2(column * KO_FRAME_SIZE.x, 0), KO_FRAME_SIZE)
-		frames.add_frame("ko", atlas)
+	SpriteSheets.add_directional(frames, "throw", THROW_SHEET, FRAME_SIZE, 10.0, false)
+	SpriteSheets.add_directional(frames, "hurt", HURT_SHEET, FRAME_SIZE, 1.0, false)
+	# Eating is only drawn facing the camera.
+	_add_strip(frames, "eat_down", EAT_SHEET, FRAME_SIZE, 7.0, false)
+	_add_strip(frames, "defeat", DEFEAT_SHEET, DEFEAT_FRAME_SIZE, 8.0, false)
+	_add_strip(frames, "ko", KO_SHEET, KO_FRAME_SIZE, 3.0, true)
 	_sprite.sprite_frames = frames
 	_hair = Sprite2D.new()
 	_hair.texture = HAIR_SHEET
@@ -203,6 +214,7 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 		_die()
 	else:
 		_invincible_timer = invincibility_time
+		_start_action("hurt")
 	return true
 
 
@@ -254,6 +266,7 @@ func throw_snack() -> void:
 	snack.position = position
 	get_parent().add_child(snack)
 	AudioManager.play("throw")
+	_start_action("throw")
 
 
 ## Eats a snack from any slot (the selected one first) to heal a suitcase.
@@ -268,6 +281,7 @@ func eat_snack() -> void:
 		return
 	inventory.take_from(index)
 	AudioManager.play("eat")
+	_start_action("eat")
 	health = mini(health + SUITCASE, max_health)
 	health_changed.emit(health, max_health)
 
@@ -324,6 +338,7 @@ func throw_suitcase() -> void:
 	carrying.throw(facing)
 	carrying = null
 	AudioManager.play("throw")
+	_start_action("throw")
 
 
 ## Sets the carried suitcase down at the player's feet, if holding one.
@@ -404,8 +419,18 @@ func _update_stamina(running: bool, delta: float) -> void:
 		stamina_changed.emit(stamina, max_stamina)
 
 
+## Plays an action (throw, eat, hurt) over walking and idling for a moment.
+func _start_action(action: String) -> void:
+	_action = action
+	_action_left = ACTION_TIMES[action]
+	_sprite.play(action + "_" + ("down" if action == "eat" else SpriteSheets.direction_name(facing)))
+
+
 func _update_animation(input: Vector2, running: bool) -> void:
 	var direction := SpriteSheets.direction_name(facing)
+	if _action_left > 0.0:
+		_action_left -= get_physics_process_delta_time()
+		return
 	var animation := "idle"
 	if input != Vector2.ZERO:
 		animation = "run" if running else "walk"
@@ -485,13 +510,33 @@ func _update_invincibility(delta: float) -> void:
 func _die() -> void:
 	is_dead = true
 	freeze()
-	# Flat on their back, centered over where they stood.
-	_sprite.offset = Vector2(0, -KO_FRAME_SIZE.y / 2.0)
-	_sprite.play("ko")
+	# Flinch, buckle and fall flat on her back, then lie there seeing stars.
+	_sprite.offset = Vector2(0, -DEFEAT_FRAME_SIZE.y / 2.0 + 1.0)
+	_sprite.play("defeat")
+	_sprite.animation_finished.connect(_on_defeat_finished, CONNECT_ONE_SHOT)
 	_update_hair()
 	AudioManager.play("death")
 	queue_redraw()
 	died.emit()
+
+
+func _on_defeat_finished() -> void:
+	# Centered over where she stood, like the defeat frames.
+	_sprite.offset = Vector2(0, -KO_FRAME_SIZE.y / 2.0)
+	_sprite.play("ko")
+
+
+## One animation from a single-row sheet of frame_size frames.
+static func _add_strip(frames: SpriteFrames, anim_name: String, sheet: Texture2D,
+		frame_size: Vector2i, fps: float, loop: bool) -> void:
+	frames.add_animation(anim_name)
+	frames.set_animation_speed(anim_name, fps)
+	frames.set_animation_loop(anim_name, loop)
+	for column in sheet.get_width() / frame_size.x:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = sheet
+		atlas.region = Rect2(Vector2(column * frame_size.x, 0), frame_size)
+		frames.add_frame(anim_name, atlas)
 
 
 func _emit_state() -> void:

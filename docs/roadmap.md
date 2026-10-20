@@ -82,7 +82,7 @@ Still mostly gray-box. Each item should be playable in the prototype room.
 Level 1 at close to final quality, start to finish.
 
 - [x] Full Level 1 layout built from tiles, with the tutorial flow
-- [ ] Final-quality art for everything in the level, with animations (done: run cycle, messy hair, the Security door, key, signs, seats, litter, checkpoint stands; still to come: Amanda's throw, eat, hurt and defeat animations, and the chickens' chase and eat)
+- [ ] Final-quality art for everything in the level, with animations (done: run cycle, messy hair, the Security door, key, signs, seats, litter, checkpoint stands; Amanda's throw, eat, hurt and defeat; still to come: the chickens' chase and eat)
 - [x] Sound effects and placeholder music (Level 1 plays a loop built from the cluck groove, `tools/music/arrivals.py`)
 - [x] Checkpoints, death and retry, and autosave
 - [x] Main menu, pause menu, basic settings (audio, fullscreen, remapping)

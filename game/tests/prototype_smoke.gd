@@ -24,6 +24,8 @@ func _ready() -> void:
 	Input.action_press("move_up")
 	Input.action_press("run")
 	await _wait(0.4)
+	# A chicken may have pecked her on the way: let the flinch finish first.
+	await _wait(player._action_left + 0.05)
 	_check(player._sprite.animation == "run_up", "running plays the run cycle")
 	await _wait(0.4)
 	Input.action_release("move_up")
@@ -411,8 +413,12 @@ func _extinguisher_tests() -> void:
 	player = setup[2]
 	player.give_extinguisher(1)
 	await get_tree().physics_frame
+	# A chicken that was being cleared away may have pecked her: let the flinch finish.
+	await _wait(player._action_left + 0.05)
 	_check(player._sprite.animation.contains("_ext"), "the player is drawn holding the extinguisher")
 	player.spray()
+	# Two frames: the first resumes before the player's own update has run.
+	await get_tree().physics_frame
 	await get_tree().physics_frame
 	_check(not player._sprite.animation.contains("_ext"), "an empty extinguisher is put away")
 	setup[0].queue_free()
@@ -462,6 +468,8 @@ func _knockout_test() -> void:
 	_check(pecks == 10, "ten pecks knock out a player with five suitcases")
 	await get_tree().physics_frame
 	var sprite: AnimatedSprite2D = player.get_node("AnimatedSprite2D")
+	_check(sprite.animation == "defeat", "a knockout plays the defeat fall")
+	await _wait(0.8)
 	_check(sprite.animation == "ko" and sprite.is_playing(), "a knocked-out player shows the KO pose")
 	setup[0].queue_free()
 

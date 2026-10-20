@@ -99,6 +99,20 @@ func _hair_test() -> void:
 	player.add_snack()
 	player.eat_snack()
 	_check(player.hair_mess_level() == 2, "eating tidies her hair a little")
+	await get_tree().physics_frame
+	_check(player._sprite.animation == "eat_down", "eating plays the eat animation")
+	await _wait(0.6)
+	_check(player._sprite.animation.begins_with("idle"), "after eating she goes back to idling")
+	player._invincible_timer = 0.0
+	player.take_damage(1, player.global_position + Vector2.LEFT)
+	await get_tree().physics_frame
+	_check(player._sprite.animation.begins_with("hurt_"), "a hit plays the hurt flinch")
+	player.facing = Vector2.RIGHT
+	player._action_left = 0.0
+	player.add_snack()
+	player.throw_snack()
+	await get_tree().physics_frame
+	_check(player._sprite.animation == "throw_right", "throwing plays the throw animation the way she faces")
 	level.queue_free()
 
 
@@ -207,6 +221,7 @@ func _checkpoint_tests() -> void:
 	await _wait(1.8)
 	var menus: GameMenus = level.get_node("UI/GameMenus")
 	_check(menus.is_open() and menus._mode == "retry" and menus._hint != "", "a knockout shows the retry screen with a hint")
+	_check(player._sprite.animation == "ko", "the defeat fall ends in the knocked-out pose")
 	var requested := [""]
 	var on_change := func(path: String) -> void: requested[0] = path
 	GameManager.scene_change_requested.connect(on_change)
