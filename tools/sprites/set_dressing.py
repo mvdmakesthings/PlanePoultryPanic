@@ -60,6 +60,7 @@ FONT = {
     "?": ["##.", "..#", ".#.", "...", ".#."],
     "!": [".#.", ".#.", ".#.", "...", ".#."],
     "#": ["#.#", "###", "#.#", "###", "#.#"],
+    ".": ["...", "...", "...", "...", ".#."],
     " ": ["...", "...", "...", "...", "..."],
     # Arrows for wayfinding signs.
     "<": ["..#", ".##", "###", ".##", "..#"],
@@ -152,6 +153,13 @@ AREA_FLIGHTS = {
         ("FLIGHT13", [("BRDG", "l"), None, ("RUN!", "R"), None]),
         ("HUMANS", [("CNCL", "R"), ("GONE", "R"), ("CNCL", "R"), ("????", "D")]),
         ("BAWK BWK", [("BAWK", "q"), ("BWAK", "D"), ("BAWK", "q"), ("KWAB", "D")]),
+    ],
+    # Gate B's board (a gag): the HOME flight from the opening, and the runway
+    # the mushrooms came from.
+    "gates_b": [
+        ("HOME", [("DLAY", "y"), ("4EVR", "R"), ("DLAY", "y"), ("4EVR", "R")]),
+        ("RUNWAY 2", [("MUSH", "q"), ("ROOM", "q"), ("MUSH", "D"), ("ROOM", "q")]),
+        ("GATE C13", [("LAST", "R"), None, ("CALL", "R"), None]),
     ],
 }
 

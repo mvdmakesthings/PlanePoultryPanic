@@ -66,6 +66,7 @@ const PA_LINES := [
 	"Flight 13, the last flight out, is now\nboarding at Gate C13.",
 	"Mushrooms growing in the carpet are\nnot complimentary. Do not eat them.",
 	"Gate agents are on a permanent break.\nPassengers will kindly board themselves.",
+	"Our Platinum lounge is for members only.\nNobody is Platinum anymore. Go on in.",
 ]
 
 var _shown_totem_hint := false

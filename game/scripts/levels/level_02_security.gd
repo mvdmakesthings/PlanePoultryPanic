@@ -80,7 +80,14 @@ const PA_LINES := [
 	"Unattended chickens will be left\nunattended. We're not going near them.",
 	"A valid boarding pass is required\nfor your final departure.",
 	"Liquids over 100 ml have been confiscated.\nSo has the security staff.",
+	"This is a reminder that this is a video\ngame. Please continue to panic.",
 ]
+## A gag: hide in restroom stall 3 this long and the PA notices.
+const STALL_GAG_TIME := 10.0
+const STALL_GAG_PA := "Stall 3 is occupied.\nForever."
+
+var _stall_time := 0.0
+var _stall_announced := false
 
 
 func _setup() -> void:
@@ -96,3 +103,15 @@ func _setup() -> void:
 	clear_title = "SECURITY CLEARED!"
 	next_label = "ON TO THE FOOD COURT"
 	next_level = NEXT_LEVEL if ResourceLoader.exists(NEXT_LEVEL) else ""
+
+
+func _physics_process(delta: float) -> void:
+	super(delta)
+	if ($Stall3 as HidingSpot).is_occupied():
+		_stall_time += delta
+		if _stall_time >= STALL_GAG_TIME and not _stall_announced:
+			_stall_announced = true
+			announce(STALL_GAG_PA)
+	else:
+		_stall_time = 0.0
+		_stall_announced = false

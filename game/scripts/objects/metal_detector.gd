@@ -6,8 +6,15 @@ extends StaticBody2D
 
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const BEEP_TIME := 0.6
+## Passes this close together count toward the tune.
+const TUNE_WINDOW := 12.0
+
+## A gag: walking through this many times in quick succession plays the
+## cluck tune instead of a beep. 0 turns it off.
+@export var tune_after := 0
 
 var _beep_left := 0.0
+var _passes: Array[float] = []
 
 @onready var _sprite: Sprite2D = $Sprite2D
 @onready var _gap: Area2D = $Gap
@@ -24,8 +31,26 @@ func _physics_process(delta: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is Player:
+		if _tune_due():
+			_beep_left = BEEP_TIME * 3.0
+			AudioManager.play("cluck_tune", global_position)
+			return
 		_beep_left = BEEP_TIME
 		AudioManager.play("beep", global_position)
+
+
+## Counts this pass; true (and starts counting over) on the tune_after-th
+## pass in a row.
+func _tune_due() -> bool:
+	if tune_after <= 0:
+		return false
+	var now := Time.get_ticks_msec() / 1000.0
+	_passes.append(now)
+	_passes.assign(_passes.filter(func(t: float) -> bool: return now - t <= TUNE_WINDOW))
+	if _passes.size() < tune_after:
+		return false
+	_passes.clear()
+	return true
 
 
 func _draw() -> void:

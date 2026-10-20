@@ -25,6 +25,13 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/checkpoint.tscn" id="23_r"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="24_r"]
 [ext_resource type="Script" path="res://scripts/ui/game_menus.gd" id="25_r"]
+[ext_resource type="Script" path="res://scripts/objects/secret_room.gd" id="s1_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mural.png" id="s2_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ice_block.png" id="s3_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/chicken_idle.png" id="s99_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/posters.png" id="s4_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/secret_door.tscn" id="s5_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/secret_stash.tscn" id="s6_secret"]
 
 [node name="Level03FoodCourt" type="Node2D"]
 script = ExtResource("1_r")
@@ -198,6 +205,77 @@ position = Vector2(432, 40)
 
 [node name="Roost" parent="." instance=ExtResource("11_r")]
 position = Vector2(512, 200)
+
+[node name="FreezerRoom" type="Node2D" parent="."]
+position = Vector2(1344, 0)
+script = ExtResource("s1_secret")
+floor_char = "."
+
+[node name="Mural" type="Sprite2D" parent="FreezerRoom"]
+position = Vector2(72, 36)
+texture = ExtResource("s2_secret")
+centered = false
+hframes = 5
+frame = 2
+
+[node name="FrozenChicken1" type="Sprite2D" parent="FreezerRoom"]
+position = Vector2(32, 72)
+texture = ExtResource("s99_secret")
+centered = false
+hframes = 3
+vframes = 4
+
+[node name="Ice1" type="Sprite2D" parent="FreezerRoom"]
+position = Vector2(32, 72)
+texture = ExtResource("s3_secret")
+centered = false
+
+[node name="FrozenChicken2" type="Sprite2D" parent="FreezerRoom"]
+position = Vector2(48, 72)
+texture = ExtResource("s99_secret")
+centered = false
+hframes = 3
+vframes = 4
+
+[node name="Ice2" type="Sprite2D" parent="FreezerRoom"]
+position = Vector2(48, 72)
+texture = ExtResource("s3_secret")
+centered = false
+
+[node name="FrozenChicken3" type="Sprite2D" parent="FreezerRoom"]
+position = Vector2(144, 72)
+texture = ExtResource("s99_secret")
+centered = false
+hframes = 3
+vframes = 4
+
+[node name="Ice3" type="Sprite2D" parent="FreezerRoom"]
+position = Vector2(144, 72)
+texture = ExtResource("s3_secret")
+centered = false
+
+[node name="Recipe" type="Sprite2D" parent="FreezerRoom"]
+position = Vector2(24, 34)
+texture = ExtResource("s4_secret")
+centered = false
+hframes = 4
+frame = 3
+
+[node name="Snack1" parent="FreezerRoom" instance=ExtResource("15_r")]
+position = Vector2(72, 120)
+
+[node name="Snack2" parent="FreezerRoom" instance=ExtResource("15_r")]
+position = Vector2(96, 124)
+
+[node name="Snack3" parent="FreezerRoom" instance=ExtResource("15_r")]
+position = Vector2(120, 120)
+
+[node name="FreezerPanel" parent="." node_paths=PackedStringArray("room") instance=ExtResource("s5_secret")]
+position = Vector2(128, 32)
+secret_id = "food_court_freezer"
+kind = "frost"
+room = NodePath("../FreezerRoom")
+open_prompt = "{interact} open the panel"
 
 [node name="Entities" type="Node2D" parent="."]
 y_sort_enabled = true
@@ -421,3 +499,35 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("25_r")
+
+[node name="SnackHoard" parent="Entities" instance=ExtResource("s6_secret")]
+position = Vector2(738, 78)
+secret_id = "food_court_hoard"
+kind = "hoard"
+snacks = 3
+found_text = "A snack hoard!"
+
+[node name="Crumbs1" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(722, 104)
+texture = ExtResource("6_r")
+hframes = 4
+frame = 1
+
+[node name="Crumbs2" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(708, 132)
+texture = ExtResource("6_r")
+hframes = 4
+frame = 1
+
+[node name="Crumbs3" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(696, 162)
+texture = ExtResource("6_r")
+hframes = 4
+frame = 1
+
+[node name="PlanterPoster" type="Sprite2D" parent="WallDecor"]
+position = Vector2(760, 32)
+texture = ExtResource("s4_secret")
+centered = false
+hframes = 4
+frame = 1

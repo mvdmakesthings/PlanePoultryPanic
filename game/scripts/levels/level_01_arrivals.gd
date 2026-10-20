@@ -72,6 +72,7 @@ const PA_LINES := [
 	"Passengers are reminded not to feed\nthe wildlife. The wildlife has noticed.",
 	"The last flight out departs from Gate C13.\nPlease proceed through Security.",
 	"Lost and Found reports a surplus of\nsnacks, and a shortage of staff.",
+	"Passengers are reminded that walls are\nnot usually doors. Except that one.",
 ]
 
 

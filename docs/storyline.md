@@ -40,6 +40,20 @@ Different areas of the terminal have different chicken populations:
 - **Gates**: Battle-hardened veterans guarding the last symbols of human flight
 - **Final Departure Gate**: The ultimate boss, a supreme chicken entity
 
+### **Mushroom Lore**
+
+The mushrooms are the root of everything, and the game tells their story in pieces rather than all at once:
+
+- **Where they came from**: A rural runway's leaking fuel drums, decades of runoff, and the hum of planes overhead. The first patch glowed in the grass beside Runway 2.
+- **The link**: When the first chicken ate one, every chicken nearby lit up with it. The mushrooms don't just give powers; they connect chickens into one telepathic flock, which is how a farmyard grudge became a worldwide uprising overnight.
+- **The varieties**: Teal glowcaps (flight), red spotted caps (rage), purple caps (egg cannon), and a fourth the chickens keep hidden: the **Pilot Cap**, gold and white with a propeller-shaped frill. It's what they've really been working toward: a mushroom that lets a chicken fly a plane, not just hop. It isn't ripe yet, so it's grown in secret rooms, out of reach. Spraying one grounds their air force.
+- **The mural**: In the terminal's hidden rooms, the chickens have painted their own history in crude cave-painting style, one panel per area: jealous chickens watching planes; mushrooms by the fuel drums; the first glowing eyes; the control tower taken; and a chicken in a captain's hat boarding a plane.
+- **The ending**: The stowaway's glowing eye says it found a ripe Pilot Cap. Players who found every secret see it wearing the captain's hat.
+
+How players meet the lore:
+- **Opening**: The departure board's news ticker crawls past ("...GLOWING MUSHROOMS FOUND NEAR RUNWAY 2... EXPERTS 'NOT WORRIED'... EXPERTS NOW WORRIED..."), and outside the window the tarmac chickens peck at a glowing patch beside a fuel drum.
+- **In the levels**: Posters (DO NOT EAT THE CARPET MUSHROOMS), boards (RUNWAY 2 CLOSED: FUNGUS), PA lines, and the mural and Pilot Caps in the secret rooms (see the Secrets section of the [GDD](game-design-document.md#secrets)).
+
 ### **The World Beyond**
 
 Outside the terminal, society has adapted to this new reality. Some humans have learned to coexist with the chicken overlords. Others have formed resistance movements. But within this airport, you face a microcosm of the larger struggle, a personal battle for freedom in a world turned upside down by the most unlikely of apocalypses.
@@ -60,7 +74,8 @@ Outside the terminal, society has adapted to this new reality. Some humans have 
 
 The game is about 30 minutes long and should never stop for long cutscenes. The story comes through:
 
-- **Opening**: A short scene of Amanda, the stranded passenger, at her cancelled gate, holding an expired boarding pass, hearing the PA announce the last flight out. As built (M5): Gate A3 in the arrival lounge, day 4 of her layover, her suitcase and snacks camped by the window. Her flight HOME flips to CANCELLED on the departure board (the others follow, and Eggseter's flips to FOWL), her boarding pass (flight PP404, seat 13C) gets stamped EXPIRED, chickens peck around the parked plane outside, and one squawks at her through the glass. Then the PA chimes: the last flight out of Bawkston is boarding at Gate C13, and the airport will be sealed after it leaves ("...BAWK."). She runs for it, and Level 1 starts in that same lounge.
+- **Opening**: A short scene of Amanda, the stranded passenger, at her cancelled gate, holding an expired boarding pass, hearing the PA announce the last flight out. As built (M5): Gate A3 in the arrival lounge, day 4 of her layover, her suitcase and snacks camped by the window. Her flight HOME flips to CANCELLED on the departure board (the others follow, and Eggseter's flips to FOWL), her boarding pass (flight PP404, seat 13C) gets stamped EXPIRED, chickens peck around the parked plane outside, and one squawks at her through the glass. Planned addition: a news ticker about the glowing mushrooms crawls along the bottom of the departure board, and the tarmac chickens peck at a glowing patch beside a leaking fuel drum (see Mushroom Lore). Then the PA chimes: the last flight out of Bawkston is boarding at Gate C13, and the airport will be sealed after it leaves ("...BAWK."). She runs for it, and Level 1 starts in that same lounge.
+- **Secrets**: Hidden rooms hold a chicken-painted mural of the uprising and the secret Pilot Cap mushroom (see Mushroom Lore).
 - **PA announcements and flight displays**: The terminal still runs on autopilot. Announcements and departure boards get stranger as the chickens take over, delivering jokes, hints, and backstory.
 - **The environment**: Nests in luggage, pecked-up signs, chickens crowding around mushroom patches, and chicken graffiti show how far the takeover has gone in each area.
 - **Ending**: Amanda boards with her new boarding pass and the plane takes off. One last shot hints that a chicken may have stowed away.

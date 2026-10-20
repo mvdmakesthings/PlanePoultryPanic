@@ -78,6 +78,7 @@ const PA_LINES := [
 	"Vending machines now accept maintenance\nkeys only. Exact change is extinct.",
 	"Please do not stack the chickens.\nThe chickens will stack themselves.",
 	"Today's special: everything.\nTomorrow's special: unknown.",
+	"If you can read this, you are standing\nstill. The chickens are not.",
 ]
 
 var _shown_totem_hint := false

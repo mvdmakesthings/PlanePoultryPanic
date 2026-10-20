@@ -27,6 +27,7 @@ import mushrooms
 import opening
 import player
 import roost
+import easter_eggs
 import security
 import security_door
 import set_dressing
@@ -136,6 +137,17 @@ IMAGES = [
     ("opening_backdrop.png", opening.backdrop_sheet),
     ("opening_tarmac.png", opening.tarmac_sheet),
     ("opening_boarding_pass.png", opening.boarding_pass_sheet),
+    ("departure_board_gates_b.png", lambda: set_dressing.departure_board_sheet("gates_b")),
+    ("secret_doors.png", easter_eggs.doors_sheet),
+    ("mural.png", easter_eggs.mural_sheet),
+    ("pilot_cap.png", easter_eggs.pilot_cap_sheet),
+    ("secret_stashes.png", easter_eggs.stashes_sheet),
+    ("suitcase_fragile.png", easter_eggs.fragile_suitcase),
+    ("posters.png", easter_eggs.posters_sheet),
+    ("fuel_drum.png", easter_eggs.fuel_drum_sheet),
+    ("captain_hat.png", easter_eggs.captain_hat),
+    ("captain_chicken.png", easter_eggs.captain_chicken_sheet),
+    ("stowaway_captain.png", easter_eggs.stowaway_captain_sheet),
 ]
 
 

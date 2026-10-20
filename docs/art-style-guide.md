@@ -412,6 +412,31 @@ Made by `tools/sprites/ending.py`.
 
 **`passenger_window.png`**: two 16x16 frames of the next cabin window along: Amanda in profile facing the front of the plane, a blue headrest behind her pink hair, then the same with her eyes shut (a blink). Shown beside `stowaway.png` at the same 6x, so she sits one window ahead of the chicken, none the wiser.
 
+### Secrets and Easter Eggs
+Made by `tools/sprites/easter_eggs.py` (see the Secrets section of the GDD). The secret rooms themselves are painted from each level's own tileset; these are the extras. Keep these layouts and names as they are: the game picks rows and frames by number.
+
+**`secret_doors.png`**: 16x32 hidden entrances for the wall face (placed like a closet door), 2 columns (closed, open) and one row per kind: 0 a cracked wall panel with feathers poking out (Arrivals), 1 a slate staff door with its red STAFF ONLY sign hanging crooked (Security), 2 a steel freezer panel with frost creeping out (Food Court), 3 a green emergency exit under a lit EXIT sign, a feather wedged in it (Gates), 4 a vent low on the wall with its grille pecked through (Final Gate). The tell is always visible when closed.
+
+**`mural.png`**: five 48x24 frames, the chickens' cave paintings on each secret room's back wall, crude on purpose: chickens behind a farm fence staring at a plane; fuel drums leaking by a runway with glowing teal mushrooms sprouting; one chicken eating and a flock lighting up teal-eyed; the control tower taken and mushrooms in the carpet; a chicken in a captain's hat walking up to a plane's door.
+
+**`pilot_cap.png`**: three 16x16 frames of the hidden Pilot Cap patch, laid out like one row of `mushroom_patch.png` (resting, spores, spores higher): pale-yellow caps with white spots and a little white propeller frill on top that turns between frames.
+
+**`secret_stashes.png`**: 16x16, 2 columns (full, searched) and one row per kind: 0 a gray security bin with a red CONFISCATED band (searched: a rubber chicken, a tiny hat and an egg), 1 a straw nest heaped with stolen snack bags (searched: crumbs), 2 Amanda's own pink suitcase with a big white tag (searched: burst open).
+
+**`suitcase_fragile.png`**: laid out like `suitcase.png` (two 14x16 frames, lying and burst): red FRAGILE stickers on the lying one; the burst one spills snack bags instead of clothes.
+
+**`posters.png`**: four 40x32 frames: DO NOT EAT THE CARPET MUSHROOMS (white, red ink), THIS PLANTER IS NOT A FARM (yellow), BAWK WAS HERE scratched into the wall (no paper, mostly transparent), and the Cluck Shack's SECRET RECIPE card ("1. RUN.").
+
+**`fuel_drum.png`**: two 16x24 frames of a rusty red fuel drum with a hazard band, leaking a glowing teal drip into a puddle that pulses. A floor prop (Arrivals' staff room), also seen outside the window in the opening.
+
+**`captain_hat.png`**: one 16x16 captain's hat (navy, gold badge, white band, black peak) hanging on a wall peg.
+
+**`captain_chicken.png`**: two 16x16 idle frames of a normal chicken wearing a pilot's cap, built from the chicken's front-facing idle frames.
+
+**`stowaway_captain.png`**: laid out like `stowaway.png`, with the chicken wearing the captain's hat. The ending uses it when every secret was found.
+
+**`departure_board_gates_b.png`**: Gate B's board, laid out like the other boards: HOME (DLAY / 4EVR), RUNWAY 2 (MUSH / ROOM), GATE C13 (LAST CALL).
+
 ### Import Settings (Godot)
 - Texture filter: Nearest
 - No mipmaps

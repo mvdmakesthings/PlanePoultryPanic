@@ -4,7 +4,9 @@ extends Node2D
 ## CANCELLED on the departure board, her boarding pass gets stamped EXPIRED,
 ## chickens run the tarmac outside (one squawks at her through the glass),
 ## and the PA announces the last flight out. Then she runs for it and
-## Level 1 starts.
+## Level 1 starts. The mushroom lore runs in the background: a news ticker
+## crawls under the departure board, and out on the tarmac a chicken pecks
+## at a glowing patch beside a leaking fuel drum.
 ##
 ## Everything happens on a timeline of beats (BEATS, in seconds). Confirm,
 ## Back or Pause skips straight to Level 1.
@@ -28,6 +30,8 @@ const CHICKEN_WALK := preload("res://assets/sprites/chicken_walk.png")
 const CHICKEN_IDLE := preload("res://assets/sprites/chicken_idle.png")
 const CHICKEN_CHASE := preload("res://assets/sprites/chicken_chase.png")
 const CHICKEN_FLIGHT := preload("res://assets/sprites/chicken_flight_walk.png")
+const MUSHROOMS := preload("res://assets/sprites/mushroom_patch.png")
+const FUEL_DRUM := preload("res://assets/sprites/fuel_drum.png")
 
 ## The window glass in opening_backdrop.png, where the tarmac shows through.
 const GLASS := Rect2(11, 15, 162, 57)
@@ -50,6 +54,11 @@ const FLAP_STEP := 0.07
 const FLAP_SPIN := 0.2
 const FLAP_CHARS := "ABCDEFGHIJKLMNOPRSTUVWXYZ#?*%&"
 const GREEN := Color("63c74d")
+
+## The news ticker under the departure board, crawling left.
+const TICKER := Rect2(184, 76, 129, 10)
+const TICKER_TEXT := "...GLOWING MUSHROOMS FOUND NEAR RUNWAY 2...     EXPERTS \"NOT WORRIED\"...     EXPERTS NOW WORRIED...     "
+const TICKER_SPEED := 28.0
 
 ## The PA panel along the bottom of the screen.
 const PANEL := Rect2(12, 130, 228, 44)
@@ -93,6 +102,8 @@ var _next_beat := 0
 var _done := false
 var _typed := 0.0
 var _outside: Control
+var _ticker: Control
+var _glow: Sprite2D
 var _board_layer: Node2D
 var _front: Node2D
 var _amanda: AnimatedSprite2D
@@ -116,6 +127,13 @@ func _ready() -> void:
 	_board_layer = Node2D.new()
 	_board_layer.draw.connect(_draw_board)
 	add_child(_board_layer)
+	_ticker = Control.new()
+	_ticker.position = TICKER.position
+	_ticker.size = TICKER.size
+	_ticker.clip_contents = true
+	_ticker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ticker.draw.connect(_draw_ticker)
+	add_child(_ticker)
 	_build_props()
 	_amanda = _animated(frames, Vector2(0, -16), "idle_up")
 	_amanda.position = AMANDA_AT
@@ -177,7 +195,20 @@ func _build_outside(frames: SpriteFrames) -> void:
 	tarmac.texture = TARMAC
 	tarmac.centered = false
 	_outside.add_child(tarmac)
-	# One pecks at the plane's landing gear, one strolls the taxiway.
+	# A leaking fuel drum, and the glowing patch that's sprouted beside it.
+	var drum := Sprite2D.new()
+	drum.texture = FUEL_DRUM
+	drum.hframes = 2
+	drum.position = Vector2(38, 34)
+	_outside.add_child(drum)
+	_glow = Sprite2D.new()
+	_glow.texture = MUSHROOMS
+	_glow.hframes = 3
+	_glow.vframes = 3
+	_glow.position = Vector2(60, 40)
+	_outside.add_child(_glow)
+	# One pecks at the plane's landing gear, one strolls the taxiway, and
+	# one pecks at the glowing patch.
 	var pecker := _animated(frames, Vector2(0, -8), "peck_left", _outside)
 	pecker.position = Vector2(124, 34)
 	_wanderer = _animated(frames, Vector2(0, -8), "walk_right", _outside)
@@ -243,6 +274,8 @@ func _process(delta: float) -> void:
 		if _done:
 			return
 	_update_flaps()
+	_glow.frame = int(_time * 3.0) % 3
+	_ticker.queue_redraw()
 	_typed += delta * TYPE_SPEED
 	# The chicken on the taxiway strolls back and forth.
 	var dir := 1.0 if _wanderer.animation == "walk_right" else -1.0
@@ -458,6 +491,17 @@ func _draw_cells(canvas: CanvasItem, font: Font, pos: Vector2, text: String, col
 		var width := font.get_string_size(text[i], HORIZONTAL_ALIGNMENT_LEFT, -1, BoardMenu.FONT_SIZE).x
 		canvas.draw_string(font, Vector2(pos.x + i * CELL + roundf((CELL - width) / 2.0), pos.y), text[i],
 			HORIZONTAL_ALIGNMENT_LEFT, -1, BoardMenu.FONT_SIZE, color)
+
+
+## The news ticker: the mushroom story, crawling past on a loop.
+func _draw_ticker() -> void:
+	var font := ThemeDB.fallback_font
+	_ticker.draw_rect(Rect2(Vector2.ZERO, TICKER.size), BoardMenu.BACK)
+	var width := font.get_string_size(TICKER_TEXT, HORIZONTAL_ALIGNMENT_LEFT, -1, BoardMenu.FONT_SIZE).x
+	var x := -fmod(_time * TICKER_SPEED, width) + TICKER.size.x
+	for i in 2:
+		_ticker.draw_string(font, Vector2(roundf(x - width + i * width), 8), TICKER_TEXT,
+			HORIZONTAL_ALIGNMENT_LEFT, -1, BoardMenu.FONT_SIZE, BoardMenu.STATUS)
 
 
 # --- The PA panel and the skip hint ---------------------------------------

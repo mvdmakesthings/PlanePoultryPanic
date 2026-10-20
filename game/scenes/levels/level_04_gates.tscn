@@ -28,6 +28,14 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/checkpoint.tscn" id="26_r"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="27_r"]
 [ext_resource type="Script" path="res://scripts/ui/game_menus.gd" id="28_r"]
+[ext_resource type="Script" path="res://scripts/objects/secret_room.gd" id="s1_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mural.png" id="s2_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mushroom_patch.png" id="s3_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/pilot_cap.tscn" id="s4_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/secret_door.tscn" id="s5_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/suitcase_fragile.png" id="s6_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/captain_chicken.tscn" id="s7_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/departure_board_gates_b.png" id="s8_secret"]
 
 [node name="Level04Gates" type="Node2D"]
 script = ExtResource("1_r")
@@ -88,7 +96,7 @@ script = ExtResource("4_r")
 
 [node name="BoardB" type="Sprite2D" parent="WallDecor"]
 position = Vector2(912, 33)
-texture = ExtResource("3_r")
+texture = ExtResource("s8_secret")
 centered = false
 hframes = 4
 script = ExtResource("4_r")
@@ -298,6 +306,67 @@ position = Vector2(1700, 330)
 
 [node name="RoostC2" parent="." instance=ExtResource("14_r")]
 position = Vector2(1950, 170)
+
+[node name="PlatinumLounge" type="Node2D" parent="."]
+position = Vector2(2400, 0)
+script = ExtResource("s1_secret")
+floor_char = "~"
+
+[node name="Mural" type="Sprite2D" parent="PlatinumLounge"]
+position = Vector2(72, 36)
+texture = ExtResource("s2_secret")
+centered = false
+hframes = 5
+frame = 3
+
+[node name="Tray1" type="Sprite2D" parent="PlatinumLounge"]
+position = Vector2(24, 72)
+texture = ExtResource("s3_secret")
+centered = false
+hframes = 3
+vframes = 3
+frame = 0
+
+[node name="Tray2" type="Sprite2D" parent="PlatinumLounge"]
+position = Vector2(148, 72)
+texture = ExtResource("s3_secret")
+centered = false
+hframes = 3
+vframes = 3
+frame = 3
+
+[node name="Tray3" type="Sprite2D" parent="PlatinumLounge"]
+position = Vector2(24, 104)
+texture = ExtResource("s3_secret")
+centered = false
+hframes = 3
+vframes = 3
+frame = 6
+
+[node name="PilotCap" parent="PlatinumLounge" instance=ExtResource("s4_secret")]
+position = Vector2(136, 112)
+secret_id = "gates_pilot_cap"
+
+[node name="LoungeSeats" parent="PlatinumLounge" instance=ExtResource("21_r")]
+position = Vector2(72, 96)
+
+[node name="Extinguisher" parent="PlatinumLounge" instance=ExtResource("19_r")]
+position = Vector2(40, 136)
+item = "extinguisher"
+count = 3
+
+[node name="Snack1" parent="PlatinumLounge" instance=ExtResource("19_r")]
+position = Vector2(96, 136)
+
+[node name="Snack2" parent="PlatinumLounge" instance=ExtResource("19_r")]
+position = Vector2(156, 136)
+
+[node name="EmergencyExit" parent="." node_paths=PackedStringArray("room") instance=ExtResource("s5_secret")]
+position = Vector2(320, 32)
+secret_id = "gates_lounge"
+kind = "exit"
+room = NodePath("../PlatinumLounge")
+open_prompt = "{interact} push the exit"
 
 [node name="Entities" type="Node2D" parent="."]
 y_sort_enabled = true
@@ -607,3 +676,14 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("28_r")
+
+[node name="FragileSuitcase" parent="Entities" instance=ExtResource("24_r")]
+position = Vector2(60, 360)
+burst_snacks = 3
+secret_id = "gates_fragile"
+
+[node name="Sprite2D" parent="Entities/FragileSuitcase"]
+texture = ExtResource("s6_secret")
+
+[node name="CaptainChicken" parent="Entities" instance=ExtResource("s7_secret")]
+position = Vector2(1846, 104)

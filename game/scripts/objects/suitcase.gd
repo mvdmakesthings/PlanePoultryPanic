@@ -24,6 +24,11 @@ const BURST_TIME := 0.6
 @export var arc_height := 8.0
 ## How close the player must be to pick it up.
 @export var reach := 16.0
+## A secret suitcase (the FRAGILE one) bursts into this many snacks when it
+## lands or hits a chicken, instead of clothes, and finds secret_id. 0 for
+## a plain suitcase.
+@export var burst_snacks := 0
+@export var secret_id := ""
 
 var state := State.LYING
 
@@ -39,6 +44,9 @@ var _show_prompt := false
 
 func _ready() -> void:
 	add_to_group("interactables")
+	# A secret suitcase already burst earlier in the run stays gone.
+	if burst_snacks > 0 and secret_id != "" and GameManager.has_secret(secret_id):
+		queue_free()
 
 
 func _physics_process(delta: float) -> void:
@@ -129,6 +137,9 @@ func _fly(delta: float) -> void:
 
 
 func _land() -> void:
+	if burst_snacks > 0:
+		_burst()
+		return
 	state = State.LYING
 	z_index = 0
 	_set_height(0.0)
@@ -140,6 +151,19 @@ func _burst() -> void:
 	_set_height(0.0)
 	_burst_left = BURST_TIME
 	queue_redraw()
+	if burst_snacks > 0:
+		_spill_snacks()
+
+
+## A secret suitcase's snacks land around where it burst.
+func _spill_snacks() -> void:
+	if secret_id != "":
+		GameManager.find_secret(secret_id)
+	var pickup_scene := load("res://scenes/objects/item_pickup.tscn") as PackedScene
+	for i in burst_snacks:
+		var pickup := pickup_scene.instantiate() as ItemPickup
+		pickup.position = position + Vector2.from_angle(i * TAU / burst_snacks + 0.4) * 12.0
+		get_parent().add_child.call_deferred(pickup)
 
 
 func _set_height(height: float) -> void:

@@ -20,14 +20,15 @@ Numbers in this doc (speeds, durations, counts) are starting values. The prototy
 6. [Chickens](#chickens)
 7. [Environment](#environment)
 8. [Levels](#levels)
-9. [UI and UX](#ui-and-ux)
-10. [Progression and Replay](#progression-and-replay)
-11. [Art Direction](#art-direction)
-12. [Audio Direction](#audio-direction)
-13. [Technical Specifications](#technical-specifications)
-14. [Release and Business](#release-and-business)
-15. [Risks](#risks)
-16. [Decision Log](#decision-log)
+9. [Secrets](#secrets)
+10. [UI and UX](#ui-and-ux)
+11. [Progression and Replay](#progression-and-replay)
+12. [Art Direction](#art-direction)
+13. [Audio Direction](#audio-direction)
+14. [Technical Specifications](#technical-specifications)
+15. [Release and Business](#release-and-business)
+16. [Risks](#risks)
+17. [Decision Log](#decision-log)
 
 ---
 
@@ -129,6 +130,9 @@ Bathroom stalls and supply closets are hiding spots. Press Interact at the door 
 ---
 
 ## Items and Inventory
+
+### How They Work
+Each secret room is entered by interacting with its door: the first time opens it (that's the find), the next steps through, and the screen fades to the room. Walking down through the gap in the room's bottom wall fades back out in front of the door. Rooms are built off to the side of the level, so they can't be seen from the terminal, and no chicken follows Amanda in. Stashes are searched with Interact and spill their snacks at Amanda's feet.
 
 ### Rules
 - **6 slots** for usable items. Snacks stack up to 3 per slot, so a full bag is a real decision.
@@ -275,6 +279,66 @@ Five connected areas played in order, each introducing something new. Each level
 
 ---
 
+## Secrets
+
+Secrets reward players who poke around, and they carry most of the mushroom lore (see [storyline.md](storyline.md#mushroom-lore)). There are two kinds:
+
+- **Secrets** (counted): hidden rooms and finds, two or three per level, 11 in all. Each one counts toward the Discovery score and the Explorer achievement, and most hold a stash that helps (snacks, an extinguisher). Finding one gives no pop-up or sound beyond the normal pickup; the count is revealed only on the score screen at the end of the run.
+- **Gags** (not counted): jokes found by looking around or doing something silly, like PA lines, departure-board flips and signs. They're just for fun, so nobody has to hunt for every one.
+
+### Rules
+- **Fair tells**: every secret has something visible that gives it away to a player who looks: a cracked wall panel with feathers poking out, a crooked sign, a crumb trail, an odd luggage tag. Nothing is hidden behind a blank wall.
+- **Stashes help**: a secret's stash is worth the detour, but no secret is needed to finish the game.
+- **Stays found**: once found, a secret stays found for the rest of the run, even after a knockout (its door stays open, its stash stays searched). Quitting and choosing Continue keeps what the last checkpoint saved.
+- **Jokes can be meta**: PA lines and signs may break the fourth wall now and then ("Passengers are reminded that walls are not usually doors. Except that one.").
+- **No new mechanics**: secrets reuse what's already in the game (interacting, hidden doors, suitcases, the extinguisher), keeping the feature lock.
+
+### The Chicken Mural
+Each level has one secret room with a crude chicken cave painting on the wall. Read in order, the five panels tell how the chickens rose:
+1. **Arrivals**: chickens on a farm stare up at planes, jealous.
+2. **Security**: glowing mushrooms sprout beside leaking fuel drums at a rural runway.
+3. **Food Court**: one chicken eats a mushroom; its eyes glow, and a hundred chickens light up with it (the telepathic link).
+4. **Gates**: chickens take the control tower and plant mushrooms in the airport carpet.
+5. **Final Gate**: a chicken in a captain's hat boards a plane, foreshadowing the stowaway.
+
+### The Pilot Cap
+A fourth, hidden mushroom: gold and white with a little propeller-shaped frill, never seen outside secret rooms. The chickens are growing it to fly planes themselves, not just hop, but it isn't ripe yet, so chickens ignore it and it never powers anyone up. Spraying a Pilot Cap patch with the extinguisher (one charge) destroys it and counts as a secret ("You grounded their air force."). Amanda never eats mushrooms of any kind.
+
+### Per Level
+| Level | Secret | Tell | How it's found | Stash |
+|---|---|---|---|---|
+| 1 Arrivals | **Amanda's bag** | A suitcase tagged "PP404 / 13C" (her flight and seat from the opening) riding the carousel | Grab it off the belt before the chute | Snacks |
+| 1 Arrivals | **Lost & Found nest** (mural 1) | A cracked panel with feathers poking out at the back of Lost & Found | Interact opens it onto a tiny closet the chickens have nested in | Snacks |
+| 2 Security | **CONFISCATED bin** | One screening bin table has a bin stamped CONFISCATED | Search it: a rubber chicken, a "suspicious" egg, a tiny hat | Snacks |
+| 2 Security | **Confiscation storage** (mural 2) | A STAFF ONLY sign hanging crooked on a door beside the scanner hall's supply closet | A storeroom behind it | Extinguisher, snacks |
+| 3 Food Court | **Cluck Shack freezer** (mural 3) | Frost creeping out from under a panel in the staff kitchen | Opens onto a walk-in freezer with the "secret recipe" pinned up: "1. RUN." | Snacks |
+| 3 Food Court | **The snack hoard** | A crumb trail leading to the corner past Noodle Gate's counter | A nest stuffed with stolen snacks | Snacks |
+| 4 Gates | **Platinum Pluck Lounge** (mural 4) | An emergency exit in Gate A's back wall, between gate A2 and the windows, a feather wedged in it | Opens into an old VIP lounge turned into a mushroom nursery | Extinguisher, snacks |
+| 4 Gates | **Pilot Cap nursery** | A gold glow among the nursery's trays | Spray the Pilot Cap patch in the Platinum Pluck Lounge | None (the charge is the cost) |
+| 4 Gates | **FRAGILE suitcase** | A suitcase in Gate A covered in FRAGILE stickers | Throw it: it bursts open in a shower of snacks instead of clothes | Snacks |
+| 5 Final Gate | **Crew room** (mural 5) | A pecked-through vent low on the boarding area's back wall, just east of the BOARDING door | Crawl in to a crew room with a captain's hat on a hook | Extinguisher, snacks |
+| 5 Final Gate | **Pilot Cap stash** | A gold glow in the crew room's corner | Spray the Pilot Cap patch in the crew room | None |
+
+### Gags
+| Level | Gag |
+|---|---|
+| 1 Arrivals | A fuel drum leaking something glowing in the staff room; a poster: DO NOT EAT THE CARPET MUSHROOMS |
+| 2 Security | Walk through lane 1's metal-detector arch five times and it beeps out the cluck melody |
+| 2 Security | "BAWK WAS HERE" scratched in restroom stall 3; hide in it long enough and the PA says "Stall 3 is occupied. Forever." |
+| 3 Food Court | A poster: THIS PLANTER IS NOT A FARM |
+| 4 Gates | Gate B's board lists the HOME flight from the opening: HOME, DELAYED (FOREVER); another line reads RUNWAY 2 CLOSED: FUNGUS |
+| 4 Gates | Flip a speed panel five times quickly and its display reads WHEEE |
+| 4 Gates | A chicken in a pilot's cap sits at Gate C's desk and ignores Amanda completely |
+| Any | Meta PA lines mixed into each level's rotation, such as the "walls are not usually doors" line |
+
+### Ending Payoff
+Finding every secret changes the ending: the stowaway chicken winking from the cabin window is wearing the captain's hat from the crew room, and after THE END the PA chimes once more: "This is your captain speaking. BAWK."
+
+### Hook for Scoring
+GameManager emits `secret_found(secret_id)` the first time each secret is found, and keeps the found IDs with the save, so the score screen can count them against the total.
+
+---
+
 ## UI and UX
 
 ### HUD
@@ -321,7 +385,7 @@ After THE END, a departure board shows how the run went: a row per category, fli
 | **Time** | Up to 3,000 | Full points at 15:00 or under, falling evenly to none at 45:00 (25:00 earns 2,000). The level splits show underneath |
 | **Efficiency** | Up to 2,000 | Getting through on less: the share of the items Amanda had (picked up, plus any she started with) that she never used |
 | **Stealth** | Up to 2,000 | The share of chickens met that never spotted her |
-| **Discovery** | Up to 2,000 | The share of secrets found (0 of 0 until secrets are added) |
+| **Discovery** | Up to 2,000 | The share of the 11 secrets found (see [Secrets](#secrets)) |
 | **Perfect Run** | +1,000 | No hits and no knockouts all run |
 | **Pacifist** | +1,000 | No chickens defeated |
 
@@ -349,7 +413,7 @@ How the stats are counted:
 | Speed Runner | Finish in under 25 minutes |
 | Pacifist | Finish without defeating any chickens |
 | Hoarder | Finish with all 6 slots full |
-| Explorer | Find every secret area |
+| Explorer | Find every secret (all 11) |
 | Perfect Run | Finish without taking damage |
 | One per level | Finish each level, to track how far players get |
 
@@ -526,3 +590,8 @@ game/
 | 2026-10-19 | The final boss takes three hits, sheds chickens with each, ignores snacks, and is formed by eight waiting chickens when the player enters the arena | Proposed |
 | 2026-10-19 | The escape is a 30-second countdown with chickens from vents and a jet-bridge walkway; running out of time counts as a knockout, retried from the boss's fall | Proposed |
 | 2026-10-19 | The ending: Amanda boards, the plane takes off, a chicken winks from a cabin window with a glowing eye while Amanda sits one window ahead, unaware (You); THE END returns to the main menu and clears the save | Proposed |
+| 2026-10-19 | Secrets: two or three counted secrets per level (11 in all), each with a fair visual tell and a stash that helps; jokes may break the fourth wall; no golden chickens; the found count shows only on the score screen | You |
+| 2026-10-19 | Secret rooms hold a five-panel chicken mural telling the uprising's origin | Proposed |
+| 2026-10-19 | A hidden fourth mushroom, the Pilot Cap: unripe, ignored by chickens, and spraying a patch counts as a secret | You (Proposed details) |
+| 2026-10-19 | The opening adds mushroom lore: a news ticker on the departure board and tarmac chickens pecking a glowing patch beside a fuel drum | You |
+| 2026-10-19 | Finding every secret puts the captain's hat on the ending's stowaway and adds a last PA line | Proposed |

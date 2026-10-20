@@ -81,6 +81,9 @@ func _apply() -> void:
 		var patch := node as MushroomPatch
 		if in_cone(patch.global_position):
 			patch.destroy()
+	for node in get_tree().get_nodes_in_group("pilot_caps"):
+		if in_cone((node as Node2D).global_position):
+			node.destroy()
 
 
 func _draw() -> void:

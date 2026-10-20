@@ -28,6 +28,11 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/checkpoint.tscn" id="26_r"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="27_r"]
 [ext_resource type="Script" path="res://scripts/ui/game_menus.gd" id="28_r"]
+[ext_resource type="Script" path="res://scripts/objects/secret_room.gd" id="s1_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mural.png" id="s2_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/secret_door.tscn" id="s3_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/secret_stash.tscn" id="s4_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/posters.png" id="s5_secret"]
 
 [node name="Level02Security" type="Node2D"]
 script = ExtResource("1_r")
@@ -187,6 +192,39 @@ position = Vector2(960, 232)
 position = Vector2(680, 240)
 shutter_path = NodePath("../Entities/Lane3Shutter")
 
+[node name="StorageRoom" type="Node2D" parent="."]
+position = Vector2(1344, 0)
+script = ExtResource("s1_secret")
+floor_char = "."
+
+[node name="Mural" type="Sprite2D" parent="StorageRoom"]
+position = Vector2(72, 36)
+texture = ExtResource("s2_secret")
+centered = false
+hframes = 5
+frame = 1
+
+[node name="StorageTable" parent="StorageRoom" instance=ExtResource("21_r")]
+position = Vector2(52, 112)
+
+[node name="Extinguisher" parent="StorageRoom" instance=ExtResource("17_r")]
+position = Vector2(140, 104)
+item = "extinguisher"
+count = 3
+
+[node name="Snack1" parent="StorageRoom" instance=ExtResource("17_r")]
+position = Vector2(60, 132)
+
+[node name="Snack2" parent="StorageRoom" instance=ExtResource("17_r")]
+position = Vector2(130, 134)
+
+[node name="StaffOnlyDoor" parent="." node_paths=PackedStringArray("room") instance=ExtResource("s3_secret")]
+position = Vector2(832, 224)
+secret_id = "security_storage"
+kind = "staff"
+room = NodePath("../StorageRoom")
+open_prompt = "{interact} try the door"
+
 [node name="Entities" type="Node2D" parent="."]
 y_sort_enabled = true
 
@@ -330,6 +368,7 @@ position = Vector2(520, 528)
 position = Vector2(292, 300)
 
 [node name="Detector1" parent="Entities" instance=ExtResource("20_r")]
+tune_after = 5
 position = Vector2(336, 280)
 
 [node name="Xray2" parent="Entities" instance=ExtResource("19_r")]
@@ -409,3 +448,18 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("28_r")
+
+[node name="ConfiscatedBin" parent="Entities" instance=ExtResource("s4_secret")]
+position = Vector2(416, 169)
+secret_id = "security_bin"
+kind = "confiscated"
+snacks = 2
+found_text = "Contraband!"
+lift = 10.0
+
+[node name="StallGraffiti" type="Sprite2D" parent="WallDecor"]
+position = Vector2(118, 28)
+texture = ExtResource("s5_secret")
+centered = false
+hframes = 4
+frame = 2

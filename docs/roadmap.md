@@ -123,7 +123,7 @@ Build each level fully before starting the next, so the game is always playable 
 - [ ] Full settings and accessibility options
 - [ ] Screen shake, particles, hit flashes, and other feedback
 - [ ] Music transitions and final audio mix
-- [ ] Secrets and easter eggs
+- [x] Secrets and easter eggs (11 secrets, gags, the mushroom lore in the opening, and the captain ending; see the GDD's Secrets section)
 
 ## M7: Beta
 

@@ -21,6 +21,13 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/floor_litter.png" id="19_litter"]
 [ext_resource type="PackedScene" path="res://scenes/objects/checkpoint.tscn" id="20_checkpoint"]
 [ext_resource type="Script" path="res://scripts/ui/game_menus.gd" id="21_menus"]
+[ext_resource type="Script" path="res://scripts/objects/secret_room.gd" id="s1_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mural.png" id="s2_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/roost.png" id="s3_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/secret_door.tscn" id="s4_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/secret_stash.tscn" id="s5_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fuel_drum.tscn" id="s6_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/posters.png" id="s7_secret"]
 
 [node name="Level01Arrivals" type="Node2D"]
 script = ExtResource("1_level")
@@ -195,6 +202,53 @@ position = Vector2(688, 224)
 [node name="SupplyCloset" parent="." instance=ExtResource("8_closet")]
 position = Vector2(864, 34)
 
+[node name="NestRoom" type="Node2D" parent="."]
+position = Vector2(1248, 0)
+script = ExtResource("s1_secret")
+floor_char = ","
+
+[node name="Mural" type="Sprite2D" parent="NestRoom"]
+position = Vector2(72, 36)
+texture = ExtResource("s2_secret")
+centered = false
+hframes = 5
+frame = 0
+
+[node name="Nest" type="Sprite2D" parent="NestRoom"]
+position = Vector2(76, 104)
+texture = ExtResource("s3_secret")
+centered = false
+
+[node name="Feathers1" type="Sprite2D" parent="NestRoom"]
+position = Vector2(40, 90)
+texture = ExtResource("19_litter")
+centered = false
+hframes = 4
+frame = 0
+
+[node name="Feathers2" type="Sprite2D" parent="NestRoom"]
+position = Vector2(140, 120)
+texture = ExtResource("19_litter")
+centered = false
+hframes = 4
+frame = 0
+
+[node name="Snack1" parent="NestRoom" instance=ExtResource("4_pickup")]
+position = Vector2(60, 128)
+
+[node name="Snack2" parent="NestRoom" instance=ExtResource("4_pickup")]
+position = Vector2(96, 132)
+
+[node name="Snack3" parent="NestRoom" instance=ExtResource("4_pickup")]
+position = Vector2(132, 128)
+
+[node name="LostFoundPanel" parent="." node_paths=PackedStringArray("room") instance=ExtResource("s4_secret")]
+position = Vector2(752, 32)
+secret_id = "arrivals_nest"
+kind = "cracked"
+room = NodePath("../NestRoom")
+open_prompt = "{interact} pull the panel"
+
 [node name="Entities" type="Node2D" parent="."]
 y_sort_enabled = true
 
@@ -331,3 +385,22 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("21_menus")
+
+[node name="AmandasBag" parent="Entities" instance=ExtResource("s5_secret")]
+position = Vector2(464, 426)
+secret_id = "arrivals_bag"
+kind = "amanda_bag"
+snacks = 3
+found_text = "My bag!"
+rides_belt = true
+prompt = "{interact} grab bag"
+
+[node name="FuelDrum" parent="Entities" instance=ExtResource("s6_secret")]
+position = Vector2(168, 520)
+
+[node name="MushroomPoster" type="Sprite2D" parent="WallDecor"]
+position = Vector2(140, 416)
+texture = ExtResource("s7_secret")
+centered = false
+hframes = 4
+frame = 0
