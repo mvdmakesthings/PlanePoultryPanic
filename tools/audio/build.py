@@ -220,6 +220,18 @@ SOUNDS = {
                                       decay=0.1 + 0.4 * (k == 5), volume=0.25)
                                  for k, f in enumerate((523, 523, 659, 784, 659, 1047))],
                                gaps=[0.0, 0.12, 0.24, 0.36, 0.48, 0.6]),
+    # Opening cutscene
+    "pa_chime": lambda: mix(*[tone("triangle", f, attack=0.005, sustain=0.05, decay=0.9,
+                                   volume=0.35) for f in (784, 659, 523)],
+                            gaps=[0.0, 0.35, 0.7]),
+    "flap": lambda: mix(tone("noise", 6000, attack=0.001, sustain=0.003, decay=0.015,
+                             lowpass=0.7, volume=0.3, seed=61),
+                        tone("square", 1400, slide=-3.0, duty=0.25, attack=0.001, sustain=0.004,
+                             decay=0.01, lowpass=0.5, volume=0.12)),
+    "stamp": lambda: mix(tone("noise", 260, attack=0.001, sustain=0.03, decay=0.18,
+                              lowpass=0.25, volume=0.7, seed=62),
+                         tone("square", 110, slide=-2.5, duty=0.5, attack=0.001, sustain=0.03,
+                              decay=0.12, lowpass=0.3, volume=0.4)),
     # Menus
     "ui_move": lambda: tone("square", 880, duty=0.5, attack=0.001, sustain=0.015, decay=0.03,
                             volume=0.2),
