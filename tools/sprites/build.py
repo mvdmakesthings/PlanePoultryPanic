@@ -18,6 +18,7 @@ import final
 import chicken
 import closet
 import effects
+import ending
 import foodcourt
 import gate
 import gates
@@ -121,6 +122,9 @@ IMAGES = [
     ("boarding_door.png", final.boarding_door_sheet),
     ("plane_door.png", final.plane_door_sheet),
     ("final_litter.png", final.litter_sheet),
+    ("ending_sky.png", ending.sky),
+    ("plane_side.png", ending.plane_sheet),
+    ("stowaway.png", ending.stowaway_sheet),
 ]
 
 
