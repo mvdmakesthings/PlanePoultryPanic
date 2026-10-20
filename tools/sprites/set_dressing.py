@@ -124,14 +124,39 @@ STATUS_X = 4 + 9 * 4  # destinations are padded to 8 letters plus a space
 
 # Destinations stay put; statuses flip like a split-flap board.
 # Each entry is (text, color) per frame, or None for a blank (flicker).
+# Destinations fit 8 letters, statuses 4.
 FLIGHTS = [
     ("HENVER", [("LATE", "y"), None, ("LATE", "y"), None]),
     ("CLUCKLND", [("CNCL", "R"), ("CNCL", "R"), ("CNCL", "D"), ("CNCL", "R")]),
     ("EGGSETER", [("????", "y"), ("#?#?", "D"), ("FOWL", "y"), ("?#?#", "D")]),
 ]
 
+# Each area's board gets stranger as the chickens take over (storyline.md).
+AREA_FLIGHTS = {
+    "security": [
+        ("BAWKSTON", [("DLAY", "y"), ("DLAY", "y"), None, ("DLAY", "y")]),
+        ("NUGGETVL", [("CNCL", "R"), ("CNCL", "R"), ("CNCL", "D"), ("CNCL", "R")]),
+        ("YOUR BAG", [("TAKN", "R"), ("TAKN", "R"), ("MINE", "D"), ("TAKN", "R")]),
+    ],
+    "food_court": [
+        ("OMELETTE", [("CNCL", "R"), ("CNCL", "D"), ("CNCL", "R"), ("CNCL", "R")]),
+        ("DRUMSTIK", [("RUN!", "R"), None, ("RUN!", "R"), None]),
+        ("BUFFET", [("OPEN", "l"), ("YUM!", "F"), ("OPEN", "l"), ("BAWK", "D")]),
+    ],
+    "gates": [
+        ("GATE C13", [("LAST", "R"), None, ("CALL", "R"), None]),
+        ("ROOSTVIL", [("PECK", "D"), ("PECK", "y"), ("PECK", "D"), ("PECK", "y")]),
+        ("ANYWHERE", [("FULL", "y"), ("FULL", "y"), ("FOWL", "D"), ("FULL", "y")]),
+    ],
+    "final": [
+        ("FLIGHT13", [("BRDG", "l"), None, ("RUN!", "R"), None]),
+        ("HUMANS", [("CNCL", "R"), ("GONE", "R"), ("CNCL", "R"), ("????", "D")]),
+        ("BAWK BWK", [("BAWK", "q"), ("BWAK", "D"), ("BAWK", "q"), ("KWAB", "D")]),
+    ],
+}
 
-def departure_board(frame):
+
+def departure_board(frame, flights=FLIGHTS):
     g = _blank(BOARD_W, BOARD_H)
     _rect(g, 0, 0, BOARD_W - 1, BOARD_H - 1, "O")
     # Casing: a slim slate bezel, lit on the top edge.
@@ -143,7 +168,7 @@ def departure_board(frame):
     # Faint row dividers, like the gaps between flap modules.
     for y in BOARD_ROWS:
         _rect(g, 3, y - 1, BOARD_W - 4, y - 1, "v")
-    for (dest, statuses), y in zip(FLIGHTS, BOARD_ROWS):
+    for (dest, statuses), y in zip(flights, BOARD_ROWS):
         _text(g, 4, y + 1, dest, "Y")
         status = statuses[frame]
         if status is not None:
@@ -156,8 +181,9 @@ def departure_board(frame):
     return g
 
 
-def departure_board_sheet():
-    return _strip([departure_board(f) for f in range(BOARD_FRAMES)], BOARD_W, BOARD_H)
+def departure_board_sheet(area=None):
+    flights = AREA_FLIGHTS[area] if area else FLIGHTS
+    return _strip([departure_board(f, flights) for f in range(BOARD_FRAMES)], BOARD_W, BOARD_H)
 
 
 # --- Windows --------------------------------------------------------------

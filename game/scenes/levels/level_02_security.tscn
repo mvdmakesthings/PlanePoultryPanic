@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/levels/level_02_security.gd" id="1_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/signs.png" id="2_r"]
-[ext_resource type="Texture2D" path="res://assets/sprites/departure_board.png" id="3_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/departure_board_security.png" id="3_r"]
 [ext_resource type="Script" path="res://scripts/objects/flipbook_sprite.gd" id="4_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/window.png" id="5_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/security_litter.png" id="6_r"]

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/levels/level_05_final_gate.gd" id="1_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/night_window.png" id="2_r"]
-[ext_resource type="Texture2D" path="res://assets/sprites/departure_board.png" id="3_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/departure_board_final.png" id="3_r"]
 [ext_resource type="Script" path="res://scripts/objects/flipbook_sprite.gd" id="4_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/final_litter.png" id="5_r"]
 [ext_resource type="PackedScene" path="res://scenes/objects/walkway.tscn" id="6_r"]
