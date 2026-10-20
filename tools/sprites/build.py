@@ -14,6 +14,7 @@ from pathlib import Path
 from PIL import Image
 
 import carousel
+import final
 import chicken
 import closet
 import effects
@@ -113,6 +114,13 @@ IMAGES = [
     ("gate_doors.png", gates.gate_doors_sheet),
     ("final_gate_door.png", gates.final_gate_sheet),
     ("gates_litter.png", gates.litter_sheet),
+    ("tiles_final.png", final.tiles_sheet),
+    ("night_window.png", final.night_window_sheet),
+    ("boss_crown.png", final.crown_sheet),
+    ("vent.png", final.vent_sheet),
+    ("boarding_door.png", final.boarding_door_sheet),
+    ("plane_door.png", final.plane_door_sheet),
+    ("final_litter.png", final.litter_sheet),
 ]
 
 
@@ -222,6 +230,7 @@ def main():
             img.resize((img.width * 8, img.height * 8), Image.NEAREST).save(
                 args.preview / name.replace(".png", "_8x.png"))
         mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_arrivals_4x.png")
+        final.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_final_4x.png")
         gates.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_gates_4x.png")
         foodcourt.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_food_court_4x.png")
         security.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_security_4x.png")
