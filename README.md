@@ -9,7 +9,7 @@ A 16-bit top-down action game: get through a chicken-overrun airport and catch t
 ## Play
 
 1. Install Godot 4 (on macOS: `brew install --cask godot`).
-2. Run the game from the repo root. It opens on the main menu; New Game starts Level 1, Arrivals / Baggage Claim:
+2. Run the game from the repo root. It opens on the main menu; New Game plays a short opening scene (skip it with Enter, Space, Esc, or the gamepad's A, B or Start), then starts Level 1, Arrivals / Baggage Claim:
 
 ```bash
 /Applications/Godot.app/Contents/MacOS/Godot --path game
@@ -75,7 +75,11 @@ In Level 1, find the maintenance key and use it on the locked door to **SECURITY
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/level_05_smoke.tscn
 ```
 
-The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1: its layout, its path from the start to the Security door, checkpoints, retrying and pausing; the third covers the main menu, settings and remapping; the fourth covers Level 2: arriving from Level 1 with the inventory, the extinguisher and mushroom patch, the scanner lanes, the shutter, hiding, the boarding pass and its gate, and checkpoints; the fifth covers Level 3: the kitchen key, vending machines, the totem forming at the roost, the exit and checkpoints; the sixth covers Level 4: walkways carrying, the speed panel, flinging, Gate B's roost and shutter, the exit and the checkpoints between gate areas; the seventh covers Level 5: the boss forming, its three hits (and ignoring snacks), the escape, running out of time, the checkpoint after the boss, and the ending. Every level test also checks that nothing was placed inside a wall. The tests use their own save and settings files, so they never touch yours. They drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
+```bash
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/opening_smoke.tscn
+```
+
+The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1: its layout, its path from the start to the Security door, checkpoints, retrying and pausing; the third covers the main menu, settings and remapping; the fourth covers Level 2: arriving from Level 1 with the inventory, the extinguisher and mushroom patch, the scanner lanes, the shutter, hiding, the boarding pass and its gate, and checkpoints; the fifth covers Level 3: the kitchen key, vending machines, the totem forming at the roost, the exit and checkpoints; the sixth covers Level 4: walkways carrying, the speed panel, flinging, Gate B's roost and shutter, the exit and the checkpoints between gate areas; the seventh covers Level 5: the boss forming, its three hits (and ignoring snacks), the escape, running out of time, the checkpoint after the boss, and the ending; the eighth covers the opening scene: it plays through its beats (sped up), can be skipped from the keyboard or a gamepad, and lands in Level 1. Every level test also checks that nothing was placed inside a wall. The tests use their own save and settings files, so they never touch yours. They drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
 
 ## Build for the browser (itch.io)
 

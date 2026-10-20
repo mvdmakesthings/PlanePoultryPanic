@@ -300,7 +300,7 @@ Kept minimal so the game stays readable at 320x180.
 
 ### Saving
 - The game autosaves at every checkpoint, and when a level starts. There's no manual save, which keeps the tension.
-- **Continue** resumes from the latest checkpoint. **New Game** asks before replacing a save.
+- **Continue** resumes from the latest checkpoint. **New Game** asks before replacing a save, then plays the opening cutscene (about 30 seconds; Confirm, Back or Pause skips it) before Level 1. Continue never shows the opening.
 - Checkpoints are "YOU ARE HERE" map stands that light up when reached. Level 1 has two: where Amanda comes down into Baggage Claim, and in the staff room. Level 2 has two: in the screening area and in the corridor to the Food Court. Level 3 has two: at the arrival and before the totem plaza. Level 4 has one at the entrance to each of Gates B and C (Gate A's is the level start). Level 5 has one at the entrance to the boarding area, and one that lights itself the moment the boss falls.
 - Finishing the game (THE END) clears the save, since there's nothing left to continue.
 - Leaving a level through its exit autosaves at the start of the next one, with the inventory carried over, so Continue resumes there.

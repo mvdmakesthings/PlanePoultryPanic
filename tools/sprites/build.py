@@ -24,6 +24,7 @@ import gate
 import gates
 import items
 import mushrooms
+import opening
 import player
 import roost
 import security
@@ -129,6 +130,9 @@ IMAGES = [
     ("departure_board_food_court.png", lambda: set_dressing.departure_board_sheet("food_court")),
     ("departure_board_gates.png", lambda: set_dressing.departure_board_sheet("gates")),
     ("departure_board_final.png", lambda: set_dressing.departure_board_sheet("final")),
+    ("opening_backdrop.png", opening.backdrop_sheet),
+    ("opening_tarmac.png", opening.tarmac_sheet),
+    ("opening_boarding_pass.png", opening.boarding_pass_sheet),
 ]
 
 
@@ -242,6 +246,7 @@ def main():
         gates.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_gates_4x.png")
         foodcourt.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_food_court_4x.png")
         security.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_security_4x.png")
+        opening.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_opening_4x.png")
         wall = set_dressing.wall_preview(tiles.by_name())
         wall.resize((wall.width * 4, wall.height * 4), Image.NEAREST).save(
             args.preview / "mock_wall_4x.png")

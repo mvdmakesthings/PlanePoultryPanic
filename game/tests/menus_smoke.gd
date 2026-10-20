@@ -65,7 +65,7 @@ func _main_menu_tests() -> void:
 	_check(_requested == "" and board.item("new_game")["status"] == "OVERWRITE SAVE?",
 		"New Game asks before replacing a save")
 	_tap("ui_accept")
-	_check(_requested == GameManager.FIRST_LEVEL and not SaveSystem.has_save(), "New Game starts over")
+	_check(_requested == GameManager.OPENING and not SaveSystem.has_save(), "New Game starts over with the opening")
 	menu.queue_free()
 
 

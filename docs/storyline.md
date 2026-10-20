@@ -60,7 +60,7 @@ Outside the terminal, society has adapted to this new reality. Some humans have 
 
 The game is about 30 minutes long and should never stop for long cutscenes. The story comes through:
 
-- **Opening**: A short scene of Amanda, the stranded passenger, at her cancelled gate, holding an expired boarding pass, hearing the PA announce the last flight out.
+- **Opening**: A short scene of Amanda, the stranded passenger, at her cancelled gate, holding an expired boarding pass, hearing the PA announce the last flight out. As built (M5): Gate A3 in the arrival lounge, day 4 of her layover, her suitcase and snacks camped by the window. Her flight HOME flips to CANCELLED on the departure board (the others follow, and Eggseter's flips to FOWL), her boarding pass (flight PP404, seat 13C) gets stamped EXPIRED, chickens peck around the parked plane outside, and one squawks at her through the glass. Then the PA chimes: the last flight out of Bawkston is boarding at Gate C13, and the airport will be sealed after it leaves ("...BAWK."). She runs for it, and Level 1 starts in that same lounge.
 - **PA announcements and flight displays**: The terminal still runs on autopilot. Announcements and departure boards get stranger as the chickens take over, delivering jokes, hints, and backstory.
 - **The environment**: Nests in luggage, pecked-up signs, chickens crowding around mushroom patches, and chicken graffiti show how far the takeover has gone in each area.
 - **Ending**: Amanda boards with her new boarding pass and the plane takes off. One last shot hints that a chicken may have stowed away.

@@ -12,6 +12,8 @@ signal scene_change_requested(path: String)
 
 const MAIN_MENU := "res://scenes/ui/main_menu.tscn"
 const FIRST_LEVEL := "res://scenes/levels/level_01_arrivals.tscn"
+## The cutscene New Game plays before the first level.
+const OPENING := "res://scenes/cutscenes/opening.tscn"
 const FADE_TIME := 0.25
 
 ## The snapshot the next level should restore, taken with take_pending().
@@ -39,10 +41,17 @@ func _ready() -> void:
 	layer.add_child(_fade)
 
 
-## Starts over from the first level, replacing any save.
+## Starts over, replacing any save: the opening cutscene plays, then it
+## calls start_first_level().
 func new_game() -> void:
 	SaveSystem.delete_game()
 	last_checkpoint = {}
+	pending = {}
+	change_scene(OPENING)
+
+
+## Starts the first level from the beginning, after the opening.
+func start_first_level() -> void:
 	pending = {}
 	change_scene(FIRST_LEVEL)
 
