@@ -107,7 +107,8 @@ Build each level fully before starting the next, so the game is always playable 
 - [x] Level 3: Food Court (first totem, vending machines; played and approved 2026-10-19)
 - [x] Level 4: Gate Areas A, B, C (walkways, all systems combined, mid-level checkpoints; played and approved 2026-10-19)
 - [ ] Level 5: Final Departure Gate (final boss, escape sequence)
-- [ ] Opening scene, ending scene, PA and departure-board text
+- [x] Opening scene: a 31-second in-engine cutscene on New Game at Amanda's cancelled gate (board flips to CANCELLED, boarding pass stamped EXPIRED, chickens on the tarmac, the PA announces the last flight from Gate C13), skippable, then Level 1
+- [ ] Ending scene, PA and departure-board text
 - [ ] Composer's tracks integrated as they arrive
 - [ ] Playtest each level as it's finished
 

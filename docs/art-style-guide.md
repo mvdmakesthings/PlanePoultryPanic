@@ -371,6 +371,15 @@ Made by `tools/sprites/gates.py`. The palette key `t` is the gate teal `#193c3e`
 
 **`gates_litter.png`**: four 16x16 floor decals: a nest with an egg, scattered boarding passes, a pecked neck pillow, a spilled coffee.
 
+### Opening Cutscene
+Made by `tools/sprites/opening.py`. The scene (`game/scenes/cutscenes/opening.tscn`) also reuses the player and chicken sheets, `seating.png`, `potted_plant.png`, `suitcase.png`, `item_snack.png`, `floor_litter.png`, and `tiles_arrivals.png` for the floor. The departure board and the PA panel are drawn by the game in the menus' departure-board style, not from a sheet.
+
+**`opening_backdrop.png`**: one 320x96 back wall of the gate lounge: wall top and lip, white panels with the blue stripe and baseboard (matching `tiles_arrivals.png`), a big three-pane window, a small "A3" gate sign, and the two hangers for the departure board. The window glass (x 11-172, y 15-71) is transparent; the view outside shows through from behind. Keep the glass and the board's spot (x 184-312, y 12-72) where they are, since the game lines things up with them.
+
+**`opening_tarmac.png`**: one 162x57 view through the window, the size of the glass: sky and clouds, the control tower and a hangar on the horizon, a parked plane, and the tarmac with taxi lines, plus glints on the glass. The game draws the chickens outside between this and the backdrop.
+
+**`opening_boarding_pass.png`**: two 96x48 frames of Amanda's boarding pass, shown as a close-up: as printed (name, destination HOME, gate A3, seat 13C, flight PP404, a barcode stub, and a chicken footprint), then with a red double-ruled EXPIRED stamp across it.
+
 ### Import Settings (Godot)
 - Texture filter: Nearest
 - No mipmaps
