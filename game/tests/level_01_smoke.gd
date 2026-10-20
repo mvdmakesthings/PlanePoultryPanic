@@ -146,6 +146,15 @@ func _critical_path_test() -> void:
 	_check(level._level_over, "going through the door ends the level")
 	var menus: GameMenus = level.get_node("UI/GameMenus")
 	_check(menus.is_open() and menus._mode == "clear", "the level-clear screen comes up")
+	var next := "res://scenes/levels/level_02_security.tscn"
+	_check(SaveSystem.load_game().get("level") == next, "clearing Arrivals autosaves at the start of Security")
+	var requested := [""]
+	var on_change := func(path: String) -> void: requested[0] = path
+	GameManager.scene_change_requested.connect(on_change)
+	_tap("ui_accept")
+	await get_tree().process_frame
+	GameManager.scene_change_requested.disconnect(on_change)
+	_check(requested[0] == next, "ON TO SECURITY goes on to Level 2")
 	level.queue_free()
 
 
