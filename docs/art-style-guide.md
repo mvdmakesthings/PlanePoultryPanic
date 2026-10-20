@@ -291,7 +291,7 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`security_door.png`**: four 48x32 frames of the locked door to Security (locked with barrier tape and a red light, unlocked with a green light, opening, open). It sits on the wall face like the boarding gate, with the same doorway.
 
-**`signs.png`**: 64x11 wayfinding signs for the wall face, one per frame: BAGGAGE CLAIM (down arrow), SECURITY (left arrow), STAFF ONLY (white on red), ARRIVALS (right arrow), LOST+FOUND, RESTROOMS (left arrow), FOOD COURT (right arrow), SCREENING (white on blue). The 3x5 font has every letter but Q. Add new signs as new frames at the end.
+**`signs.png`**: 64x11 wayfinding signs for the wall face, one per frame: BAGGAGE CLAIM (down arrow), SECURITY (left arrow), STAFF ONLY (white on red), ARRIVALS (right arrow), LOST+FOUND, RESTROOMS (left arrow), FOOD COURT (right arrow), SCREENING (white on blue). The 3x5 font has every letter but Q, and every digit. Add new signs as new frames at the end.
 
 **`maintenance_cart.png`**: one 24x24 janitor's cart (mop bucket, spray bottles, trash bag). A solid floor prop; its base is about 22x6.
 
@@ -353,6 +353,23 @@ Made by `tools/sprites/foodcourt.py`.
 **`food_litter.png`**: four 16x16 floor decals: spilled fries, a soda puddle with its cup, a dropped tray, a burger wrapper.
 
 **`gates_door.png`**: four 48x32 frames of the door to the gates, laid out like `security_door.png` (closed, closed, opening, open): the boarding gate's glass doors under an ALL GATES sign.
+
+### Gate Areas (Level 4)
+Made by `tools/sprites/gates.py`. The palette key `t` is the gate teal `#193c3e`.
+
+**`tiles_gates.png`**: the same layout and tile names as `tiles_arrivals.png`: `carpet` is dark teal carpet, `carpet_pattern` the lounges' teal grid carpet with orange dots, `tile` and `wood` as in Arrivals. Walls are pale gray with an orange departure-board stripe and a teal baseboard.
+
+**`walkway.png`**: moving-walkway pieces, 16x16. Rows: top-left end, top middle, top-right end, bottom-left end, bottom middle, bottom-right end. Columns: 4 frames of the belt (dark rubber, light slats 8 px apart) creeping 2 px east per frame; the game plays them backward for a westbound walkway and faster at higher speeds. The ends are steel comb plates with a hazard stripe and only use column 0. The top row carries the far handrail along its top edge, the bottom row the near handrail along its bottom edge. The walkway draws itself from this sheet, two tiles tall and any number long.
+
+**`speed_panel.png`**: three 12x14 frames of the walkway control box on the wall: the dial and light at slow (green), normal (yellow) and full (red).
+
+**`gate_desk.png`**: one 32x24 gate agent's podium with a monitor and a boarding-pass printer. A solid floor prop; its base is about 28x6.
+
+**`gate_doors.png`**: six closed 48x32 boarding gates for the wall face, one per frame: GATE A1, A2, B4, B5, C8, C9, drawn like `gate_door.png` with a red "closed" light.
+
+**`final_gate_door.png`**: four 48x32 frames of the door to GATE C13, laid out like `security_door.png` (closed, closed, opening, open).
+
+**`gates_litter.png`**: four 16x16 floor decals: a nest with an egg, scattered boarding passes, a pecked neck pillow, a spilled coffee.
 
 ### Import Settings (Godot)
 - Texture filter: Nearest
