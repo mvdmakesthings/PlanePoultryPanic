@@ -373,10 +373,10 @@ position = Vector2(780, 500)
 position = Vector2(470, 336)
 
 [node name="TrashBin4" parent="Entities" instance=ExtResource("20_r")]
-position = Vector2(200, 80)
+position = Vector2(252, 100)
 
 [node name="TrashBin5" parent="Entities" instance=ExtResource("20_r")]
-position = Vector2(824, 80)
+position = Vector2(770, 100)
 
 [node name="PlazaCart1" parent="Entities" instance=ExtResource("21_r")]
 position = Vector2(420, 300)
