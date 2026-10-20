@@ -60,12 +60,20 @@ const RETRY_HINTS := {
 	],
 }
 const NEXT_LEVEL := "res://scenes/levels/level_05_final_gate.tscn"
+## PA announcements, played in turn (see GameLevel.pa_lines).
+const PA_LINES := [
+	"Please keep right on the moving walkways.\nChickens, please keep... anywhere else.",
+	"Flight 13, the last flight out, is now\nboarding at Gate C13.",
+	"Mushrooms growing in the carpet are\nnot complimentary. Do not eat them.",
+	"Gate agents are on a permanent break.\nPassengers will kindly board themselves.",
+]
 
 var _shown_totem_hint := false
 
 
 func _setup() -> void:
 	map = MAP
+	pa_lines = PA_LINES
 	tiles_texture = preload("res://assets/sprites/tiles_gates.png")
 	music = "gates" if ResourceLoader.exists(AudioManager.MUSIC_DIR + "gates.wav") else "security"
 	hint_zones = HINT_ZONES

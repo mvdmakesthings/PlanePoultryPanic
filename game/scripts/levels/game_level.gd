@@ -21,6 +21,11 @@ const TILE := LevelBuilder.TILE
 const HINT_TIME := 8.0
 ## One-off hints for things that happen, shown for this long.
 const EVENT_HINT_TIME := 5.0
+## The first PA announcement comes this long after the level starts, then
+## one every PA_INTERVAL seconds, each shown for PA_TIME.
+const PA_FIRST_DELAY := 4.0
+const PA_INTERVAL := 40.0
+const PA_TIME := 6.0
 ## Retry hints every level can fall back on, by what landed the last hit.
 const COMMON_RETRY_HINTS := {
 	"peck": [
@@ -49,6 +54,9 @@ var key_hints := {}
 var locked_hints := {}
 ## Shown the first time the player is hurt ("" for none).
 var hurt_hint := ""
+## PA announcements, played in turn through the level: the terminal on
+## autopilot, getting stranger as the chickens take over (storyline.md).
+var pa_lines: Array = []
 ## Extra retry hints, merged over COMMON_RETRY_HINTS.
 var retry_hints := {}
 ## The door that ends the level when walked through.
@@ -71,6 +79,9 @@ var _shown_hurt_hint := false
 var _shown_key_hints := {}
 var _last_health := -1
 var _rebake_queued := false
+var _pa_next := PA_FIRST_DELAY
+var _pa_index := 0
+var _pa_left := 0.0
 ## The scene's item pickups, to tell which have been picked up.
 var _pickups: Array[String] = []
 
@@ -139,6 +150,30 @@ func _build() -> void:
 
 func _physics_process(delta: float) -> void:
 	_update_hints(delta)
+	_update_pa(delta)
+
+
+## Plays the PA chime and shows an announcement at the bottom of the screen.
+func announce(text: String) -> void:
+	AudioManager.play("pa_chime")
+	_hud.show_pa(text)
+	_pa_left = PA_TIME
+
+
+func _update_pa(delta: float) -> void:
+	if _level_over:
+		_hud.show_pa("")
+		return
+	_pa_left -= delta
+	if _pa_left <= 0.0:
+		_hud.show_pa("")
+	if pa_lines.is_empty():
+		return
+	_pa_next -= delta
+	if _pa_next <= 0.0:
+		_pa_next = PA_INTERVAL
+		announce(pa_lines[_pa_index % pa_lines.size()])
+		_pa_index += 1
 
 
 ## Bakes the navigation again (next frame, once), after something solid

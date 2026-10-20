@@ -75,6 +75,8 @@ func _layout_tests() -> void:
 	await get_tree().physics_frame
 	_check(hud._hint.contains("boarding pass"), "the first hint says what to look for")
 	_check(get_tree().get_nodes_in_group("mushroom_patches").size() == 3, "Security has three mushroom patches")
+	await _wait(GameLevel.PA_FIRST_DELAY + 0.2)
+	_check(hud._pa.contains("pockets"), "the PA makes its first announcement a few seconds in")
 	# The queue hall's north wall is solid except at the queue's exit.
 	_kill_chickens()
 	player.global_position = Vector2(400, 470)

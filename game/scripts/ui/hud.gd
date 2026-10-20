@@ -39,6 +39,8 @@ var _countdown := -1.0
 ## The boss's hits left and total, or 0 total when there's no boss.
 var _boss_hits := 0
 var _boss_max := 0
+## The PA announcement on screen, or "".
+var _pa := ""
 
 
 func _ready() -> void:
@@ -74,6 +76,13 @@ func show_message(text: String) -> void:
 
 ## Shows a tutorial hint at the top of the screen ("" hides it). Action
 ## names in braces are drawn as their buttons, like "{run}" -> [SHIFT].
+## Shows a PA announcement in a banner near the bottom; "" hides it.
+func show_pa(text: String) -> void:
+	if text != _pa:
+		_pa = text
+		queue_redraw()
+
+
 ## Shows the escape countdown at the top right; negative hides it.
 func show_countdown(seconds: float) -> void:
 	if ceilf(seconds) != ceilf(_countdown):
@@ -122,6 +131,8 @@ func _draw() -> void:
 		ButtonGlyphs.draw(self, font, Vector2(hint_x, size.y - 5), controls_hint, TEXT, TEXT_OUTLINE)
 	if _hint != "":
 		_draw_hint(font)
+	if _pa != "":
+		_draw_pa(font)
 	if _boss_max > 0:
 		_draw_board_box(font, "SUPREME TOTEM", "")
 		for i in _boss_max:
@@ -157,6 +168,26 @@ func _draw_hint(font: Font) -> void:
 	for line in lines:
 		ButtonGlyphs.draw_centered(self, font, panel.get_center().x, y, line, HINT_TEXT)
 		y += 11
+
+
+## The PA banner: a dark strip above the inventory with a "PA" tag and
+## the announcement in pale blue, so it never looks like a tutorial hint.
+func _draw_pa(font: Font) -> void:
+	var lines := _pa.split("\n")
+	var width := 0.0
+	for line in lines:
+		width = maxf(width, font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x)
+	var height := lines.size() * 10 + 4
+	var panel := Rect2(roundf((size.x - width) / 2.0) - 4, size.y - 22 - height, width + 8, height)
+	draw_rect(panel.grow(1), Color("124e89"))
+	draw_rect(panel, HINT_BACK)
+	var tag := Rect2(panel.position + Vector2(-1, -9), Vector2(14, 8))
+	draw_rect(tag, Color("124e89"))
+	draw_string(font, tag.position + Vector2(2, 7), "PA", HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, Color("ffffff"))
+	var y := panel.position.y + 10
+	for line in lines:
+		draw_string(font, Vector2(panel.position.x, y), line, HORIZONTAL_ALIGNMENT_CENTER, panel.size.x, FONT_SIZE, Color("c0cbdc"))
+		y += 10
 
 
 ## A small departure-board box at the top right: a label and a value.

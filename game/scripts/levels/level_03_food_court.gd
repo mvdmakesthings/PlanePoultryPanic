@@ -72,12 +72,20 @@ const RETRY_HINTS := {
 	],
 }
 const NEXT_LEVEL := "res://scenes/levels/level_04_gates.tscn"
+## PA announcements, played in turn (see GameLevel.pa_lines).
+const PA_LINES := [
+	"The Food Court is open. The chickens\nhave been very clear about that.",
+	"Vending machines now accept maintenance\nkeys only. Exact change is extinct.",
+	"Please do not stack the chickens.\nThe chickens will stack themselves.",
+	"Today's special: everything.\nTomorrow's special: unknown.",
+]
 
 var _shown_totem_hint := false
 
 
 func _setup() -> void:
 	map = MAP
+	pa_lines = PA_LINES
 	tiles_texture = preload("res://assets/sprites/tiles_food_court.png")
 	# The GDD gives Security and the Food Court one track.
 	music = "security"

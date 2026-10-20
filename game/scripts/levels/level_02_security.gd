@@ -74,10 +74,18 @@ const RETRY_HINTS := {
 	],
 }
 const NEXT_LEVEL := "res://scenes/levels/level_03_food_court.tscn"
+## PA announcements, played in turn (see GameLevel.pa_lines).
+const PA_LINES := [
+	"Please remove all snacks, keys and\ndignity from your pockets.",
+	"Unattended chickens will be left\nunattended. We're not going near them.",
+	"A valid boarding pass is required\nfor your final departure.",
+	"Liquids over 100 ml have been confiscated.\nSo has the security staff.",
+]
 
 
 func _setup() -> void:
 	map = MAP
+	pa_lines = PA_LINES
 	tiles_texture = preload("res://assets/sprites/tiles_security.png")
 	music = "security" if ResourceLoader.exists(AudioManager.MUSIC_DIR + "security.wav") else "arrivals"
 	hint_zones = HINT_ZONES

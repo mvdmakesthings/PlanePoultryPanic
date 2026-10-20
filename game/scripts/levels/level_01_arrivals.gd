@@ -66,10 +66,18 @@ const HURT_HINT := "Ouch! {eat_snack} eats a snack\nto heal a suitcase"
 const LOCKED_HINT := "Locked. Find a maintenance\nkey: try the staff room"
 const KEY_HINT := "Got the maintenance key!\nBack to the SECURITY door"
 const NEXT_LEVEL := "res://scenes/levels/level_02_security.tscn"
+## PA announcements, played in turn (see GameLevel.pa_lines).
+const PA_LINES := [
+	"Welcome to Bawkston! Baggage from all\nflights is arriving on the carousel.",
+	"Passengers are reminded not to feed\nthe wildlife. The wildlife has noticed.",
+	"The last flight out departs from Gate C13.\nPlease proceed through Security.",
+	"Lost and Found reports a surplus of\nsnacks, and a shortage of staff.",
+]
 
 
 func _setup() -> void:
 	map = MAP
+	pa_lines = PA_LINES
 	music = "arrivals"
 	hint_zones = HINT_ZONES
 	hurt_hint = HURT_HINT

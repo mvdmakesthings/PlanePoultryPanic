@@ -64,6 +64,7 @@ const VENT_INTERVAL := 2.5
 const MAX_CHICKENS := 12
 ## Where the jet bridge starts, for walking through the boarding door.
 const JET_BRIDGE_START := Vector2(48, 496)
+const ESCAPE_PA := "FINAL CALL for Flight 13!\nDoors close in thirty seconds."
 const BOSS_HINT := "The SUPREME TOTEM! Snacks won't\nwork. Ram it, freeze it, or lure\nit onto a walkway: three hits!"
 const STAGGER_HINT := "It's shrinking! Hit it again!"
 const ESCAPE_HINT := "FINAL CALL! The doors close in\n30 seconds. Scan your pass at\nthe BOARDING door and run!"
@@ -81,6 +82,12 @@ const RETRY_HINTS := {
 }
 
 const ENDING := "res://scenes/ui/ending.tscn"
+## PA announcements, played in turn (see GameLevel.pa_lines).
+const PA_LINES := [
+	"This is the final boarding call for Flight 13.\nAll other flights have been... eaten.",
+	"BAWK. Bawk bawk BAWK. ...Sorry, the\nchickens have found the microphone.",
+	"Would passenger Amanda please report\nto Gate C13. Bring a luggage cart.",
+]
 
 var boss: Totem
 var boss_beaten := false
@@ -96,6 +103,7 @@ var _last_tick := -1
 
 func _setup() -> void:
 	map = MAP
+	pa_lines = PA_LINES
 	tiles_texture = preload("res://assets/sprites/tiles_final.png")
 	music = "gates"
 	hint_zones = HINT_ZONES
@@ -179,7 +187,9 @@ func _on_boss_broken(_fell: bool) -> void:
 func _start_escape() -> void:
 	escape_left = ESCAPE_TIME
 	_vent_timer = 1.0
-	AudioManager.play("pa_chime")
+	# No more chatter: just the last call.
+	pa_lines = []
+	announce(ESCAPE_PA)
 	AudioManager.play_music("boss")
 	show_event_hint(ESCAPE_HINT)
 

@@ -55,6 +55,7 @@ func _layout_tests() -> void:
 	var level := await _fresh_level()
 	var stuck: Array[String] = level.things_in_walls()
 	_check(stuck.is_empty(), "nothing stands inside a wall %s" % [stuck])
+	_check(ResourceLoader.exists("res://assets/sprites/departure_board_final.png"), "the final gate has its own departure board")
 	for sound in ["boss_hit", "crown_burst", "tick", "pa_chime", "vent"]:
 		_check(ResourceLoader.exists(AudioManager.SFX_DIR + sound + ".wav"), "the %s sound exists" % sound)
 	_check(ResourceLoader.exists(AudioManager.MUSIC_DIR + "boss.wav"), "the boss music exists")
@@ -119,6 +120,7 @@ func _boss_and_escape_test() -> void:
 	await _wait(1.0)
 	_check(not is_instance_valid(boss) and level.boss_beaten, "the third hit brings it down for good")
 	_check(level.escape_left > 25.0, "the escape countdown starts")
+	_check(hud._pa.contains("FINAL CALL"), "the PA makes the final call")
 	_check(not (level.get_node("BoardingDoor") as LockedDoor).sealed, "the boarding door unseals")
 	var save := SaveSystem.load_game()
 	_check(save.get("checkpoint") == "escape" and save.get("extra", {}).get("boss_beaten") == true,
