@@ -7,6 +7,9 @@ extends Node
 const ROOM := preload("res://scenes/levels/prototype_room.tscn")
 const CHICKEN := preload("res://scenes/characters/chicken.tscn")
 const TOTEM := preload("res://scenes/characters/totem.tscn")
+const EGG := preload("res://scenes/objects/egg_projectile.tscn")
+const PICKUP := preload("res://scenes/objects/item_pickup.tscn")
+const CHECKPOINT := preload("res://scenes/objects/checkpoint.tscn")
 
 var _room: Node
 var _player: Player
@@ -25,6 +28,41 @@ func _ready() -> void:
 	_player.global_position = Vector2(200, 250)
 	_player.facing = Vector2.RIGHT
 	await _wait(0.8)
+
+	# She runs (dust), grabs a snack (sparkle), eats one (crumbs), throws one
+	# for a chicken (crumbs), and an egg splats beside her.
+	var pickup := PICKUP.instantiate() as ItemPickup
+	pickup.position = Vector2(290, 250)
+	_entities.add_child(pickup)
+	Input.action_press("run")
+	Input.action_press("move_right")
+	await _wait(0.9)
+	Input.action_release("move_right")
+	Input.action_release("run")
+	await _wait(0.4)
+	_player.health -= Player.SUITCASE
+	_player.eat_snack()
+	await _wait(0.9)
+	var eater := _chicken(Vector2(330, 280))
+	_player.facing = Vector2.DOWN
+	_player.throw_snack()
+	await _wait(2.0)
+	if is_instance_valid(eater):
+		eater.queue_free()
+	var egg := EGG.instantiate() as EggProjectile
+	egg.direction = Vector2.LEFT
+	egg.position = Vector2(370, 236)
+	_entities.add_child(egg)
+	await _wait(1.0)
+	var checkpoint := CHECKPOINT.instantiate() as Checkpoint
+	checkpoint.position = Vector2(300, 200)
+	_entities.add_child(checkpoint)
+	await _wait(0.3)
+	checkpoint.activate()
+	await _wait(1.8)
+	_player.global_position = Vector2(200, 250)
+	_player.facing = Vector2.RIGHT
+	await _wait(0.5)
 
 	# A chicken pecks her.
 	var pecker := _chicken(Vector2(222, 250))
@@ -85,6 +123,9 @@ func _ready() -> void:
 	boss.topple(Vector2.RIGHT)
 	await _wait(2.4)
 
+	# Clear the room first, so nothing starts a sound while it goes quiet.
+	_room.queue_free()
+	await get_tree().process_frame
 	await AudioManager.silence()
 	get_tree().quit()
 
