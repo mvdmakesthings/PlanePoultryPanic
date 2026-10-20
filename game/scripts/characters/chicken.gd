@@ -15,6 +15,8 @@ enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
+const CHASE_SHEET := preload("res://assets/sprites/chicken_chase.png")
+const EAT_SHEET := preload("res://assets/sprites/chicken_eat.png")
 const POWER_SHEETS := {
 	"flight": preload("res://assets/sprites/chicken_flight_walk.png"),
 	"rage": preload("res://assets/sprites/chicken_rage_walk.png"),
@@ -136,6 +138,15 @@ func _ready() -> void:
 	frames.remove_animation("default")
 	SpriteSheets.add_directional(frames, "walk", WALK_SHEET, FRAME_SIZE, 8.0)
 	SpriteSheets.add_directional(frames, "idle", IDLE_SHEET, FRAME_SIZE, 3.0)
+	SpriteSheets.add_directional(frames, "chase", CHASE_SHEET, FRAME_SIZE, 12.0)
+	# Eating is only drawn facing the camera: peck, chip in beak, chomp.
+	frames.add_animation("eat_down")
+	frames.set_animation_speed("eat_down", 6.0)
+	for column in EAT_SHEET.get_width() / FRAME_SIZE.x:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = EAT_SHEET
+		atlas.region = Rect2(Vector2(column * FRAME_SIZE.x, 0), FRAME_SIZE)
+		frames.add_frame("eat_down", atlas)
 	for mode: String in POWER_SHEETS:
 		SpriteSheets.add_directional(frames, mode + "_walk", POWER_SHEETS[mode], FRAME_SIZE, 8.0)
 	_sprite.sprite_frames = frames
@@ -662,6 +673,11 @@ func _update_visuals() -> void:
 	var animation: String
 	if show_power:
 		animation = power + "_walk_" + direction
+	elif state in [State.EATING, State.FEEDING]:
+		animation = "eat_down"
+	elif state == State.PURSUE and moving:
+		# Flapping and squawking after the player.
+		animation = "chase_" + direction
 	else:
 		animation = ("walk_" if moving else "idle_") + direction
 	if _sprite.animation != animation:
@@ -673,7 +689,8 @@ func _update_visuals() -> void:
 	elif not _sprite.is_playing():
 		_sprite.play(animation)
 
-	_sprite.speed_scale = 1.5 if state == State.PURSUE else 1.0
+	# Powered chickens have no chase cycle, so they hurry their walk instead.
+	_sprite.speed_scale = 1.5 if state == State.PURSUE and show_power else 1.0
 	if state == State.WINDUP:
 		# Squash during the wind-up so the shot can be dodged.
 		_sprite.scale = Vector2(1.15, 0.85) if int(_timer * 12.0) % 2 == 0 else Vector2.ONE

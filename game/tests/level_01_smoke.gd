@@ -21,6 +21,7 @@ func _ready() -> void:
 	await _hair_test()
 	await _critical_path_test()
 	await _chicken_path_test()
+	await _chicken_animation_test()
 	await _pause_test()
 	await _checkpoint_tests()
 	SaveSystem.delete_game()
@@ -167,6 +168,37 @@ func _chicken_path_test() -> void:
 	if is_instance_valid(runner):
 		print("staff-room chicken at %s, state %d" % [runner.global_position, runner.state])
 	_check(not is_instance_valid(bait), "a chicken paths through the staff room door to a snack")
+	level.queue_free()
+
+
+## Chasing chickens flap and squawk; eating chickens peck and chomp.
+func _chicken_animation_test() -> void:
+	var level := await _fresh_level()
+	var player: Player = level.get_node("Entities/Player")
+	player._invincible_timer = 1.0e9
+	var chickens := get_tree().get_nodes_in_group("chickens")
+	for i in range(1, chickens.size()):
+		chickens[i].queue_free()
+	var chicken: Chicken = chickens[0]
+	player.global_position = Vector2(620, 300)
+	chicken.global_position = Vector2(560, 300)
+	chicken.alert()
+	await _wait(0.3)
+	var sprite: AnimatedSprite2D = chicken.get_node("AnimatedSprite2D")
+	_check(sprite.animation.begins_with("chase_"), "a chasing chicken plays the chase cycle")
+	var bait: ThrownSnack = preload("res://scenes/objects/thrown_snack.tscn").instantiate()
+	bait.direction = Vector2.ZERO
+	bait.position = chicken.global_position + Vector2(-12, 0)
+	level.get_node("Entities").add_child(bait)
+	player.global_position = Vector2(860, 500)
+	var ate := false
+	for i in 60:
+		await get_tree().physics_frame
+		if chicken.state == Chicken.State.EATING:
+			await get_tree().physics_frame
+			ate = sprite.animation == "eat_down"
+			break
+	_check(ate, "an eating chicken plays the eat cycle")
 	level.queue_free()
 
 
