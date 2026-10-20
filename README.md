@@ -55,6 +55,47 @@ In Level 1, find the maintenance key and use it on the locked door to **SECURITY
 
 The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1: its layout, its path from the start to the Security door, checkpoints, retrying and pausing; the third covers the main menu, settings and remapping. The tests use their own save and settings files, so they never touch yours. Both drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
 
+## Build for the browser (itch.io)
+
+The project has a **Web** export preset (`game/export_presets.cfg`). It uses the single-threaded web build, so it runs on hosts that can't send special headers, like itch.io and GitHub Pages.
+
+1. Install the web export templates once. In the Godot editor: **Editor > Manage Export Templates > Download and Install**. The templates must match your Godot version exactly.
+2. Export from the repo root:
+
+```bash
+mkdir -p build/web
+```
+
+```bash
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path game --export-release "Web"
+```
+
+This writes `build/web/index.html` plus the `.wasm`, `.pck` and `.js` files next to it. `build/` is gitignored.
+
+3. Try it locally before uploading. Opening `index.html` straight from disk won't work; it needs a web server:
+
+```bash
+python3 -m http.server 8060 --directory build/web
+```
+
+Then open <http://localhost:8060>. Click the game once so it gets keyboard focus.
+
+4. Zip the *contents* of `build/web` (not the folder itself, so `index.html` sits at the top of the zip):
+
+```bash
+cd build/web && zip -r ../plane-poultry-panic-web.zip . && cd -
+```
+
+5. On itch.io, create or edit the project, set **Kind of project** to **HTML**, upload the zip and tick **This file will be played in the browser**. Set the embed size to 1280 × 720 (16:9, a clean multiple of the 320 × 180 game) and turn on the **Fullscreen button**. Leave **SharedArrayBuffer support** off; this build doesn't need it.
+
+Browser build notes:
+
+- The download is about 10 MB zipped (the engine is most of it; the game itself is under 200 KB), so expect a few seconds of loading on first visit.
+- Players need to click the game before keys work. Until then, arrow keys and Space scroll the itch.io page instead.
+- Gamepads work in Chrome, Firefox and Safari, but the browser only reports a pad after a button is pressed, and button layouts can differ from desktop for non-standard controllers.
+- Browsers block sound until the player clicks or presses a key. The game has no audio yet; when it does, don't rely on a sound playing before the first input.
+- Browser builds run slower than desktop ones, especially on laptops on battery. If a playtester reports stutter, ask which browser they used.
+
 ## Rebuild the sprites
 
 Sprites are generated from Python sources in `tools/sprites/` (needs Pillow):
