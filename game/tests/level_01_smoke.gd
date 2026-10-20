@@ -40,6 +40,8 @@ func _ready() -> void:
 
 func _layout_tests() -> void:
 	var level := await _fresh_level()
+	var stuck: Array[String] = level.things_in_walls()
+	_check(stuck.is_empty(), "nothing stands inside a wall %s" % [stuck])
 	var player: Player = level.get_node("Entities/Player")
 	var hud: Hud = level.get_node("UI/HUD")
 	_check(player.snacks == 0, "the player arrives with no snacks")

@@ -296,6 +296,19 @@ func _restored(_data: Dictionary) -> void:
 	pass
 
 
+## Names of anything standing on the floor (under Entities) whose feet are
+## inside a wall tile, for tests: placement mistakes the eye can miss.
+func things_in_walls() -> Array[String]:
+	var rows := PackedStringArray(map)
+	var stuck: Array[String] = []
+	for node in $Entities.get_children():
+		if node is Node2D:
+			var tile := Vector2i(((node as Node2D).global_position - Vector2(0, 1)) / TILE)
+			if LevelBuilder.is_map_wall(rows, tile.x, tile.y):
+				stuck.append(str(node.name))
+	return stuck
+
+
 func _checkpoints() -> Array[Checkpoint]:
 	var found: Array[Checkpoint] = []
 	for node in find_children("*", "", true, false):

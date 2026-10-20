@@ -52,6 +52,8 @@ func _arrival_test() -> void:
 
 func _layout_tests() -> void:
 	var level := await _fresh_level()
+	var stuck: Array[String] = level.things_in_walls()
+	_check(stuck.is_empty(), "nothing stands inside a wall %s" % [stuck])
 	var player: Player = level.get_node("Entities/Player")
 	var hud: Hud = level.get_node("UI/HUD")
 	_check(ResourceLoader.exists(AudioManager.SFX_DIR + "vend.wav"), "the vend sound exists")
