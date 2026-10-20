@@ -218,7 +218,7 @@ Behavior priority, highest first:
 | Emergency exit | Shortcut. Some are blocked, and some lead past extra danger. |
 | Bathroom stall, supply closet | Hiding spot (see [Hiding](#hiding)) |
 | Gate seating | Blocks egg projectiles |
-| Flight information display, PA system | Story, jokes, and hints. The Arrivals departure board lists chicken-punned flights (Henver, Cluckland, Eggseter) whose statuses flicker and flip. |
+| Flight information display, PA system | Story, jokes, and hints. Each area has its own departure board, stranger as the chickens take over: Arrivals lists chicken-punned flights (Henver, Cluckland, Eggseter); Security has YOUR BAG TAKN; the Food Court DRUMSTIK RUN!; the gates GATE C13 LAST CALL; the final gate HUMANS GONE and BAWK BWK. PA announcements play with a chime in a banner above the inventory (styled apart from tutorial hints): each level cycles through its own lines, the first a few seconds in, then every 40 seconds. In Level 5 they stop for the final call when the escape begins. |
 | Potted plants | Solid floor props. The player, carts, and chickens go around them; chickens path around them like walls. |
 | Welcome banner, windows | Set dressing. The banner names the city, "Welcome to Bawkston!" (Proposed); the windows look out on the tarmac and a parked plane. |
 

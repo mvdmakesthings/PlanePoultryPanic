@@ -281,6 +281,8 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`departure_board.png`**: four 64x28 frames of the flight information display that hangs on the wall face. A "DEPARTURES" title over three flights; the destinations stay put while the statuses flip and flicker like a split-flap board. Loop at about 3 FPS. Text uses a 3x5 pixel font (in `tools/sprites/set_dressing.py`) with yellow titles, orange destinations, and red for cancellations.
 
+**`departure_board_security.png`**, **`departure_board_food_court.png`**, **`departure_board_gates.png`**, **`departure_board_final.png`**: the same 64x28 board, 4 frames, with each area's flights (listed in `AREA_FLIGHTS` in `tools/sprites/set_dressing.py`).
+
 **`window.png`**: three 32x24 frames of a window on the wall face, looking out at the tarmac: plain tarmac with the control tower, a parked plane's nose, then the same plane's tail. Hang the nose and tail windows 40 px apart (left edge to left edge) and the plane lines up across them. The bottom 3 rows are the sill.
 
 **`potted_plant.png`**: two 16x24 floor planters side by side: a leafy ficus in terracotta, then a snake plant in a chrome planter. They stand on the floor and block movement, with the pot's base (about 12x6) as the solid part.
