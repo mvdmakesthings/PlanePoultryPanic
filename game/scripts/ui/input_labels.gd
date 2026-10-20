@@ -6,6 +6,18 @@ extends RefCounted
 
 ## Actions that are really a group of bindings, named as one.
 const GROUPS := {"move": "WASD"}
+## Shorter names for keys whose full names crowd a prompt.
+const SHORT := {"ESCAPE": "ESC", "ENTER": "ENTER", "BACKSPACE": "BKSP"}
+
+## Gamepad buttons named the Xbox way, which Steam Deck also uses.
+const BUTTON_NAMES := {
+	JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y",
+	JOY_BUTTON_LEFT_SHOULDER: "LB", JOY_BUTTON_RIGHT_SHOULDER: "RB",
+	JOY_BUTTON_BACK: "BACK", JOY_BUTTON_START: "START", JOY_BUTTON_GUIDE: "HOME",
+	JOY_BUTTON_LEFT_STICK: "L3", JOY_BUTTON_RIGHT_STICK: "R3",
+	JOY_BUTTON_DPAD_UP: "D-UP", JOY_BUTTON_DPAD_DOWN: "D-DOWN",
+	JOY_BUTTON_DPAD_LEFT: "D-LEFT", JOY_BUTTON_DPAD_RIGHT: "D-RIGHT",
+}
 
 static var _token := RegEx.create_from_string("\\{(\\w+)\\}")
 
@@ -18,8 +30,7 @@ static func label(action: String) -> String:
 	for event in InputMap.action_get_events(action):
 		var key := event as InputEventKey
 		if key:
-			var code := key.physical_keycode if key.physical_keycode != KEY_NONE else key.keycode
-			return OS.get_keycode_string(code).to_upper()
+			return key_name(key.physical_keycode if key.physical_keycode != KEY_NONE else key.keycode)
 	return action.to_upper()
 
 
@@ -29,3 +40,16 @@ static func format(text: String) -> String:
 	for found in _token.search_all(text):
 		out = out.replace(found.get_string(), label(found.get_string(1)))
 	return out
+
+
+static func key_name(keycode: int) -> String:
+	if keycode == KEY_NONE:
+		return "-"
+	var name := OS.get_keycode_string(keycode).to_upper()
+	return SHORT.get(name, name)
+
+
+static func button_name(button: int) -> String:
+	if button == JOY_BUTTON_INVALID:
+		return "-"
+	return BUTTON_NAMES.get(button, "BTN %d" % button)

@@ -20,6 +20,7 @@ var _round_over := false
 @onready var _gate: GateDoor = $Gate
 @onready var _player: Player = $Entities/Player
 @onready var _hud: Hud = $UI/HUD
+@onready var _menus: GameMenus = $UI/GameMenus
 
 
 func _ready() -> void:
@@ -90,10 +91,13 @@ func _add_wall(rect: Rect2) -> void:
 func _on_gate_entered() -> void:
 	if not _round_over:
 		_round_over = true
+		_menus.can_pause = false
 		_player.freeze()
 		_hud.show_message("YOU MADE YOUR FLIGHT!\nPress R to play again")
 
 
 func _on_player_died() -> void:
 	_round_over = true
+	# Start restarts the round now, so it no longer pauses.
+	_menus.can_pause = false
 	_hud.show_message("GROUNDED.\nPress R to try again")
