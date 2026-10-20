@@ -14,6 +14,7 @@ config/name="Plane Poultry Panic"
 config/description="Escape a chicken-overrun airport terminal and catch the last flight out."
 run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://icon.png"
 
 [autoload]
 
