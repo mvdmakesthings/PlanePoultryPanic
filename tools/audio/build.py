@@ -247,6 +247,13 @@ SOUNDS = {
                               lowpass=0.25, volume=0.7, seed=62),
                          tone("square", 110, slide=-2.5, duty=0.5, attack=0.001, sustain=0.03,
                               decay=0.12, lowpass=0.3, volume=0.4)),
+    # Secrets: lane 1's metal detector, walked through five times, beeps out
+    # a little tune and clucks at the end.
+    "cluck_tune": lambda: mix(*[tone("square", f, duty=0.5, attack=0.001, sustain=0.07, decay=0.03,
+                                     lowpass=0.6, volume=0.22)
+                                for f in (1319, 1319, 1568, 1319, 1175, 1047, 1175, 1319)],
+                              cluck(71, 1.3),
+                              gaps=[0.0, 0.14, 0.28, 0.42, 0.63, 0.77, 0.91, 1.05, 1.3]),
     # Menus
     "ui_move": lambda: tone("square", 880, duty=0.5, attack=0.001, sustain=0.015, decay=0.03,
                             volume=0.2),

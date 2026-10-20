@@ -87,6 +87,7 @@ const PA_LINES := [
 	"This is the final boarding call for Flight 13.\nAll other flights have been... eaten.",
 	"BAWK. Bawk bawk BAWK. ...Sorry, the\nchickens have found the microphone.",
 	"Would passenger Amanda please report\nto Gate C13. Bring a luggage cart.",
+	"Achievement unlocked: listening to the PA.\nThere is no achievement. Run.",
 ]
 
 var boss: Totem

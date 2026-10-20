@@ -7,6 +7,9 @@ extends Node2D
 
 const SIZE := Vector2(12, 14)
 const NAMES := ["slow", "normal", "FULL"]
+## A gag: this many flips this fast and the panel says WHEEE.
+const WHEEE_FLIPS := 5
+const WHEEE_WINDOW := 4.0
 
 @export var walkway_paths: Array[NodePath] = []
 @export var reach := 22.0
@@ -14,6 +17,7 @@ const NAMES := ["slow", "normal", "FULL"]
 var walkways: Array[Walkway] = []
 
 var _show_prompt := false
+var _flips: Array[float] = []
 
 @onready var _sprite: Sprite2D = $Sprite2D
 
@@ -38,6 +42,13 @@ func interact(player: Player) -> void:
 	for walkway in walkways:
 		walkway.cycle_speed()
 	AudioManager.play("switch", base_point())
+	var now := Time.get_ticks_msec() / 1000.0
+	_flips.append(now)
+	_flips.assign(_flips.filter(func(t: float) -> bool: return now - t <= WHEEE_WINDOW))
+	if _flips.size() >= WHEEE_FLIPS:
+		_flips.clear()
+		FloatText.spawn(player, "WHEEE!")
+		return
 	FloatText.spawn(player, "Speed: " + NAMES[walkways[0].speed])
 
 
