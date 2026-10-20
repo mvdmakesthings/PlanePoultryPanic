@@ -3,7 +3,9 @@ extends Node2D
 ## The ending: Amanda crosses the tarmac and boards the last plane, it takes
 ## off into the night, and then a close-up of a cabin window: a chicken pops
 ## up and winks, one eye glowing mushroom teal, while in the next window
-## along Amanda faces forward, blinking contentedly, none the wiser. THE END. Any confirm or
+## along Amanda faces forward, blinking contentedly, none the wiser. THE END.
+## A run that found every secret sees the stowaway in the captain's hat
+## from the crew room, and the PA has one last word. Any confirm or
 ## pause press skips ahead; on the end card it goes back to the main menu,
 ## and the finished run's save is cleared.
 
@@ -12,6 +14,8 @@ signal finished
 const SKY := preload("res://assets/sprites/ending_sky.png")
 const PLANE := preload("res://assets/sprites/plane_side.png")
 const STOWAWAY := preload("res://assets/sprites/stowaway.png")
+const STOWAWAY_CAPTAIN := preload("res://assets/sprites/stowaway_captain.png")
+const CAPTAIN_LINE := "\"This is your captain speaking. BAWK.\""
 const PASSENGER := preload("res://assets/sprites/passenger_window.png")
 const WALK := preload("res://assets/sprites/player_walk.png")
 const BLACK := Color("181425")
@@ -22,6 +26,10 @@ const DOOR_X := 196.0
 ## The caption on the board at the bottom, and the end card's lines.
 var caption := ""
 var shot := ""
+## Every secret was found this run: the captain's ending.
+var captain := false
+## The captain's PA line is showing on the end card.
+var captain_spoke := false
 
 var _plane: Sprite2D
 var _amanda: Sprite2D
@@ -65,7 +73,8 @@ func _ready() -> void:
 		_fuselage.draw_rect(Rect2(0, 146, 320, 6), Color("8b9bb4")))
 	add_child(_fuselage)
 	_window = Sprite2D.new()
-	_window.texture = STOWAWAY
+	captain = GameManager.found_every_secret()
+	_window.texture = STOWAWAY_CAPTAIN if captain else STOWAWAY
 	_window.hframes = 3
 	_window.scale = Vector2(6, 6)
 	_window.position = Vector2(104, 84)
@@ -166,6 +175,12 @@ func _play() -> void:
 
 	shot = "end"
 	_ui.queue_redraw()
+	if captain:
+		await get_tree().create_timer(1.2).timeout
+		if not _done:
+			AudioManager.play("pa_chime")
+			captain_spoke = true
+			_ui.queue_redraw()
 
 
 func _finish() -> void:
@@ -202,6 +217,8 @@ func _draw_ui() -> void:
 		_ui.draw_string(font, Vector2(0, 70), "THE END", HORIZONTAL_ALIGNMENT_CENTER, w, 16, BoardMenu.TITLE)
 		_ui.draw_string(font, Vector2(0, 92), "Amanda made her flight.", HORIZONTAL_ALIGNMENT_CENTER, w, 8, BoardMenu.LABEL)
 		_ui.draw_string(font, Vector2(0, 104), "Thanks for playing Plane Poultry Panic!", HORIZONTAL_ALIGNMENT_CENTER, w, 8, BoardMenu.LABEL)
+		if captain_spoke:
+			_ui.draw_string(font, Vector2(0, 124), CAPTAIN_LINE, HORIZONTAL_ALIGNMENT_CENTER, w, 8, BoardMenu.STATUS)
 		ButtonGlyphs.draw_centered(_ui, font, w / 2.0, 150, "{ui_accept} MAIN MENU", BoardMenu.STATUS)
 		return
 	if caption == "":
