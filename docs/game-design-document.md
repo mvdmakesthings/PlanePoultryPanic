@@ -182,6 +182,7 @@ Chickens head for mushroom patches when they can. Watching a patch and timing a 
 - **Formation**: Totems form at designer-placed roosts (straw nests) when 4 chickens settle there. Wandering chickens within about 7 tiles head for a roost; once settled they ignore the player. Placing roosts by hand keeps totems feeling emergent while staying under level-design control.
 - **Buildup**: Stacking takes 2 seconds, with the settled chickens hopping and a flashing "!!" over the nest, so an alert player can break it up early with a thrown snack.
 - **Abilities**: Lumbers after the player (slower than a walk); a ground stomp around itself after a shaking wind-up with a "!"; 3-egg barrages from range; calling nearby chickens into the chase when it spots the player; and sustained flight. Every 7 seconds or so, or whenever the player is in range behind furniture, it lifts off and flies straight at them for a few seconds, trailing teal sparks. A red zone marks the landing spot 0.7 seconds before it slams down with a stomp; the spot is fixed once marked, so the player can step out of it. In the air it's out of reach of carts and the belt, but spraying it still brings it down.
+- **The Supreme Totem (final boss)**: Eight chickens tall, crowned with a giant glowing teal mushroom, and too proud for snacks (three snacks beside it do nothing). It takes three hits: each of the first two knocks chickens off its base (they land dazed beside it), and it reels for two seconds, flickering, then comes on 15% faster and flies more often. The third hit topples it for good and the crown bursts. The HUD shows its hits left as red pips at the top right. Because snacks don't work on it, a Pacifist run defeats the chickens it lands on only if it falls on them.
 - **Toppling**: Freeze its base with the extinguisher, ram it with a luggage cart, or lure it onto the carousel belt. It falls away from the hit, flattening any chicken where its members land; its own chickens land dazed along the fall line. Three snacks lying beside it break it apart instead, with no defeats. The roost then rests for 20 seconds.
 
 ### AI States
@@ -264,6 +265,7 @@ Five connected areas played in order, each introducing something new. Each level
 - **Layout**: One large gate area with a central boss arena
 - **Chickens**: Maximum density, the supreme chicken totem
 - **Goal**: Present the boarding pass, beat the boss, and run for the plane in a short escape sequence
+- **As built (M5)**: Gate C13's night lounge (snacks, a vending machine with its key, an extinguisher, a checkpoint at the boarding-area entrance) opens onto the boarding area. Stepping in wakes a dormant roost: eight waiting chickens rush it and stack into the Supreme Totem. The arena has four luggage carts, two extinguisher cabinets and two moving walkways (a totem on a belt loses its footing). After it falls, a PA chime announces 30 seconds to doors closing; a countdown runs at the top right, chickens drop out of wall vents near the player (every 2.5 seconds, at most 12 chickens at once), the BOARDING door (sealed until then) reads the boarding pass, and a full-speed walkway runs the jet bridge to the plane door. The countdown reaching zero is a knockout ("time") with its own retry hints; a checkpoint at the boss's fall restarts the escape with the boss still beaten. Boarding plays the ending scene.
 
 ### Level Design Principles
 - Clear sightlines so the player can plan
@@ -299,7 +301,8 @@ Kept minimal so the game stays readable at 320x180.
 ### Saving
 - The game autosaves at every checkpoint, and when a level starts. There's no manual save, which keeps the tension.
 - **Continue** resumes from the latest checkpoint. **New Game** asks before replacing a save.
-- Checkpoints are "YOU ARE HERE" map stands that light up when reached. Level 1 has two: where Amanda comes down into Baggage Claim, and in the staff room. Level 2 has two: in the screening area and in the corridor to the Food Court. Level 3 has two: at the arrival and before the totem plaza. Level 4 has one at the entrance to each of Gates B and C (Gate A's is the level start).
+- Checkpoints are "YOU ARE HERE" map stands that light up when reached. Level 1 has two: where Amanda comes down into Baggage Claim, and in the staff room. Level 2 has two: in the screening area and in the corridor to the Food Court. Level 3 has two: at the arrival and before the totem plaza. Level 4 has one at the entrance to each of Gates B and C (Gate A's is the level start). Level 5 has one at the entrance to the boarding area, and one that lights itself the moment the boss falls.
+- Finishing the game (THE END) clears the save, since there's nothing left to continue.
 - Leaving a level through its exit autosaves at the start of the next one, with the inventory carried over, so Continue resumes there.
 
 ### Difficulty Modes
@@ -362,6 +365,8 @@ Commissioned from a chiptune composer. Placeholder music is used until then.
 Level 2 (Security) has its own placeholder in the same style: a 16-bar D minor loop that holds back for four bars, then brings in the groove and the cluck melody over sixteenth-note hats (`tools/music/security.py`).
 
 Level 4 (Gate Areas) has its own: 132 BPM in A minor with four-on-the-floor kicks, a pumping octave bass and sixteenth hats (`tools/music/gates.py`).
+
+Level 5 has a boss loop (`tools/music/boss.py`, 144 BPM in E Phrygian, a galloping bass, the long "bawk" as a horn stab, and a rising cluck roll), and the ending a victory loop (`tools/music/victory.py`, 100 BPM in C major, its melody opening on the airport chime's two notes).
 
 Plus short stings for game over, checkpoint, and item fanfares.
 
@@ -495,3 +500,6 @@ game/
 | 2026-10-19 | Security and the Food Court share one placeholder track, as in the music list | Proposed |
 | 2026-10-19 | Moving walkways: handrails on both sides, three speeds set from a wall panel, chickens flung off the end at full speed are knocked out by hitting something solid; the player is never flung | Proposed |
 | 2026-10-19 | Level 4 layout: Gates A, B, C joined by walkway corridors, with roosts in B and C and a shutter room in B | You |
+| 2026-10-19 | The final boss takes three hits, sheds chickens with each, ignores snacks, and is formed by eight waiting chickens when the player enters the arena | Proposed |
+| 2026-10-19 | The escape is a 30-second countdown with chickens from vents and a jet-bridge walkway; running out of time counts as a knockout, retried from the boss's fall | Proposed |
+| 2026-10-19 | The ending: Amanda boards, the plane takes off, a chicken winks from a cabin window with a glowing eye; THE END returns to the main menu and clears the save | Proposed |

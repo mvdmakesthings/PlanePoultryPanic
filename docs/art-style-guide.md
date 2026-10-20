@@ -371,6 +371,32 @@ Made by `tools/sprites/gates.py`. The palette key `t` is the gate teal `#193c3e`
 
 **`gates_litter.png`**: four 16x16 floor decals: a nest with an egg, scattered boarding passes, a pecked neck pillow, a spilled coffee.
 
+### Final Departure Gate (Level 5)
+Made by `tools/sprites/final.py`.
+
+**`tiles_final.png`**: the same layout and tile names as `tiles_arrivals.png`, at night: `carpet` is deep blue night carpet, `tile` dark slate tile, `carpet_pattern` the boarding area's navy carpet with teal-glowing diamonds, `wood` the jet bridge's ribbed floor. Walls are navy with a glowing teal line (the reserved `#2ce8f5`, allowed here because the boarding area is the chickens' seat of power).
+
+**`night_window.png`**: three 32x24 night windows for the wall face: stars over the tarmac with runway lights, then the last plane's lit nose and tail (hang them 40 px apart, like `window.png`).
+
+**`boss_crown.png`**: two 24x20 frames of the Supreme Totem's crown, a giant glowing teal mushroom cap with pale spots and a halo of spores that pulses between frames. The game draws it on top of the stack.
+
+**`vent.png`**: two 16x12 frames of a wall vent: shut, then the grille knocked open with a feather drifting out as a chicken drops.
+
+**`boarding_door.png`**: four 48x32 frames of Gate C13's BOARDING door, laid out like `security_door.png`: sealed (red light, teal-and-black barrier tape), unlocked, opening, open onto the jet bridge.
+
+**`plane_door.png`**: four 48x32 frames of the airplane's door at the end of the jet bridge: the white fuselage with a blue stripe around a door that swings open onto the warm cabin.
+
+**`final_litter.png`**: four 16x16 floor decals: glowing spore dust, a crushed mushroom, a huge feather, a dropped LAST CALL sign.
+
+### Ending
+Made by `tools/sprites/ending.py`.
+
+**`ending_sky.png`**: one 320x180 night backdrop: stars, the moon, the dark terminal and control tower on the horizon, the tarmac with runway lights. Light dithering in the sky.
+
+**`plane_side.png`**: two 128x40 frames of the last plane side on, facing right: wheels down, then wheels up with the engine glowing.
+
+**`stowaway.png`**: three 16x16 frames of a cabin window: empty, a chicken's head popping up, then the chicken winking with a glowing teal eye. Shown scaled up 6x as a deliberate close-up.
+
 ### Import Settings (Godot)
 - Texture filter: Nearest
 - No mipmaps

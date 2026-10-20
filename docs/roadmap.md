@@ -106,7 +106,7 @@ Build each level fully before starting the next, so the game is always playable 
 - [x] Level 2: Security Checkpoint (boarding pass, first powered chickens, extinguisher, hiding; played and approved 2026-10-19)
 - [x] Level 3: Food Court (first totem, vending machines; played and approved 2026-10-19)
 - [x] Level 4: Gate Areas A, B, C (walkways, all systems combined, mid-level checkpoints; played and approved 2026-10-19)
-- [ ] Level 5: Final Departure Gate (final boss, escape sequence)
+- [x] Level 5: Final Departure Gate (final boss, escape sequence, and the ending scene; built 2026-10-19, waiting on your playtest)
 - [ ] Opening scene, ending scene, PA and departure-board text
 - [ ] Composer's tracks integrated as they arrive
 - [ ] Playtest each level as it's finished

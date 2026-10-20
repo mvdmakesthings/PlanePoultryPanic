@@ -43,7 +43,7 @@ The one-room prototype is still there as a test bed for chicken behavior and ite
 
 Every control can be remapped in Settings > Controls. Prompts and hints show keyboard keys or gamepad buttons, whichever you touched last. Menus work with the arrow keys or WASD, Enter, and Esc, or a gamepad, or the mouse.
 
-In Level 1, find the maintenance key and use it on the locked door to **SECURITY**. That leads on to Level 2, the Security Checkpoint: take a fire extinguisher, get past the first powered chickens and up through a scanner lane, find your boarding pass in the screening bins, and scan it at the gate to the **FOOD COURT**. In Level 3, the Food Court, stock up (maintenance keys open vending machines) and get past the first chicken totem to the door to **ALL GATES**. Level 4 runs through Gates A, B and C, joined by moving walkways: a speed panel on the corridor wall sets them to slow, normal or full, and at full speed chickens riding off the end get flung into the wall. The door to **GATE C13** at the far end leads on. Your inventory carries over from level to level. Hints at the top of the screen teach the controls as you go. The "YOU ARE HERE" map stands are checkpoints: reaching one autosaves, and after a knockout you retry from the latest one. Continue in the main menu picks up from there. In the prototype room, reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
+In Level 1, find the maintenance key and use it on the locked door to **SECURITY**. That leads on to Level 2, the Security Checkpoint: take a fire extinguisher, get past the first powered chickens and up through a scanner lane, find your boarding pass in the screening bins, and scan it at the gate to the **FOOD COURT**. In Level 3, the Food Court, stock up (maintenance keys open vending machines) and get past the first chicken totem to the door to **ALL GATES**. Level 4 runs through Gates A, B and C, joined by moving walkways: a speed panel on the corridor wall sets them to slow, normal or full, and at full speed chickens riding off the end get flung into the wall. The door to **GATE C13** at the far end leads on to Level 5, the Final Departure Gate: beat the **Supreme Totem** (three hits: shove carts into it, freeze its base, or lure it onto a walkway), then the doors start closing. Scan your boarding pass at the **BOARDING** door and run the jet bridge to the plane before the countdown runs out. Boarding plays the ending. Your inventory carries over from level to level. Hints at the top of the screen teach the controls as you go. The "YOU ARE HERE" map stands are checkpoints: reaching one autosaves, and after a knockout you retry from the latest one. Continue in the main menu picks up from there. In the prototype room, reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
 
 ## Run the smoke tests
 
@@ -71,7 +71,11 @@ In Level 1, find the maintenance key and use it on the locked door to **SECURITY
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/level_04_smoke.tscn
 ```
 
-The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1: its layout, its path from the start to the Security door, checkpoints, retrying and pausing; the third covers the main menu, settings and remapping; the fourth covers Level 2: arriving from Level 1 with the inventory, the extinguisher and mushroom patch, the scanner lanes, the shutter, hiding, the boarding pass and its gate, and checkpoints; the fifth covers Level 3: the kitchen key, vending machines, the totem forming at the roost, the exit and checkpoints; the sixth covers Level 4: walkways carrying, the speed panel, flinging, Gate B's roost and shutter, the exit and the checkpoints between gate areas. Every level test also checks that nothing was placed inside a wall. The tests use their own save and settings files, so they never touch yours. They drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
+```bash
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/level_05_smoke.tscn
+```
+
+The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1: its layout, its path from the start to the Security door, checkpoints, retrying and pausing; the third covers the main menu, settings and remapping; the fourth covers Level 2: arriving from Level 1 with the inventory, the extinguisher and mushroom patch, the scanner lanes, the shutter, hiding, the boarding pass and its gate, and checkpoints; the fifth covers Level 3: the kitchen key, vending machines, the totem forming at the roost, the exit and checkpoints; the sixth covers Level 4: walkways carrying, the speed panel, flinging, Gate B's roost and shutter, the exit and the checkpoints between gate areas; the seventh covers Level 5: the boss forming, its three hits (and ignoring snacks), the escape, running out of time, the checkpoint after the boss, and the ending. Every level test also checks that nothing was placed inside a wall. The tests use their own save and settings files, so they never touch yours. They drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
 
 ## Build for the browser (itch.io)
 
@@ -156,6 +160,16 @@ Level 4 (the Gate Areas) has a faster loop, 132 BPM in A minor:
 
 ```bash
 python3 tools/music/gates.py
+```
+
+Level 5's boss fight and escape have a 144 BPM loop, and the ending a gentler victory loop:
+
+```bash
+python3 tools/music/boss.py
+```
+
+```bash
+python3 tools/music/victory.py
 ```
 
 Older chiptune sketches are note lists in `tools/audio/music.py`, built only with `tools/audio/build.py --music` (as `chip_*.wav`); the game doesn't use them.
