@@ -46,6 +46,7 @@ PALETTE = {
     "v": "3e2731",  # deepest brown
     "l": "63c74d",  # leaf light
     "D": "d77643",  # dim departure-board orange
+    "t": "193c3e",  # gate-area teal (carpet)
 }
 
 
