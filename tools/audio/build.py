@@ -192,6 +192,12 @@ SOUNDS = {
                         *[tone("noise", 1400, attack=0.001, sustain=0.01, decay=0.05,
                                lowpass=0.5, volume=0.35, seed=42 + k) for k in range(3)],
                         gaps=[0.0, 0.0, 0.22, 0.31, 0.38]),
+    # Gate Areas
+    "walkway_hum": lambda: walkway_hum(),
+    "whoosh": lambda: mix(tone("noise", 800, slide=2.5, attack=0.03, sustain=0.08, decay=0.15,
+                               lowpass=0.5, volume=0.45, seed=51),
+                          tone("square", 300, slide=3.0, duty=0.25, attack=0.01, sustain=0.05,
+                               decay=0.1, lowpass=0.4, volume=0.15)),
     # Security
     "beep": lambda: mix(*[tone("square", 1760, duty=0.5, attack=0.001, sustain=0.06, decay=0.02,
                                lowpass=0.6, volume=0.22) for _ in range(2)], gaps=[0.0, 0.12]),
@@ -240,6 +246,19 @@ def carousel_hum():
         click = rnd.uniform(-1, 1) * max(0.0, 1.0 - clack_t * 25)
         rattle += (click - rattle) * 0.3
         out.append((drone * wobble * 0.35 + rattle * 0.25))
+    return out
+
+
+def walkway_hum():
+    """A one-second loop of a smooth electric whine with a faint tick of
+    the belt's comb plates, higher and softer than the carousel's motor."""
+    n = RATE
+    out = []
+    for i in range(n):
+        t = i / RATE
+        whine = 0.35 * math.sin(math.tau * 82 * t) + 0.15 * math.sin(math.tau * 246 * t)
+        tick = 0.15 * math.sin(math.tau * 1800 * t) * max(0.0, 1.0 - ((t * 4) % 1.0) * 40)
+        out.append((whine * (1.0 + 0.1 * math.sin(math.tau * 3 * t)) + tick) * 0.3)
     return out
 
 
