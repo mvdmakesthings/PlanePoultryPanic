@@ -17,6 +17,7 @@ import carousel
 import chicken
 import closet
 import effects
+import foodcourt
 import gate
 import items
 import mushrooms
@@ -97,6 +98,13 @@ IMAGES = [
     ("stall_door.png", security.stall_sheet),
     ("pass_gate.png", security.pass_gate_sheet),
     ("security_litter.png", security.litter_sheet),
+    ("tiles_food_court.png", foodcourt.tiles_sheet),
+    ("restaurant_fronts.png", foodcourt.fronts_sheet),
+    ("food_table.png", lambda: to_image(foodcourt.food_table())),
+    ("vending_machine.png", foodcourt.vending_sheet),
+    ("trash_bin.png", lambda: to_image(foodcourt.trash_bin())),
+    ("food_litter.png", foodcourt.litter_sheet),
+    ("gates_door.png", foodcourt.gates_door_sheet),
 ]
 
 
@@ -206,6 +214,7 @@ def main():
             img.resize((img.width * 8, img.height * 8), Image.NEAREST).save(
                 args.preview / name.replace(".png", "_8x.png"))
         mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_arrivals_4x.png")
+        foodcourt.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_food_court_4x.png")
         security.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_security_4x.png")
         wall = set_dressing.wall_preview(tiles.by_name())
         wall.resize((wall.width * 4, wall.height * 4), Image.NEAREST).save(
