@@ -6,6 +6,13 @@
   3 frames: plain tarmac, a parked plane's nose, the same plane's tail.
 - potted_plant.png: 16x24 floor planters, 2 frames: leafy ficus, snake plant.
 - welcome_banner.png: a 48x18 hanging banner, "WELCOME TO BAWKSTON".
+- signs.png: 64x11 wayfinding signs for the wall face, one per frame.
+- maintenance_cart.png: a 24x24 janitor's cart, a floor prop.
+- seating.png: a 48x24 row of three airport seats, a floor prop.
+- map_stand.png: a 16x28 "YOU ARE HERE" map on a post, the checkpoint,
+  3 frames: off, lit, lit with the dot blinking.
+- floor_litter.png: 16x16 floor decals (feathers, pecked chips, a cracked
+  egg, footprints) that show the chickens have moved in.
 """
 import math
 
@@ -44,6 +51,11 @@ FONT = {
     "!": [".#.", ".#.", ".#.", "...", ".#."],
     "#": ["#.#", "###", "#.#", "###", "#.#"],
     " ": ["...", "...", "...", "...", "..."],
+    # Arrows for wayfinding signs.
+    "<": ["..#", ".##", "###", ".##", "..#"],
+    ">": ["#..", "##.", "###", "##.", "#.."],
+    "v": ["...", "###", "###", ".#.", "..."],
+    "+": ["...", ".#.", "###", ".#.", "..."],
 }
 
 
@@ -357,6 +369,236 @@ def welcome_banner():
 
 def welcome_banner_sheet():
     return to_image(welcome_banner())
+
+
+# --- Wayfinding signs ----------------------------------------------------
+
+SIGN_W, SIGN_H = 64, 11
+# (text, panel color, text color, accent for arrows), one per frame. Airport
+# wayfinding is yellow on charcoal; staff areas are white on red.
+SIGNS = [
+    ("BAGGAGE CLAIM v", "k", "F", "F"),
+    ("< SECURITY", "k", "F", "F"),
+    ("STAFF ONLY", "r", "C", "C"),
+    ("ARRIVALS >", "k", "F", "F"),
+    ("LOST+FOUND", "k", "F", "F"),
+]
+
+
+def sign(frame):
+    text, panel, ink, _ = SIGNS[frame]
+    g = _blank(SIGN_W, SIGN_H)
+    _rect(g, 0, 0, SIGN_W - 1, SIGN_H - 1, "O")
+    _rect(g, 1, 1, SIGN_W - 2, SIGN_H - 2, panel)
+    # Lit top edge, shaded bottom edge.
+    _rect(g, 1, 1, SIGN_W - 2, 1, "p" if panel == "k" else "R")
+    _rect(g, 1, SIGN_H - 2, SIGN_W - 2, SIGN_H - 2, "O" if panel == "k" else "v")
+    _text(g, (SIGN_W - _text_width(text)) // 2, 3, text, ink)
+    return g
+
+
+def signs_sheet():
+    return _strip([sign(f) for f in range(len(SIGNS))], SIGN_W, SIGN_H)
+
+
+# --- Maintenance cart -----------------------------------------------------
+
+CART_W, CART_H = 24, 24
+
+
+def maintenance_cart():
+    """A janitor's cart seen from the front: a yellow mop bucket with a
+    wringer and a mop standing in it on the left, a gray shelf cart with
+    spray bottles on top and a bulging trash bag on the right. Its base
+    (about 22x6) is the solid part."""
+    g = _blank(CART_W, CART_H)
+    # Cart body: gray shelves, lit on top, shaded on the right.
+    _rect(g, 10, 7, 22, 20, "w")
+    _rect(g, 10, 7, 22, 7, "C")
+    _rect(g, 10, 8, 22, 8, "W")
+    _rect(g, 22, 8, 22, 20, "T")
+    _rect(g, 11, 13, 21, 13, "T")
+    _rect(g, 11, 14, 21, 14, "W")
+    # Supplies on the top shelf: a blue and a green spray bottle, a roll.
+    _rect(g, 12, 3, 13, 6, "b")
+    _rect(g, 12, 2, 13, 2, "C")
+    put(g, 2, 14, "C")
+    _rect(g, 15, 4, 16, 6, "l")
+    _rect(g, 15, 3, 16, 3, "C")
+    _rect(g, 18, 4, 20, 6, "C")
+    _rect(g, 20, 4, 20, 6, "W")
+    # Trash bag bulging out of the lower shelf.
+    _rect(g, 13, 15, 21, 20, "k")
+    _rect(g, 14, 15, 15, 16, "p")
+    put(g, 15, 18, "O")
+    # Mop bucket: yellow, lit on the left, with dark water and a wringer.
+    _rect(g, 1, 12, 10, 20, "Y")
+    _rect(g, 1, 12, 2, 20, "F")
+    _rect(g, 9, 12, 10, 20, "y")
+    _rect(g, 2, 12, 9, 12, "k")
+    _rect(g, 6, 9, 10, 12, "T")
+    _rect(g, 6, 9, 10, 9, "W")
+    # Mop: handle standing up out of the bucket, gray strands at the rim.
+    _rect(g, 4, 0, 4, 12, "n")
+    put(g, 0, 4, "a")
+    _rect(g, 2, 11, 6, 12, "W")
+    put(g, 11, 3, "C")
+    # Wheels.
+    for x in (2, 8, 12, 20):
+        _rect(g, x, 21, x + 1, 21, "p")
+    return _outline(g)
+
+
+def maintenance_cart_sheet():
+    return to_image(maintenance_cart())
+
+
+# --- Airport seating ------------------------------------------------------
+
+SEAT_W, SEAT_H = 48, 24
+
+
+def seating():
+    """A row of three joined airport seats facing the viewer: blue padded
+    backs and seats on a chrome beam, armrests between them. The beam's
+    feet (about 44x6) are the solid part."""
+    g = _blank(SEAT_W, SEAT_H)
+    for i in range(3):
+        x0 = 2 + i * 15
+        # Backrest, lit on its top edge, with a seam.
+        _rect(g, x0, 2, x0 + 13, 11, "B")
+        _rect(g, x0, 2, x0 + 13, 2, "b")
+        _rect(g, x0 + 13, 3, x0 + 13, 11, "k")
+        _rect(g, x0 + 2, 7, x0 + 11, 7, "k")
+        # Seat cushion seen from above, in front of the back.
+        _rect(g, x0, 12, x0 + 13, 15, "b")
+        _rect(g, x0, 15, x0 + 13, 15, "B")
+    # Chrome armrests at both ends and between seats.
+    for x in (1, 16, 31, 46):
+        _rect(g, x, 9, x, 15, "C")
+        _rect(g, x, 16, x, 16, "w")
+    # Beam and feet.
+    _rect(g, 1, 17, 46, 18, "W")
+    _rect(g, 1, 18, 46, 18, "w")
+    for x in (4, 22, 40):
+        _rect(g, x, 19, x + 2, 21, "T")
+        _rect(g, x - 1, 22, x + 3, 22, "w")
+    return _outline(g)
+
+
+def seating_sheet():
+    return to_image(seating())
+
+
+# --- Floor litter ---------------------------------------------------------
+
+LITTER = 16
+
+
+def _litter(kind):
+    """16x16 decals drawn flat on the floor, showing the chickens moved in."""
+    g = _blank(LITTER, LITTER)
+    if kind == "feathers":
+        for x, y, tip in ((3, 4, 1), (9, 2, -1), (11, 9, 1), (5, 11, -1), (13, 13, -1)):
+            put(g, y, x, "C")
+            put(g, y, x + tip, "c")
+            put(g, y + 1, x + tip, "c")
+    elif kind == "chips":
+        # A burst bag of chips, pecked clean but for crumbs.
+        _rect(g, 3, 6, 9, 10, "R")
+        _rect(g, 3, 6, 9, 6, "W")
+        _rect(g, 4, 8, 8, 8, "Y")
+        put(g, 9, 9, "r")
+        for x, y in ((11, 7), (12, 9), (10, 11), (13, 12), (7, 12)):
+            put(g, y, x, "F")
+        g = _outline(g)
+        put(g, 3, 13, "C")
+        put(g, 3, 14, "c")
+    elif kind == "egg":
+        # A cracked egg: a runny yolk with clear white around it, and the
+        # two jagged shell halves rocking beside it.
+        for y in range(6, 13):
+            for x in range(2, 12):
+                d = ((x - 6.5) / 4.6) ** 2 + ((y - 9.2) / 3.0) ** 2
+                if d < 1.0:
+                    put(g, y, x, "C" if d > 0.35 else "Y")
+        put(g, 8, 5, "F")
+        put(g, 9, 5, "F")
+        put(g, 10, 8, "y")
+        put(g, 11, 9, "c")
+        # Shell halves: cupped, lit on the left, jagged on the open side.
+        for x0, y0 in ((10, 3), (12, 9)):
+            _rect(g, x0, y0 + 1, x0 + 2, y0 + 2, "C")
+            put(g, y0 + 2, x0 + 2, "c")
+            put(g, y0, x0, "C")
+            put(g, y0, x0 + 2, "C")
+        g = _outline(g)
+    elif kind == "footprints":
+        # A trail of chicken footprints.
+        for x, y in ((2, 12), (6, 9), (10, 7), (13, 3)):
+            put(g, y, x, "T")
+            put(g, y - 1, x - 1, "T")
+            put(g, y - 1, x + 1, "T")
+            put(g, y - 2, x, "T")
+    return g
+
+
+LITTER_KINDS = ("feathers", "chips", "egg", "footprints")
+
+
+def litter_sheet():
+    return _strip([_litter(k) for k in LITTER_KINDS], LITTER, LITTER)
+
+
+# --- Checkpoint map stand ------------------------------------------------
+
+STAND_W, STAND_H = 16, 28
+
+
+def map_stand(frame):
+    """A "YOU ARE HERE" terminal map on a post, the game's checkpoint.
+    Frame 0: switched off (dark screen). Frames 1-2: lit, with the red
+    "you are here" dot blinking. Its base (about 8x4) is the solid part."""
+    g = _blank(STAND_W, STAND_H)
+    lit = frame > 0
+    # Screen in a slate frame, lit on its top edge.
+    _rect(g, 1, 1, 14, 13, "p")
+    _rect(g, 1, 1, 14, 1, "T")
+    _rect(g, 2, 2, 13, 12, "W" if lit else "k")
+    if lit:
+        # A tiny floor plan: blue walls with a partition and a doorway, a
+        # brown carousel ring, a green exit on the right wall.
+        _rect(g, 3, 3, 12, 3, "B")
+        _rect(g, 3, 3, 3, 11, "B")
+        _rect(g, 12, 3, 12, 11, "B")
+        _rect(g, 3, 11, 12, 11, "B")
+        _rect(g, 3, 6, 6, 6, "B")
+        _rect(g, 9, 6, 12, 6, "B")
+        _rect(g, 8, 8, 11, 10, "n")
+        _rect(g, 9, 9, 10, 9, "W")
+        _rect(g, 12, 4, 12, 5, "l")
+        if frame == 1:
+            _rect(g, 4, 8, 5, 9, "R")
+        else:
+            put(g, 9, 4, "R")
+    else:
+        # A faint reflection on the dark glass.
+        put(g, 3, 3, "p")
+        put(g, 4, 3, "p")
+        put(g, 3, 4, "p")
+    # "YOU ARE HERE" strip under the screen: a yellow bar with a red dot.
+    _rect(g, 2, 14, 13, 15, "F" if lit else "y")
+    put(g, 14, 3, "R" if lit else "r")
+    # Post and base plate.
+    _rect(g, 7, 16, 8, 24, "w")
+    _rect(g, 7, 16, 7, 24, "W")
+    _rect(g, 4, 25, 11, 26, "T")
+    _rect(g, 4, 25, 11, 25, "w")
+    return _outline(g)
+
+
+def map_stand_sheet():
+    return _strip([map_stand(f) for f in range(3)], STAND_W, STAND_H)
 
 
 # --- Preview --------------------------------------------------------------

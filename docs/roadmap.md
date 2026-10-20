@@ -81,13 +81,13 @@ Still mostly gray-box. Each item should be playable in the prototype room.
 
 Level 1 at close to final quality, start to finish.
 
-- [ ] Full Level 1 layout built from tiles, with the tutorial flow
-- [ ] Final-quality art for everything in the level, with animations
-- [ ] Sound effects and placeholder music
-- [ ] Checkpoints, death and retry, and autosave
-- [ ] Main menu, pause menu, basic settings (audio, fullscreen, remapping)
-- [ ] Context prompts that switch between keyboard and gamepad icons
-- [ ] Runs well on Steam Deck, or a low-end PC as a stand-in
+- [x] Full Level 1 layout built from tiles, with the tutorial flow
+- [ ] Final-quality art for everything in the level, with animations (done: run cycle, messy hair, the Security door, key, signs, seats, litter, checkpoint stands; still to come: Amanda's throw, eat, hurt and defeat animations, and the chickens' chase and eat)
+- [x] Sound effects and placeholder music (Level 1 plays a loop built from the cluck groove, `tools/music/arrivals.py`)
+- [x] Checkpoints, death and retry, and autosave
+- [x] Main menu, pause menu, basic settings (audio, fullscreen, remapping)
+- [x] Context prompts that switch between keyboard and gamepad icons
+- [ ] Runs well on Steam Deck, or a low-end PC as a stand-in (measured on an Apple M1: 1.4 ms a frame in normal play, 2.4 ms with 46 chickens, worst frames under 9 ms, 40 MB of memory. Run `game/tests/level_01_perf.tscn` on a Deck or low-end PC to tick this off; see the README)
 - [ ] 3-5 friends play it without help; watch silently and take notes
 - [ ] **Measure how long M4 took** and re-plan M5-M8 from that
 

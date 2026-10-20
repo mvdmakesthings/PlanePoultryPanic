@@ -160,4 +160,4 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, 7.0, SHADOW_COLOR)
 	draw_set_transform(Vector2.ZERO)
 	if _show_prompt:
-		InteractPrompt.draw(self, 0.0, -20.0, "F lift")
+		InteractPrompt.draw(self, 0.0, -20.0, "{interact} lift")

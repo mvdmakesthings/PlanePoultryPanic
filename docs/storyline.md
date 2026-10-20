@@ -24,7 +24,7 @@ Airports, once symbols of human ingenuity and connection, became monuments to hu
 
 ### **Your Story Begins**
 
-You are a connecting passenger caught in the chaos of the initial chicken uprising. Your original flight was canceled when the terminal was overrun, and you’ve been stranded for days as the outside world descended into apocalyptic chaos.
+You play as Amanda, a connecting passenger caught in the chaos of the initial chicken uprising. Your original flight was canceled when the terminal was overrun, and you’ve been stranded for days as the outside world descended into apocalyptic chaos.
 
 Now you’ve learned of one final departure, a last flight to safety before the airport is permanently sealed. This isn’t the destination you planned, but it’s your only hope of escape from this feathered nightmare.
 
@@ -60,10 +60,10 @@ Outside the terminal, society has adapted to this new reality. Some humans have 
 
 The game is about 30 minutes long and should never stop for long cutscenes. The story comes through:
 
-- **Opening**: A short scene of the stranded passenger at their cancelled gate, holding an expired boarding pass, hearing the PA announce the last flight out.
+- **Opening**: A short scene of Amanda, the stranded passenger, at her cancelled gate, holding an expired boarding pass, hearing the PA announce the last flight out.
 - **PA announcements and flight displays**: The terminal still runs on autopilot. Announcements and departure boards get stranger as the chickens take over, delivering jokes, hints, and backstory.
 - **The environment**: Nests in luggage, pecked-up signs, chickens crowding around mushroom patches, and chicken graffiti show how far the takeover has gone in each area.
-- **Ending**: The passenger boards with their new boarding pass and the plane takes off. One last shot hints that a chicken may have stowed away.
+- **Ending**: Amanda boards with her new boarding pass and the plane takes off. One last shot hints that a chicken may have stowed away.
 
 ### **Tone Guardrails**
 

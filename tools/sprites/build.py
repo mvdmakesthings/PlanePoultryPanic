@@ -22,6 +22,7 @@ import items
 import mushrooms
 import player
 import roost
+import security_door
 import set_dressing
 import tiles
 from palette import to_image
@@ -37,6 +38,8 @@ SHEETS = [
     ("player_idle.png", player.idle_cycle(), 16, 32, 2),
     ("player_walk_extinguisher.png", player.walk_cycle_extinguisher(), 16, 32, 8),
     ("player_idle_extinguisher.png", player.idle_cycle_extinguisher(), 16, 32, 2),
+    ("player_run.png", player.run_cycle(), 16, 32, 12),
+    ("player_run_extinguisher.png", player.run_cycle_extinguisher(), 16, 32, 12),
     ("chicken_walk.png", chicken.walk_cycle(), 16, 16, 8),
     ("chicken_idle.png", chicken.idle_cycle(), 16, 16, 4),
     ("chicken_flight_walk.png", chicken.powered_walk("flight"), 16, 16, 8),
@@ -56,6 +59,7 @@ IMAGES = [
     ("luggage_cart.png", items.cart),
     ("suitcase.png", items.suitcase),
     ("player_ko.png", player.ko_sheet),
+    ("player_hair_mess.png", player.hair_mess_sheet),
     ("item_extinguisher.png", items.extinguisher),
     ("extinguisher_cabinet.png", items.cabinet),
     ("ice_block.png", items.ice),
@@ -67,6 +71,13 @@ IMAGES = [
     ("window.png", set_dressing.window_sheet),
     ("potted_plant.png", set_dressing.potted_plant_sheet),
     ("welcome_banner.png", set_dressing.welcome_banner_sheet),
+    ("item_maintenance_key.png", items.maintenance_key),
+    ("security_door.png", security_door.sheet),
+    ("signs.png", set_dressing.signs_sheet),
+    ("maintenance_cart.png", set_dressing.maintenance_cart_sheet),
+    ("seating.png", set_dressing.seating_sheet),
+    ("floor_litter.png", set_dressing.litter_sheet),
+    ("map_stand.png", set_dressing.map_stand_sheet),
 ]
 
 

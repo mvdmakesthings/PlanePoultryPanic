@@ -76,7 +76,7 @@ Steam Deck support means full gamepad support from the start, not as a late addi
 Reach the Final Departure Gate alive, holding the boarding pass, and defeat or escape the final chicken totem to board the plane.
 
 ### Failure
-When health reaches zero, the player restarts from the last checkpoint with their inventory as it was when they reached it. A short hint about what went wrong appears on the retry screen.
+When health reaches zero, the player restarts from the last checkpoint with their inventory as it was when they reached it, and full health. A short hint about what went wrong appears on the retry screen (based on what landed the last hit), with Retry from Checkpoint and Main Menu. Pickups already taken and doors already unlocked stay that way; chickens, carts and thrown items start fresh.
 
 ---
 
@@ -102,7 +102,7 @@ When health reaches zero, the player restarts from the last checkpoint with thei
 ## Player
 
 ### Identity
-A stranded connecting passenger. They start with a carry-on, a wallet, and an expired boarding pass from their cancelled flight.
+**Amanda**, a stranded connecting passenger. She starts with a carry-on, a wallet, and an expired boarding pass from her cancelled flight.
 
 ### Attributes
 | Attribute | Starting value |
@@ -117,6 +117,7 @@ A stranded connecting passenger. They start with a carry-on, a wallet, and an ex
 ### Damage
 - Chicken pecks cost half a suitcase, so it takes 10 pecks to lose all 5. Environmental hazards cost a whole suitcase. Eggs only sting: a quarter of a suitcase each. A partly lost suitcase is shown as a partly emptied icon.
 - After a hit, the player is briefly knocked back and is invincible for 1.5 seconds (the sprite blinks).
+- Her hair gets messier as she loses health: a cowlick below 75%, puffed-out tufts below 50%, and wild frizz with a lock over her face below 25%. Healing tidies it again. It shows how hurt she is at a glance, without looking at the HUD.
 - A chicken that lands a peck bounces back about two tiles and is dazed for a moment before chasing again, so the player has a chance to run.
 
 ### Healing
@@ -232,6 +233,7 @@ Five connected areas played in order, each introducing something new. Each level
 - **Chickens**: Few, all normal
 - **Teaches**: Movement, running, snack throwing and eating, interacting, the carousel as a hazard
 - **Goal**: Find a maintenance key and unlock the door to Security
+- **As built (M4)**: Amanda steps out of Gate 1 into an arrival lounge (walking, picking up snacks), crosses a hallway (running, a first chicken to distract with a snack, a luggage cart to shove), and comes down into Baggage Claim right beside the locked SECURITY door. The key is in a staff room in the far corner, past the big carousel and its chickens; an optional Lost & Found holds extra snacks. Hints at the top of the screen teach each control as she reaches it, plus one-offs the first time she's hurt, tries the locked door, or finds the key. Two map-stand checkpoints: at the bottom of the stairs into Baggage Claim, and in the staff room.
 
 ### Level 2: Security Checkpoint (about 5 minutes)
 - **Purpose**: First powered chickens and the boarding pass
@@ -273,12 +275,12 @@ Five connected areas played in order, each introducing something new. Each level
 Kept minimal so the game stays readable at 320x180.
 - **Top left**: Health as luggage icons; stamina bar underneath
 - **Bottom**: The 6 inventory slots with the selected one highlighted and stack counts; key items shown as small icons next to them
-- **Near objects**: Context prompts showing the right button for the current input device (keyboard or gamepad)
+- **Near objects**: Context prompts showing the right button for the current input device (keyboard or gamepad). Buttons are drawn as icons: keycaps for the keyboard; for a gamepad, round A, B, X and Y buttons in their Xbox colors and small pills for the rest. The last device touched decides, so prompts switch the moment the player picks up a controller or touches a key. Tutorial hints and menu footers use the same icons.
 
 ### Menus
-- **Main menu**: Departure-board style with flickering text over a looping airport scene. New Game, Continue, Settings, Credits, Quit.
+- **Main menu**: Departure-board style with flickering text over a looping airport scene (Amanda running from chickens across the terminal floor). New Game, Continue, Settings, Credits, Quit. Credits comes later.
 - **Pause menu**: Resume, Map (once the map is found), Settings, Quit to Menu
-- **Settings**: Controls (remapping), Audio (master, music, effects), Video (fullscreen, window scale), Accessibility. Changes apply immediately, and each category has Reset to Defaults.
+- **Settings**: Controls (remapping), Audio (master, music, effects), Video (fullscreen, window scale), Accessibility. Changes apply immediately, and each category has Reset to Defaults. Built so far: music, effects and ambience volume, fullscreen, and remapping each action's main key and gamepad button (a binding already in use swaps with it).
 
 ### Accessibility
 - Full remapping for keyboard and gamepad
@@ -291,8 +293,9 @@ Kept minimal so the game stays readable at 320x180.
 ## Progression and Replay
 
 ### Saving
-- The game autosaves at every checkpoint. There's no manual save, which keeps the tension.
-- **Continue** resumes from the latest checkpoint.
+- The game autosaves at every checkpoint, and when a level starts. There's no manual save, which keeps the tension.
+- **Continue** resumes from the latest checkpoint. **New Game** asks before replacing a save.
+- Checkpoints are "YOU ARE HERE" map stands that light up when reached. Level 1 has two: where Amanda comes down into Baggage Claim, and in the staff room.
 
 ### Difficulty Modes
 | Mode | Changes |
@@ -345,13 +348,15 @@ Commissioned from a chiptune composer. Placeholder music is used until then.
 | # | Track | Mood |
 |---|---|---|
 | 1 | Main theme | Upbeat and adventurous with a comic edge |
-| 2 | Arrivals | Calm with a creeping unease |
+| 2 | Arrivals | Driving and tense: the energy of a dystopian, post-apocalyptic airport |
 | 3 | Security and Food Court | Mid-tempo, growing urgency |
 | 4 | Gate Areas | High energy, survival tension |
 | 5 | Boss | Intense, with chicken-themed musical jokes |
 | 6 | Victory | Triumphant relief with a travel motif |
 
 Plus short stings for game over, checkpoint, and item fanfares.
+
+Until the composer's tracks arrive, Level 1 plays a placeholder built from real chicken recordings (two CC0 recordings by JarredGibb on Freesound): a spooky-surf groove in E minor at 112 BPM with cluck percussion and a melody played on a repitched cluck, through an SNES-style output stage (`tools/music/arrivals.py`). The main menu is silent for now.
 
 **Composer brief and timing**: Engage the composer once the vertical slice is playable, so they can hear and see the game. Ask for loopable tracks, stems if affordable, and a license covering the Steam release, trailers, and a possible soundtrack release.
 
@@ -374,6 +379,7 @@ Positional audio for chickens and machinery, separate audio buses for music, eff
 ### Performance Targets
 - 60 FPS on Steam Deck and on a dual-core 2.0 GHz PC with integrated graphics
 - Under 512 MB of RAM and under 500 MB installed
+- **Measured (M4, Level 1)** with `game/tests/level_01_perf.tscn` on an Apple M1: about 1.4 ms a frame in normal play (worst 1% about 6 ms), 1.5 ms with every chicken chasing, 2.4 ms with 46 chickens (worst 1% about 8.5 ms); about 40 MB of memory; 2.9 MB of assets. Still to check on a Steam Deck or a low-end PC.
 
 ### Display
 - Base resolution 320x180 with the viewport stretched by whole-number multiples only, for crisp pixels
@@ -467,3 +473,9 @@ game/
 | 2026-10-19 | Rolling suitcases can be carried overhead and thrown; a hit defeats the chicken | You |
 | 2026-10-19 | A suitcase bursts open when it defeats a chicken (one defeat each), but a missed throw can be picked up again; carrying it slows the player and blocks running, items, and hiding | Proposed |
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |
+| 2026-10-19 | The player's hair gets messier as her health drops | You |
+| 2026-10-19 | The player character is named Amanda (she/her) | You |
+| 2026-10-19 | Retrying from a checkpoint restores full health (the inventory is as it was) | Proposed |
+| 2026-10-19 | Checkpoints are "YOU ARE HERE" map stands | Proposed |
+| 2026-10-19 | Arrivals music should be energetic and dystopian, not slow and sad | You |
+| 2026-10-19 | Level 1's placeholder music is built from the cluck groove (real chicken recordings as percussion and melody) | You |

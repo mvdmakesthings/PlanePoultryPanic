@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/checkpoint.gd" id="1_checkpoint"]
+[ext_resource type="Texture2D" path="res://assets/sprites/map_stand.png" id="2_texture"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_base"]
+size = Vector2(8, 4)
+
+[node name="Checkpoint" type="StaticBody2D" groups=["nav_obstacles"]]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_checkpoint")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_texture")
+offset = Vector2(0, -14)
+hframes = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_base")

@@ -66,6 +66,7 @@ func interact(player: Player) -> void:
 	if direction == Vector2.ZERO:
 		return
 	velocity = direction * shove_speed
+	AudioManager.play("shove", global_position)
 	if absf(direction.x) > 0.1:
 		_sprite.flip_h = direction.x < 0.0
 	_show_prompt = false
@@ -77,4 +78,4 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, 11.0, SHADOW_COLOR)
 	draw_set_transform(Vector2.ZERO)
 	if _show_prompt:
-		InteractPrompt.draw(self, 0.0, -24.0, "F push")
+		InteractPrompt.draw(self, 0.0, -24.0, "{interact} push")

@@ -17,19 +17,42 @@ const SLOT_SELECTED := Color("feae34")
 const SLOT_SIZE := 14.0
 const SLOT_GAP := 1.0
 const FONT_SIZE := 8
-const CONTROLS_HINT := "SPACE use  Q/R switch  E eat  F act  G drop"
+const CONTROLS_HINT := "{use_item}use {prev_item}{next_item}switch {eat_snack}eat {interact}act {drop_item}drop"
+## Tutorial hints use the departure-board look: dark panel, yellow text.
+const HINT_BACK := Color("181425")
+const HINT_EDGE := Color("3a4466")
+const HINT_TEXT := Color("fee761")
+
+## The controls reminder in the bottom right; levels with tutorial hints
+## clear it.
+var controls_hint := CONTROLS_HINT
 
 var _health := 0
 var _max_health := 0
 var _stamina_ratio := 1.0
 var _player: Player
 var _message := ""
+var _hint := ""
 var _icons := {}
 
 
 func _ready() -> void:
 	for item: String in Inventory.ITEMS:
 		_icons[item] = load(Inventory.ITEMS[item]["icon"])
+	for item: String in Inventory.KEY_ITEMS:
+		_icons[item] = load(Inventory.KEY_ITEMS[item]["icon"])
+
+
+func _enter_tree() -> void:
+	InputSetup.device_changed.connect(_on_device_changed)
+
+
+func _exit_tree() -> void:
+	InputSetup.device_changed.disconnect(_on_device_changed)
+
+
+func _on_device_changed(_gamepad: bool) -> void:
+	queue_redraw()
 
 
 func bind_player(player: Player) -> void:
@@ -42,6 +65,14 @@ func bind_player(player: Player) -> void:
 func show_message(text: String) -> void:
 	_message = text
 	queue_redraw()
+
+
+## Shows a tutorial hint at the top of the screen ("" hides it). Action
+## names in braces are drawn as their buttons, like "{run}" -> [SHIFT].
+func show_hint(text: String) -> void:
+	if text != _hint:
+		_hint = text
+		queue_redraw()
 
 
 func _on_health_changed(current: int, maximum: int) -> void:
@@ -67,7 +98,11 @@ func _draw() -> void:
 
 	if _player:
 		_draw_inventory(font)
-	_draw_text(font, Vector2(0, size.y - 5), CONTROLS_HINT, HORIZONTAL_ALIGNMENT_RIGHT, size.x - 4)
+	if controls_hint != "":
+		var hint_x := size.x - 4 - ButtonGlyphs.width(font, controls_hint)
+		ButtonGlyphs.draw(self, font, Vector2(hint_x, size.y - 5), controls_hint, TEXT, TEXT_OUTLINE)
+	if _hint != "":
+		_draw_hint(font)
 
 	if _message != "":
 		draw_rect(Rect2(Vector2.ZERO, size), Color(TEXT_OUTLINE, 0.6))
@@ -77,6 +112,23 @@ func _draw() -> void:
 		for line in lines:
 			_draw_text(font, Vector2(0, y), line, HORIZONTAL_ALIGNMENT_CENTER, size.x)
 			y += 12.0
+
+
+## A dark panel centered at the top, one line of yellow text per hint line,
+## with buttons drawn as glyphs.
+func _draw_hint(font: Font) -> void:
+	var lines := _hint.split("\n")
+	var width := 0.0
+	for line in lines:
+		width = maxf(width, ButtonGlyphs.width(font, line))
+	# Lines are a little taller than the text so button glyphs fit.
+	var panel := Rect2(roundf((size.x - width) / 2.0) - 4, 3, width + 8, lines.size() * 11 + 3)
+	draw_rect(panel.grow(1), HINT_EDGE)
+	draw_rect(panel, HINT_BACK)
+	var y := panel.position.y + 10
+	for line in lines:
+		ButtonGlyphs.draw_centered(self, font, panel.get_center().x, y, line, HINT_TEXT)
+		y += 11
 
 
 ## One suitcase per Player.SUITCASE health units; partly lost suitcases are
@@ -115,8 +167,12 @@ func _draw_inventory(font: Font) -> void:
 	# Key items sit to the right of the slots and never take one up.
 	var x := origin.x + Inventory.SLOT_COUNT * (SLOT_SIZE + SLOT_GAP) + 4
 	for item: String in inventory.key_items:
-		_draw_text(font, Vector2(x, size.y - 5), "%s x%d" % [item, inventory.key_items[item]], HORIZONTAL_ALIGNMENT_LEFT, -1)
-		x += 48
+		var icon: Texture2D = _icons[item]
+		draw_texture(icon, Vector2(x, origin.y + roundf((SLOT_SIZE - icon.get_height()) / 2.0)))
+		var count: int = inventory.key_items[item]
+		if count > 1:
+			_draw_text(font, Vector2(x + icon.get_width() - 2, size.y - 2), str(count), HORIZONTAL_ALIGNMENT_LEFT, -1)
+		x += icon.get_width() + 4
 
 
 func _draw_text(font: Font, pos: Vector2, text: String, align: HorizontalAlignment, width: float) -> void:

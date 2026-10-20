@@ -249,6 +249,201 @@ def idle_cycle():
     }
 
 
+# ---------- running ----------
+# Run frames: push off (legs wide, body low), flight (both feet off the
+# floor), push off with the other leg, flight. Longer stride than the walk,
+# knees driven high, arms pumping, and the backpack bouncing a beat behind.
+
+
+def _lowered(grid, rows=1):
+    """The whole frame drops by rows pixels (the body lands)."""
+    return ["." * 16 for _ in range(rows)] + grid[:len(grid) - rows]
+
+
+def _draw_leg(g, points, near):
+    """A 2px-wide leg along points (hip to ankle), then a boot at the ankle.
+    The near leg gets a lit edge; the far leg is all shadow."""
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        steps = max(abs(x1 - x0), abs(y1 - y0), 1)
+        for i in range(steps + 1):
+            x = round(x0 + (x1 - x0) * i / steps)
+            y = round(y0 + (y1 - y0) * i / steps)
+            put(g, y, x, "P")
+            put(g, y, x + 1, "p" if near else "P")
+            if abs(x1 - x0) > abs(y1 - y0):
+                # A mostly flat stretch (a foot kicked back) needs height too.
+                put(g, y + 1, x, "P")
+                put(g, y + 1, x + 1, "P")
+    ax, ay = points[-1]
+    put(g, ay + 1, ax, "GNN")
+    put(g, ay + 2, ax - 1, "NNNN")
+
+
+def _outline_below(g, top):
+    """Outline the legs: transparent pixels from row top down that touch them."""
+    out = list(g)
+    for y in range(top, len(g)):
+        for x in range(16):
+            if g[y][x] != ".":
+                continue
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < 16 and top <= ny < len(g) and g[ny][nx] not in ".O":
+                    put(out, y, x, "O")
+                    break
+    return out
+
+
+# Side-view leg poses as (far leg points, near leg points), hip to ankle,
+# for a body whose hips sit on row 22.
+SIDE_RUN_LEGS = {
+    # Push off: near leg reaching forward, far leg pushing back.
+    "near_front": ([(6, 22), (4, 25), (2, 27)], [(7, 22), (9, 25), (11, 27)]),
+    "near_back": ([(7, 22), (9, 25), (11, 27)], [(6, 22), (4, 25), (2, 27)]),
+    # Flight: one knee driven up in front, the other foot kicked up behind.
+    "flight_near_up": ([(6, 22), (5, 25), (2, 24)], [(7, 22), (10, 23), (9, 26)]),
+    "flight_far_up": ([(7, 22), (10, 23), (9, 26)], [(6, 22), (5, 25), (2, 24)]),
+}
+
+
+def _side_run_frame(legs, landing):
+    g = list(SIDE[:22]) + blank_rows(10)
+    far, near = SIDE_RUN_LEGS[legs]
+    _draw_leg(g, far, near=False)
+    _draw_leg(g, near, near=True)
+    g = _outline_below(g, 22)
+    if landing:
+        g = _lowered(g)
+        # The backpack lags the landing by another pixel.
+        pack = [g[r][0:5] for r in range(12, 22)]
+        for i, text in enumerate(pack):
+            put(g, 13 + i, 0, text)
+    return g
+
+
+def side_run():
+    return [
+        _side_run_frame("near_front", True),
+        _side_run_frame("flight_near_up", False),
+        _side_run_frame("near_back", True),
+        _side_run_frame("flight_far_up", False),
+    ]
+
+
+def very_short_leg(leg):
+    # Knee driven high: two shin rows gone, foot two rows up.
+    return leg[:2] + leg[4:] + [".....", "....."]
+
+
+def front_back_run(base):
+    left, right = leg_columns(base)
+    pump = lambda grid, cols: swing_arm(swing_arm(grid, cols), cols)
+    push_a = _lowered(pump(with_legs(base, long_leg(left), very_short_leg(right)), (12, 15)))
+    push_b = _lowered(pump(with_legs(base, very_short_leg(left), long_leg(right)), (1, 4)))
+    flight = with_legs(base, short_leg(left), short_leg(right))
+    return [push_a, flight, push_b, flight]
+
+
+def run_cycle():
+    """Run frames keyed by direction: down, up, right, left."""
+    right = side_run()
+    return {
+        "down": front_back_run(FRONT),
+        "up": front_back_run(BACK),
+        "right": right,
+        "left": [mirror(f) for f in right],
+    }
+
+
+# ---------- messy hair ----------
+# Her hair gets messier as she loses health. Flyaway strands are an overlay
+# drawn over whatever animation is playing, so every sheet stays tidy and
+# only this one small sheet changes with health. Each overlay frame is
+# 24x20 and lines up with the top-left of a 16x32 player frame moved 4px
+# up and left (MESS_MARGIN), so strands can poke out above and beside the
+# head. The game lines it up with the head in each frame by finding the top
+# of the head (the first opaque row), so it follows bobbing and breathing.
+
+MESS_SIZE = (24, 20)
+MESS_MARGIN = 4
+MESS_LEVELS = 3
+
+# Tufts per view, added on top of the previous level's. Each tuft is a root
+# pixel on the head's outline followed by the pixels it puffs out through,
+# in player-frame coordinates (they may go above or beside the frame).
+# A tuft marked "lock" hangs inside the head instead (over the face).
+HAIR_STRANDS = {
+    "down": [
+        # 1: a cowlick curling off the crown, a kink at one side.
+        [[(8, 0), (8, -1), (9, -1)], [(14, 7), (15, 7)]],
+        # 2: small tufts at the top left and both sides.
+        [[(5, 0), (5, -1)], [(1, 6), (0, 6), (0, 7)], [(14, 10), (15, 10)]],
+        # 3: a little frizz all round, and a lock fallen over the face.
+        [[(10, 0), (10, -1), (11, -1)], [(1, 4), (0, 4)], [(14, 4), (15, 4)],
+         ["lock", (6, 5), (6, 6)]],
+    ],
+    "up": [
+        [[(7, 0), (7, -1), (6, -1)], [(1, 7), (0, 7)]],
+        [[(10, 0), (10, -1)], [(14, 6), (15, 6), (15, 5)], [(1, 10), (0, 10)]],
+        [[(5, 0), (5, -1), (4, -1)], [(14, 9), (15, 9)], [(1, 4), (0, 4)],
+         ["lock", (6, 6), (7, 7)]],
+    ],
+    "right": [
+        [[(8, 0), (8, -1), (7, -1)], [(2, 7), (1, 7)]],
+        [[(5, 1), (5, 0)], [(2, 9), (1, 9), (1, 10)]],
+        [[(10, 0), (10, -1), (11, -1)], [(2, 4), (1, 4)], [(13, 3), (14, 3)],
+         ["lock", (6, 4), (7, 5)]],
+    ],
+}
+
+
+def _hair_mess(base, strands_by_level, level):
+    """One overlay frame: strands up to level, outlined, on a clear canvas."""
+    w, h = MESS_SIZE
+    m = MESS_MARGIN
+    solid = lambda x, y: 0 <= x < 16 and 0 <= y < 32 and base[y][x] != "."
+    g = ["." * w for _ in range(h)]
+    hair = set()
+    for strands in strands_by_level[:level]:
+        for strand in strands:
+            if strand[0] == "lock":
+                for i, (x, y) in enumerate(strand[1:]):
+                    put(g, y + m, x + m, "d" if i else "H")
+                continue
+            for i, (x, y) in enumerate(strand):
+                put(g, y + m, x + m, "H")
+                hair.add((x, y))
+    # Outline the strands where they stick out past the head, in the hair's
+    # shadow color (a selective outline) so they stay soft, not wiry.
+    for x, y in hair:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx, ny = x + dx, y + dy
+            if (nx, ny) in hair or solid(nx, ny):
+                continue
+            if 0 <= nx + m < w and 0 <= ny + m < h:
+                put(g, ny + m, nx + m, "d")
+    return g
+
+
+def hair_mess_sheet():
+    """Rows are directions (down, up, right, left); columns are mess levels 1-3."""
+    from PIL import Image
+    from palette import to_image
+    w, h = MESS_SIZE
+    out = Image.new("RGBA", (w * MESS_LEVELS, h * 4), (0, 0, 0, 0))
+    views = {"down": FRONT, "up": BACK, "right": SIDE}
+    for row, direction in enumerate(("down", "up", "right", "left")):
+        view = "right" if direction == "left" else direction
+        for level in range(1, MESS_LEVELS + 1):
+            g = _hair_mess(views[view], HAIR_STRANDS[view], level)
+            if direction == "left":
+                # The margins are equal on both sides, so flipping the whole
+                # overlay mirrors it around the player frame too.
+                g = mirror(g)
+            out.alpha_composite(to_image(g), ((level - 1) * w, row * h))
+    return out
+
+
 # ---------- holding the fire extinguisher ----------
 
 # A small extinguisher carried by its handle: 5x8.
@@ -302,6 +497,10 @@ def walk_cycle_extinguisher():
 
 def idle_cycle_extinguisher():
     return _with_extinguisher(idle_cycle())
+
+
+def run_cycle_extinguisher():
+    return _with_extinguisher(run_cycle())
 
 
 # ---------- knocked out ----------

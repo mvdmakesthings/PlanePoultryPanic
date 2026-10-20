@@ -141,7 +141,9 @@ Left-facing frames are mirrored from right-facing ones, so each character only n
 | Hurt | 4 | 1, plus blinking | M4 |
 | Defeat | 1 | 4 | M4 |
 
-Until the run cycle exists, running plays the walk cycle faster with small dust puffs at the player's heels. Running is a core mechanic tied to stamina, so it gets its own cycle before the vertical slice. That way players can see at a glance when they're spending stamina.
+Running is a core mechanic tied to stamina, so it has its own cycle: players can see at a glance when they're spending stamina. The run cycle is done (M4); throw, eat, hurt and defeat are still to come.
+
+**Messy hair**: the player's hair gets messier as she loses health (see the GDD). Rather than a messy copy of every sheet, one overlay sheet holds flyaway tufts that are drawn over whatever animation is playing.
 
 **Chickens**
 
@@ -210,6 +212,8 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 | `player_walk.png` | 16x32 | 4 per direction | Contact, passing, contact, passing. In side views each passing frame plants the leg that just landed and kicks the other boot up behind; the near leg is lit and the far leg is in shadow so they read apart. |
 | `player_walk_extinguisher.png`, `player_idle_extinguisher.png` | 16x32 | Same as walk and idle | The same cycles with a small extinguisher in the player's left hand, placed at the hand in every frame so it swings with the arm |
 | `player_idle.png` | 16x32 | 2 per direction | Breathing: the head sinks 1px on the second frame. Play slowly (about 2 FPS). |
+| `player_run.png`, `player_run_extinguisher.png` | 16x32 | 4 per direction | Push off, flight, push off with the other leg, flight. The body lands a pixel lower on push-off frames and the backpack bounces a beat behind. Play at 12 FPS. |
+| `player_hair_mess.png` | 24x20 | 3 per direction (one per mess level) | Flyaway hair drawn over the player: a cowlick (below 75% health), puffed-out tufts (below 50%), wild frizz with a lock over the face (below 25%). Each frame covers the player frame's top 16 rows plus a 4 px margin above and to each side. The game lines it up with the top of the head in each animation frame, so redrawn sheets keep working as long as the head is the topmost thing drawn. |
 | `player_ko.png` | 32x20 | 2, in one row (not per direction) | Game over: flat on their back, head to the left, X eyes, with stars circling above the head. Loop slowly (about 3 FPS). Drawn centered over the spot the player fell. |
 | `chicken_walk.png` | 16x16 | 4 per direction | Head bobs forward on side-view contact frames; front and back views waddle. |
 | `chicken_idle.png` | 16x16 | 3 per direction | Stand, dip, peck. Hold the first frame and play the peck now and then. |
@@ -274,6 +278,20 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 **`potted_plant.png`**: two 16x24 floor planters side by side: a leafy ficus in terracotta, then a snake plant in a chrome planter. They stand on the floor and block movement, with the pot's base (about 12x6) as the solid part.
 
 **`welcome_banner.png`**: one 48x18 banner hanging from a rod on the wall face: "WELCOME TO BAWKSTON!" The city name is **Proposed**, not final.
+
+**`item_maintenance_key.png`**: one 12x8 brass key, for the pickup and the HUD's key-item row. Key item pickups twinkle in code.
+
+**`security_door.png`**: four 48x32 frames of the locked door to Security (locked with barrier tape and a red light, unlocked with a green light, opening, open). It sits on the wall face like the boarding gate, with the same doorway.
+
+**`signs.png`**: 64x11 wayfinding signs for the wall face, one per frame: BAGGAGE CLAIM (down arrow), SECURITY (left arrow), STAFF ONLY (white on red), ARRIVALS (right arrow), LOST+FOUND. Add new signs as new frames at the end.
+
+**`maintenance_cart.png`**: one 24x24 janitor's cart (mop bucket, spray bottles, trash bag). A solid floor prop; its base is about 22x6.
+
+**`seating.png`**: one 48x24 row of three airport seats facing the viewer. A solid floor prop; its base is about 44x8.
+
+**`floor_litter.png`**: four 16x16 floor decals: feathers, a pecked bag of chips, a cracked egg, chicken footprints. Drawn flat under everything, no collision.
+
+**`map_stand.png`**: three 16x28 frames of the "YOU ARE HERE" airport map on a post that marks a checkpoint: switched off, then lit with a tiny floor plan whose red dot blinks (alternate frames 1 and 2 at about 2 FPS). A solid floor prop; its base is about 8x4.
 
 **`carousel.png`**: modular baggage carousel, 16x16 tiles. Rows are pieces; columns are 4 animation frames of the belt moving clockwise (play at about 8 FPS so the slats creep along).
 

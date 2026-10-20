@@ -45,6 +45,7 @@ func interact(player: Player) -> void:
 		return
 	occupant = player
 	_swing_time = 0.3
+	AudioManager.play("closet", base_point())
 	player.hide_in(self)
 	# Chickens already chasing saw where the player went.
 	for node in get_tree().get_nodes_in_group("chickens"):
@@ -73,9 +74,10 @@ func _release() -> void:
 	var player := occupant
 	occupant = null
 	_swing_time = 0.3
+	AudioManager.play("closet", base_point())
 	player.leave_hiding()
 
 
 func _draw() -> void:
 	if _show_prompt:
-		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "F leave" if occupant else "F hide")
+		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "{interact} leave" if occupant else "{interact} hide")

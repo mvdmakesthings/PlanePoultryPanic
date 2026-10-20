@@ -58,6 +58,7 @@ func _physics_process(delta: float) -> void:
 
 func _splat() -> void:
 	_splatted = true
+	AudioManager.play("splat", global_position)
 	_timer = 0.0
 	_sprite.frame = 1
 	_sprite.position.y = 0.0

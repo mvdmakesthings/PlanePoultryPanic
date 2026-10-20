@@ -21,7 +21,13 @@ func _ready() -> void:
 	_check(player.global_position.x - start.x > 60.0, "player walks right")
 
 	var stamina_before := player.stamina
-	await _hold(["move_up", "run"], 0.8)
+	Input.action_press("move_up")
+	Input.action_press("run")
+	await _wait(0.4)
+	_check(player._sprite.animation == "run_up", "running plays the run cycle")
+	await _wait(0.4)
+	Input.action_release("move_up")
+	Input.action_release("run")
 	_check(player.stamina < stamina_before, "running spends stamina")
 
 	var snacks_before := player.snacks
@@ -110,6 +116,7 @@ func _ready() -> void:
 	await _spray_under_attack_tests()
 	await _totem_tests()
 
+	await AudioManager.silence()
 	if _failures.is_empty():
 		print("SMOKE TEST PASSED")
 		get_tree().quit(0)

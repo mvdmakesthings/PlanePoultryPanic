@@ -19,7 +19,17 @@ const WALK_SHEET := preload("res://assets/sprites/player_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/player_idle.png")
 const WALK_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_walk_extinguisher.png")
 const IDLE_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_idle_extinguisher.png")
+const RUN_SHEET := preload("res://assets/sprites/player_run.png")
+const RUN_EXTINGUISHER_SHEET := preload("res://assets/sprites/player_run_extinguisher.png")
 const KO_SHEET := preload("res://assets/sprites/player_ko.png")
+## Flyaway hair drawn over every animation, messier as health drops. Rows
+## are directions, columns are mess levels 1-3; each frame reaches
+## HAIR_MARGIN pixels above and beside the player frame.
+const HAIR_SHEET := preload("res://assets/sprites/player_hair_mess.png")
+const HAIR_LEVELS := 3
+const HAIR_MARGIN := 4
+## Below each of these fractions of full health, the hair gets one level messier.
+const HAIR_MESS_BELOW: Array[float] = [0.75, 0.5, 0.25]
 const FRAME_SIZE := Vector2i(16, 32)
 ## The knocked-out pose lies flat, so its frames are wide and short.
 const KO_FRAME_SIZE := Vector2i(32, 20)
@@ -68,6 +78,9 @@ var is_dead := false
 ## The closest thing Interact would use right now, or null. Only this one
 ## shows its prompt, so overlapping prompts never stack up.
 var interact_target: Node2D = null
+## What landed the last hit: "peck", "egg" or "stomp" (anything heavier),
+## so the retry screen can say what went wrong.
+var last_hit := ""
 ## The suitcase held overhead, or null.
 var carrying: Suitcase = null
 ## The closet the player is hiding in, or null.
@@ -79,6 +92,10 @@ var is_hidden: bool:
 var _invincible_timer := 0.0
 var _exhausted := false
 var _knockback := Vector2.ZERO
+var _hair: Sprite2D
+## Top opaque row of each animation frame, so the hair follows the head.
+var _head_tops := {}
+var _sheet_images := {}
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -95,6 +112,8 @@ func _ready() -> void:
 	SpriteSheets.add_directional(frames, "idle", IDLE_SHEET, FRAME_SIZE, 2.0)
 	SpriteSheets.add_directional(frames, "walk_ext", WALK_EXTINGUISHER_SHEET, FRAME_SIZE, 8.0)
 	SpriteSheets.add_directional(frames, "idle_ext", IDLE_EXTINGUISHER_SHEET, FRAME_SIZE, 2.0)
+	SpriteSheets.add_directional(frames, "run", RUN_SHEET, FRAME_SIZE, 12.0)
+	SpriteSheets.add_directional(frames, "run_ext", RUN_EXTINGUISHER_SHEET, FRAME_SIZE, 12.0)
 	frames.add_animation("ko")
 	frames.set_animation_speed("ko", 3.0)
 	for column in KO_SHEET.get_width() / KO_FRAME_SIZE.x:
@@ -103,6 +122,16 @@ func _ready() -> void:
 		atlas.region = Rect2(Vector2(column * KO_FRAME_SIZE.x, 0), KO_FRAME_SIZE)
 		frames.add_frame("ko", atlas)
 	_sprite.sprite_frames = frames
+	_hair = Sprite2D.new()
+	_hair.texture = HAIR_SHEET
+	_hair.centered = false
+	_hair.hframes = HAIR_LEVELS
+	_hair.vframes = SpriteSheets.DIRECTIONS.size()
+	_sprite.add_child(_hair)
+	_sprite.frame_changed.connect(_update_hair)
+	_sprite.frame_changed.connect(_play_footstep)
+	_sprite.animation_changed.connect(_update_hair)
+	health_changed.connect(func(_current: int, _maximum: int) -> void: _update_hair())
 	_sprite.play("idle_down")
 	# Deferred so listeners that connect in the level's _ready get initial values.
 	_emit_state.call_deferred()
@@ -164,8 +193,10 @@ func _unhandled_input(event: InputEvent) -> void:
 func take_damage(amount: int, from_position: Vector2) -> bool:
 	if is_dead or is_hidden or _invincible_timer > 0.0:
 		return false
+	last_hit = "peck" if amount == PECK else "egg" if amount < PECK else "stomp"
 	health = maxi(health - amount, 0)
 	health_changed.emit(health, max_health)
+	AudioManager.play("hurt")
 	_knockback = (global_position - from_position).normalized() * knockback_strength
 	put_down_suitcase()
 	if health == 0:
@@ -180,10 +211,19 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 func pick_up(item: String, count: int) -> int:
 	if is_dead or is_hidden:
 		return count
+	if Inventory.KEY_ITEMS.has(item):
+		inventory.add_key_item(item, count)
+		FloatText.spawn(self, "Got it!")
+		AudioManager.play("key")
+		return 0
 	if Inventory.ITEMS[item]["stack"] > 1:
-		return count - inventory.add_stackable(item, count)
+		var added := inventory.add_stackable(item, count)
+		if added > 0:
+			AudioManager.play("pickup")
+		return count - added
 	if not inventory.add_single(item, count):
 		return count
+	AudioManager.play("pickup")
 	# A newly picked up tool goes straight into the player's hand.
 	if item == "extinguisher":
 		inventory.select_item(item)
@@ -213,6 +253,7 @@ func throw_snack() -> void:
 	snack.direction = facing
 	snack.position = position
 	get_parent().add_child(snack)
+	AudioManager.play("throw")
 
 
 ## Eats a snack from any slot (the selected one first) to heal a suitcase.
@@ -226,6 +267,7 @@ func eat_snack() -> void:
 		FloatText.spawn(self, "Full!")
 		return
 	inventory.take_from(index)
+	AudioManager.play("eat")
 	health = mini(health + SUITCASE, max_health)
 	health_changed.emit(health, max_health)
 
@@ -247,6 +289,7 @@ func spray() -> void:
 	foam.direction = facing
 	foam.position = position
 	get_parent().add_child(foam)
+	AudioManager.play("spray")
 
 
 ## Aim at the nearest threatening chicken in range, or straight ahead.
@@ -280,6 +323,7 @@ func throw_suitcase() -> void:
 		return
 	carrying.throw(facing)
 	carrying = null
+	AudioManager.play("throw")
 
 
 ## Sets the carried suitcase down at the player's feet, if holding one.
@@ -362,14 +406,72 @@ func _update_stamina(running: bool, delta: float) -> void:
 
 func _update_animation(input: Vector2, running: bool) -> void:
 	var direction := SpriteSheets.direction_name(facing)
-	var animation := "walk" if input != Vector2.ZERO else "idle"
+	var animation := "idle"
+	if input != Vector2.ZERO:
+		animation = "run" if running else "walk"
 	# Carry the extinguisher in hand while it's the selected item.
 	if inventory.selected_item() == "extinguisher" and carrying == null:
 		animation += "_ext"
 	animation += "_" + direction
 	if _sprite.animation != animation:
+		# Switching between walking and running keeps the stride going.
+		var frame := _sprite.frame
 		_sprite.play(animation)
-	_sprite.speed_scale = 1.6 if running else 1.0
+		if input != Vector2.ZERO:
+			_sprite.frame = frame
+
+
+## 0 while health is high, up to 3 (wild) when it's nearly gone.
+func hair_mess_level() -> int:
+	var ratio := float(health) / float(max_health)
+	var level := 0
+	for threshold in HAIR_MESS_BELOW:
+		if ratio < threshold:
+			level += 1
+	return level
+
+
+func _update_hair() -> void:
+	var level := hair_mess_level()
+	var animation := String(_sprite.animation)
+	var row := SpriteSheets.DIRECTIONS.find(animation.get_slice("_", animation.get_slice_count("_") - 1))
+	_hair.visible = level > 0 and not is_dead and row >= 0
+	if not _hair.visible:
+		return
+	_hair.frame = row * HAIR_LEVELS + level - 1
+	var top_left := _sprite.offset - Vector2(FRAME_SIZE) / 2.0
+	var head_top := _head_top(_sprite.sprite_frames.get_frame_texture(_sprite.animation, _sprite.frame))
+	_hair.position = top_left + Vector2(-HAIR_MARGIN, head_top - HAIR_MARGIN)
+
+
+## The first row of a frame with anything drawn in it: where the head starts.
+func _head_top(texture: Texture2D) -> int:
+	if _head_tops.has(texture):
+		return _head_tops[texture]
+	var top := 0
+	var atlas := texture as AtlasTexture
+	if atlas:
+		if not _sheet_images.has(atlas.atlas):
+			_sheet_images[atlas.atlas] = atlas.atlas.get_image()
+		var image: Image = _sheet_images[atlas.atlas]
+		var region := Rect2i(atlas.region)
+		top = region.size.y
+		for y in region.size.y:
+			for x in region.size.x:
+				if image.get_pixel(region.position.x + x, region.position.y + y).a > 0.0:
+					top = y
+					break
+			if top == y:
+				break
+	_head_tops[texture] = top
+	return top
+
+
+## A footstep on each contact frame of the walk and run cycles.
+func _play_footstep() -> void:
+	var animation := String(_sprite.animation)
+	if (animation.begins_with("walk") or animation.begins_with("run")) and _sprite.frame % 2 == 0:
+		AudioManager.play("step")
 
 
 func _update_invincibility(delta: float) -> void:
@@ -386,6 +488,8 @@ func _die() -> void:
 	# Flat on their back, centered over where they stood.
 	_sprite.offset = Vector2(0, -KO_FRAME_SIZE.y / 2.0)
 	_sprite.play("ko")
+	_update_hair()
+	AudioManager.play("death")
 	queue_redraw()
 	died.emit()
 

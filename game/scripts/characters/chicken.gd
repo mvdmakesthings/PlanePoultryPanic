@@ -255,6 +255,7 @@ func can_interact(player: Player) -> bool:
 
 func interact(player: Player) -> void:
 	_slide_velocity = Shove.direction_for(self, player) * ice_shove_speed
+	AudioManager.play("shove", global_position)
 
 
 ## Bursts into feathers and leaves the game.
@@ -262,6 +263,7 @@ func defeat() -> void:
 	var poof := POOF_SCENE.instantiate() as Node2D
 	poof.position = position
 	get_parent().add_child(poof)
+	AudioManager.play("poof", global_position)
 	defeated.emit()
 	queue_free()
 
@@ -631,6 +633,7 @@ func _start_pursuit(alert_others: bool) -> void:
 	_lost_sight_time = 0.0
 	if not alert_others:
 		return
+	AudioManager.play("cluck", global_position)
 	for node in get_tree().get_nodes_in_group("chickens"):
 		var other := node as Chicken
 		if other != self and global_position.distance_to(other.global_position) < alert_radius:
@@ -642,6 +645,7 @@ func _check_hit() -> void:
 		return
 	for body in _hitbox.get_overlapping_bodies():
 		if body is Player and (body as Player).take_damage(Player.PECK, global_position):
+			AudioManager.play("peck", global_position)
 			# Bounce back off the player and stay dazed for a moment.
 			state = State.RECOIL
 			_timer = daze_time
@@ -701,4 +705,4 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, 5.0, SHADOW_COLOR)
 	draw_set_transform(Vector2.ZERO)
 	if _show_prompt:
-		InteractPrompt.draw(self, 0.0, -20.0, "F push")
+		InteractPrompt.draw(self, 0.0, -20.0, "{interact} push")

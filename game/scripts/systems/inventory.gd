@@ -18,6 +18,12 @@ const ITEMS := {
 	"extinguisher": {"stack": 1, "icon": "res://assets/sprites/item_extinguisher.png"},
 }
 
+## Key items: held in their own row, never in a slot. "name" is what the
+## player is told when they pick one up.
+const KEY_ITEMS := {
+	"maintenance_key": {"name": "Maintenance key", "icon": "res://assets/sprites/item_maintenance_key.png"},
+}
+
 ## Each slot is {} when empty, or {"item": String, "count": int}.
 var slots: Array[Dictionary] = []
 var selected := 0

@@ -43,10 +43,11 @@ func interact(player: Player) -> void:
 	player.give_extinguisher(charges)
 	is_empty = true
 	_sprite.frame = 1
+	AudioManager.play("closet", base_point())
 	_show_prompt = false
 	queue_redraw()
 
 
 func _draw() -> void:
 	if _show_prompt:
-		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "F take")
+		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "{interact} take")
