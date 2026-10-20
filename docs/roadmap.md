@@ -117,7 +117,7 @@ Build each level fully before starting the next, so the game is always playable 
 ## M6: Systems and Polish
 
 - [ ] Difficulty modes (Easy, Standard, Hard, Expert)
-- [ ] Scoring screen
+- [x] Scoring screen (time, efficiency, stealth, discovery, Perfect Run and Pacifist bonuses, airline ranks, best score; built 2026-10-19)
 - [ ] Steam achievements
 - [ ] Speedrun mode with level splits
 - [ ] Full settings and accessibility options

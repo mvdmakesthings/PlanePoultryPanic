@@ -302,7 +302,7 @@ Kept minimal so the game stays readable at 320x180.
 - The game autosaves at every checkpoint, and when a level starts. There's no manual save, which keeps the tension.
 - **Continue** resumes from the latest checkpoint. **New Game** asks before replacing a save, then plays the opening cutscene (about 30 seconds; Confirm, Back or Pause skips it) before Level 1. Continue never shows the opening.
 - Checkpoints are "YOU ARE HERE" map stands that light up when reached. Level 1 has two: where Amanda comes down into Baggage Claim, and in the staff room. Level 2 has two: in the screening area and in the corridor to the Food Court. Level 3 has two: at the arrival and before the totem plaza. Level 4 has one at the entrance to each of Gates B and C (Gate A's is the level start). Level 5 has one at the entrance to the boarding area, and one that lights itself the moment the boss falls.
-- Finishing the game (THE END) clears the save, since there's nothing left to continue.
+- Finishing the game (THE END) clears the save, since there's nothing left to continue, then shows the score screen. The best score has a file of its own, so it outlasts the save.
 - Leaving a level through its exit autosaves at the start of the next one, with the inventory carried over, so Continue resumes there.
 
 ### Difficulty Modes
@@ -314,11 +314,33 @@ Kept minimal so the game stays readable at 320x180.
 | Expert | Maximum chickens, instant power-ups at mushroom patches, checkpoints only at the start of each level |
 
 ### Scoring
-A score at the end of the run, made up of:
-- **Time**: Faster runs score more
-- **Efficiency**: Items used compared to items collected
-- **Stealth**: Chickens avoided compared to chickens that spotted you
-- **Discovery**: Secrets found and alternate routes taken
+After THE END, a departure board shows how the run went: a row per category, flipping in one at a time like split-flap letters, then the total counting up, the rank, and the best score and fastest finish (with NEW BEST! or NEW FASTEST! blinking when one is beaten). The main menu shows the best score once a run has been finished.
+
+| Category | Points | How |
+|---|---|---|
+| **Time** | Up to 3,000 | Full points at 15:00 or under, falling evenly to none at 45:00 (25:00 earns 2,000). The level splits show underneath |
+| **Efficiency** | Up to 2,000 | Getting through on less: the share of the items Amanda had (picked up, plus any she started with) that she never used |
+| **Stealth** | Up to 2,000 | The share of chickens met that never spotted her |
+| **Discovery** | Up to 2,000 | The share of secrets found (0 of 0 until secrets are added) |
+| **Perfect Run** | +1,000 | No hits and no knockouts all run |
+| **Pacifist** | +1,000 | No chickens defeated |
+
+The best possible score is 11,000. Finishing under 25:00 earns a **SPEED RUNNER!** tag on the time row.
+
+| Rank | Total |
+|---|---|
+| Lost Luggage | 0 |
+| Standby | 2,500 |
+| Economy | 4,500 |
+| Business Class | 6,500 |
+| First Class | 8,500 |
+| Captain | 10,000 |
+
+How the stats are counted:
+- **The clock** only runs in levels: not in cutscenes, while paused, or on the level-clear and retry screens. A knockout still costs the time spent before it.
+- **Items** are snacks (one each) and extinguishers (one each, whatever their charges); key items don't count. A snack is used when thrown or eaten, an extinguisher once it's empty. Dropping something takes it off the collected count, so picking it up again doesn't count twice.
+- **Chickens met** are all the chickens in the levels played, including ones that arrive later from vents. A chicken has spotted Amanda once it chases her, including when another chicken alerted it.
+- **Retries**: the level resets after a knockout, so items, chickens and defeats go back to what they were at the checkpoint, while time, hits and knockouts stay. Every stat is saved with each checkpoint, and hits, knockouts and the time are written to the save again as they change, so Continue picks up exactly where things stood.
 
 ### Achievements (Steam)
 | Achievement | Condition |
