@@ -291,6 +291,8 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`floor_litter.png`**: four 16x16 floor decals: feathers, a pecked bag of chips, a cracked egg, chicken footprints. Drawn flat under everything, no collision.
 
+**`map_stand.png`**: three 16x28 frames of the "YOU ARE HERE" airport map on a post that marks a checkpoint: switched off, then lit with a tiny floor plan whose red dot blinks (alternate frames 1 and 2 at about 2 FPS). A solid floor prop; its base is about 8x4.
+
 **`carousel.png`**: modular baggage carousel, 16x16 tiles. Rows are pieces; columns are 4 animation frames of the belt moving clockwise (play at about 8 FPS so the slats creep along).
 
 | Row | Piece |

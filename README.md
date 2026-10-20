@@ -4,7 +4,7 @@
 
 A 16-bit top-down action game: get through a chicken-overrun airport and catch the last flight out. Built with Godot 4.
 
-![The player's walk cycle in all four directions](docs/images/player_walk.gif)
+![Amanda's walk cycle in all four directions](docs/images/player_walk.gif)
 
 ## Play
 
@@ -31,7 +31,7 @@ The one-room prototype is still there as a test bed for chicken behavior and ite
 | Switch inventory slot | Q / R, or mouse wheel | LB / Y |
 | Drop the selected slot | G | Back |
 | Eat a snack (heal) | E | X |
-| Push a cart, take an extinguisher, pick up or put down a suitcase | F | B |
+| Interact: push a cart, take an extinguisher, lift or put down a suitcase, unlock a door, hide in a closet | F | B |
 | Pause (Resume, Settings, Quit to Menu) | Esc | Start |
 | Restart the prototype room (after winning or losing) | R | Start |
 
