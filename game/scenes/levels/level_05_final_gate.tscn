@@ -1,0 +1,351 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/level_05_final_gate.gd" id="1_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/night_window.png" id="2_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/departure_board.png" id="3_r"]
+[ext_resource type="Script" path="res://scripts/objects/flipbook_sprite.gd" id="4_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/final_litter.png" id="5_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/walkway.tscn" id="6_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/boarding_door.tscn" id="7_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/plane_door.tscn" id="8_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/extinguisher_cabinet.tscn" id="9_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/chicken_vent.tscn" id="10_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/roost.tscn" id="11_r"]
+[ext_resource type="PackedScene" path="res://scenes/characters/player.tscn" id="12_r"]
+[ext_resource type="PackedScene" path="res://scenes/characters/chicken.tscn" id="13_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/item_pickup.tscn" id="14_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/vending_machine.tscn" id="15_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/seating.tscn" id="16_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/gate_desk.tscn" id="17_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/luggage_cart.tscn" id="18_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/potted_plant.tscn" id="19_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/checkpoint.tscn" id="20_r"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="21_r"]
+[ext_resource type="Script" path="res://scripts/ui/game_menus.gd" id="22_r"]
+
+[node name="Level05FinalGate" type="Node2D"]
+script = ExtResource("1_r")
+
+[node name="Floor" type="TileMapLayer" parent="."]
+
+[node name="Props" type="TileMapLayer" parent="."]
+
+[node name="WallDecor" type="Node2D" parent="."]
+
+[node name="LoungeWindow" type="Sprite2D" parent="WallDecor"]
+position = Vector2(32, 34)
+texture = ExtResource("2_r")
+centered = false
+hframes = 3
+
+[node name="LoungeWindowNose" type="Sprite2D" parent="WallDecor"]
+position = Vector2(72, 34)
+texture = ExtResource("2_r")
+centered = false
+hframes = 3
+frame = 1
+
+[node name="LoungeWindowTail" type="Sprite2D" parent="WallDecor"]
+position = Vector2(112, 34)
+texture = ExtResource("2_r")
+centered = false
+hframes = 3
+frame = 2
+
+[node name="ArenaWindow" type="Sprite2D" parent="WallDecor"]
+position = Vector2(500, 34)
+texture = ExtResource("2_r")
+centered = false
+hframes = 3
+
+[node name="ArenaWindowNose" type="Sprite2D" parent="WallDecor"]
+position = Vector2(540, 34)
+texture = ExtResource("2_r")
+centered = false
+hframes = 3
+frame = 1
+
+[node name="ArenaWindowTail" type="Sprite2D" parent="WallDecor"]
+position = Vector2(580, 34)
+texture = ExtResource("2_r")
+centered = false
+hframes = 3
+frame = 2
+
+[node name="LoungeBoard" type="Sprite2D" parent="WallDecor"]
+position = Vector2(160, 33)
+texture = ExtResource("3_r")
+centered = false
+hframes = 4
+script = ExtResource("4_r")
+
+[node name="FloorLitter" type="Node2D" parent="."]
+
+[node name="Litter1" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(420, 260)
+texture = ExtResource("5_r")
+hframes = 4
+
+[node name="Litter2" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(700, 300)
+texture = ExtResource("5_r")
+hframes = 4
+frame = 1
+
+[node name="Litter3" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(560, 160)
+texture = ExtResource("5_r")
+hframes = 4
+frame = 2
+
+[node name="Litter4" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(860, 360)
+texture = ExtResource("5_r")
+hframes = 4
+
+[node name="Litter5" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(380, 380)
+texture = ExtResource("5_r")
+hframes = 4
+frame = 3
+
+[node name="Litter6" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(300, 120)
+texture = ExtResource("5_r")
+hframes = 4
+frame = 2
+
+[node name="Litter7" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(640, 200)
+texture = ExtResource("5_r")
+hframes = 4
+
+[node name="Litter8" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(760, 230)
+texture = ExtResource("5_r")
+hframes = 4
+
+[node name="Litter9" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(200, 520)
+texture = ExtResource("5_r")
+hframes = 4
+frame = 1
+
+[node name="Litter10" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(700, 500)
+texture = ExtResource("5_r")
+hframes = 4
+frame = 2
+
+[node name="Litter11" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(1000, 470)
+texture = ExtResource("5_r")
+hframes = 4
+
+[node name="Litter12" type="Sprite2D" parent="FloorLitter"]
+position = Vector2(140, 300)
+texture = ExtResource("5_r")
+hframes = 4
+frame = 3
+
+[node name="ArenaWalkwayEast" parent="." instance=ExtResource("6_r")]
+position = Vector2(448, 112)
+length_tiles = 24
+east = true
+
+[node name="ArenaWalkwayWest" parent="." instance=ExtResource("6_r")]
+position = Vector2(480, 320)
+length_tiles = 24
+east = false
+
+[node name="JetBridgeWalkway" parent="." instance=ExtResource("6_r")]
+position = Vector2(128, 480)
+length_tiles = 56
+east = true
+speed = 2
+
+[node name="BoardingDoor" parent="." instance=ExtResource("7_r")]
+position = Vector2(896, 32)
+
+[node name="PlaneDoor" parent="." instance=ExtResource("8_r")]
+position = Vector2(1152, 432)
+
+[node name="LoungeCabinet" parent="." instance=ExtResource("9_r")]
+position = Vector2(240, 40)
+
+[node name="ArenaCabinet1" parent="." instance=ExtResource("9_r")]
+position = Vector2(460, 40)
+
+[node name="ArenaCabinet2" parent="." instance=ExtResource("9_r")]
+position = Vector2(700, 40)
+
+[node name="Vent1" parent="." instance=ExtResource("10_r")]
+position = Vector2(380, 36)
+
+[node name="Vent2" parent="." instance=ExtResource("10_r")]
+position = Vector2(620, 36)
+
+[node name="Vent3" parent="." instance=ExtResource("10_r")]
+position = Vector2(780, 36)
+
+[node name="Vent4" parent="." instance=ExtResource("10_r")]
+position = Vector2(300, 436)
+
+[node name="Vent5" parent="." instance=ExtResource("10_r")]
+position = Vector2(620, 436)
+
+[node name="Vent6" parent="." instance=ExtResource("10_r")]
+position = Vector2(940, 436)
+
+[node name="BossRoost" parent="." instance=ExtResource("11_r")]
+position = Vector2(640, 232)
+chickens_needed = 8
+call_radius = 600.0
+totem_hits = 3
+totem_crowned = true
+totem_snack_proof = true
+dormant = true
+once = true
+
+[node name="Entities" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="Entities" instance=ExtResource("12_r")]
+position = Vector2(64, 230)
+
+[node name="BossChicken1" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(710, 232)
+
+[node name="BossChicken2" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(689, 260)
+
+[node name="BossChicken3" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(640, 272)
+
+[node name="BossChicken4" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(591, 260)
+
+[node name="BossChicken5" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(570, 232)
+
+[node name="BossChicken6" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(591, 204)
+
+[node name="BossChicken7" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(640, 192)
+
+[node name="BossChicken8" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(689, 204)
+
+[node name="LoungeChicken1" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(220, 300)
+
+[node name="LoungeChicken2" parent="Entities" instance=ExtResource("13_r")]
+position = Vector2(160, 380)
+
+[node name="Snack1" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(100, 300)
+
+[node name="Snack2" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(140, 330)
+
+[node name="Snack3" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(260, 360)
+
+[node name="Snack4" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(280, 160)
+
+[node name="Snack5" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(60, 380)
+
+[node name="Snack6" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(420, 200)
+
+[node name="Snack7" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(860, 200)
+
+[node name="Snack8" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(420, 380)
+
+[node name="Snack9" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(860, 380)
+
+[node name="Snack10" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(300, 500)
+
+[node name="Snack11" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(800, 500)
+
+[node name="LoungeKey" parent="Entities" instance=ExtResource("14_r")]
+position = Vector2(40, 360)
+item = "maintenance_key"
+
+[node name="LoungeVending" parent="Entities" instance=ExtResource("15_r")]
+position = Vector2(200, 120)
+snacks = 3
+
+[node name="Seats1" parent="Entities" instance=ExtResource("16_r")]
+position = Vector2(84, 112)
+
+[node name="Seats2" parent="Entities" instance=ExtResource("16_r")]
+position = Vector2(84, 146)
+
+[node name="Seats3" parent="Entities" instance=ExtResource("16_r")]
+position = Vector2(290, 260)
+
+[node name="Seats4" parent="Entities" instance=ExtResource("16_r")]
+position = Vector2(290, 300)
+
+[node name="GateDesk" parent="Entities" instance=ExtResource("17_r")]
+position = Vector2(376, 100)
+
+[node name="ArenaCart1" parent="Entities" instance=ExtResource("18_r")]
+position = Vector2(500, 180)
+
+[node name="ArenaCart2" parent="Entities" instance=ExtResource("18_r")]
+position = Vector2(780, 180)
+
+[node name="ArenaCart3" parent="Entities" instance=ExtResource("18_r")]
+position = Vector2(500, 290)
+
+[node name="ArenaCart4" parent="Entities" instance=ExtResource("18_r")]
+position = Vector2(780, 290)
+
+[node name="Plant1" parent="Entities" instance=ExtResource("19_r")]
+position = Vector2(24, 90)
+variety = 1
+
+[node name="Plant2" parent="Entities" instance=ExtResource("19_r")]
+position = Vector2(296, 380)
+variety = 0
+
+[node name="Plant3" parent="Entities" instance=ExtResource("19_r")]
+position = Vector2(372, 380)
+variety = 1
+
+[node name="Plant4" parent="Entities" instance=ExtResource("19_r")]
+position = Vector2(968, 380)
+variety = 0
+
+[node name="CheckpointArena" parent="Entities" instance=ExtResource("20_r")]
+position = Vector2(300, 220)
+id = "arena"
+
+[node name="CheckpointEscape" parent="Entities" instance=ExtResource("20_r")]
+position = Vector2(872, 120)
+id = "escape"
+automatic = false
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UI" instance=ExtResource("21_r")]
+
+[node name="GameMenus" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("22_r")

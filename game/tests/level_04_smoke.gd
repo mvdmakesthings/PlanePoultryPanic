@@ -159,6 +159,8 @@ func _exit_test() -> void:
 	var menus: GameMenus = level.get_node("UI/GameMenus")
 	_check(level._level_over and menus.is_open() and menus._mode == "clear",
 		"walking through to C13 clears the level")
+	_check(SaveSystem.load_game().get("level") == "res://scenes/levels/level_05_final_gate.tscn",
+		"clearing the gate areas autosaves at the start of the Final Departure Gate")
 	level.queue_free()
 
 
