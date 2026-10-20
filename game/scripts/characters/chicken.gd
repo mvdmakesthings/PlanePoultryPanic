@@ -270,6 +270,8 @@ func freeze(seconds: float) -> void:
 	_timer = seconds
 	velocity = Vector2.ZERO
 	_slide_velocity = Vector2.ZERO
+	Juice.flash(_sprite, Juice.WHITE, 0.25)
+	Juice.squash(_sprite, Vector2(1.3, 0.75))
 
 
 ## Frozen chickens can be shoved like a cart.
@@ -290,6 +292,7 @@ func fling(launch: Vector2) -> void:
 	state = State.FLUNG
 	_slide_velocity = launch
 	_target_snack = null
+	Juice.squash(_sprite, Vector2(0.7, 1.3), 0.3)
 	AudioManager.play("whoosh", global_position)
 
 
@@ -304,6 +307,8 @@ func defeat() -> void:
 	poof.position = position
 	get_parent().add_child(poof)
 	AudioManager.play("poof", global_position)
+	Juice.hitstop(0.05)
+	Juice.shake(2.0)
 	defeated.emit()
 	queue_free()
 
@@ -628,6 +633,8 @@ func _update_hop(delta: float) -> void:
 	_hop_ready_in = hop_cooldown
 	collision_mask = WORLD_LAYER | CHICKEN_LAYER
 	_sprite.position.y = 0.0
+	Juice.squash(_sprite, Vector2(1.3, 0.7), 0.15)
+	ParticleBurst.spawn(get_parent(), "dust", global_position, Vector2.ZERO, 3)
 
 
 func _overlaps_world() -> bool:
@@ -721,6 +728,9 @@ func _check_hit() -> void:
 	for body in _hitbox.get_overlapping_bodies():
 		if body is Player and (body as Player).take_damage(Player.PECK, global_position):
 			AudioManager.play("peck", global_position)
+			ParticleBurst.spawn(get_parent(), "feather", global_position.lerp(body.global_position, 0.5),
+				Vector2.ZERO, 3)
+			Juice.squash(_sprite, Vector2(0.8, 1.2), 0.15)
 			# Bounce back off the player and stay dazed for a moment.
 			state = State.RECOIL
 			_timer = daze_time
@@ -758,7 +768,7 @@ func _update_visuals() -> void:
 	if state == State.WINDUP:
 		# Squash during the wind-up so the shot can be dodged.
 		_sprite.scale = Vector2(1.15, 0.85) if int(_timer * 12.0) % 2 == 0 else Vector2.ONE
-	else:
+	elif not Juice.is_squashing(_sprite):
 		_sprite.scale = Vector2.ONE
 	if _is_hopping():
 		var t := clampf(_hop_elapsed / hop_duration, 0.0, 1.0)

@@ -350,11 +350,11 @@ Kept minimal so the game stays readable at 320x180.
 ### Menus
 - **Main menu**: Departure-board style with flickering text over a looping airport scene (Amanda running from chickens across the terminal floor). New Game, Continue, Settings, Credits, Quit. Credits comes later.
 - **Pause menu**: Resume, Map (once the map is found), Settings, Quit to Menu
-- **Settings**: Controls (remapping), Audio (master, music, effects), Video (fullscreen, window scale), Accessibility. Changes apply immediately, and each category has Reset to Defaults. Built so far: music, effects and ambience volume, fullscreen, and remapping each action's main key and gamepad button (a binding already in use swaps with it).
+- **Settings**: Controls (remapping), Audio (master, music, effects), Video (fullscreen, window scale), Accessibility. Changes apply immediately, and each category has Reset to Defaults. Built so far: music, effects and ambience volume, fullscreen, screen shake, and remapping each action's main key and gamepad button (a binding already in use swaps with it).
 
 ### Accessibility
 - Full remapping for keyboard and gamepad
-- Screen shake toggle
+- Screen shake toggle (built: Settings > Screen Shake, on by default)
 - Colorblind-safe chicken states: every powered mode also has a shape or animation cue, never color alone
 - Text size option for menus and dialogue
 
@@ -468,7 +468,7 @@ Generated in a retro "sfxr" style by Claude, with real chicken recordings (licen
 - **Feedback**: Satisfying pickup, throw, hit, and menu sounds
 
 ### Mixing
-Positional audio for chickens and machinery, separate audio buses for music, effects, and ambience, and music that ducks under important cues.
+Positional audio for chickens and machinery, separate audio buses for music, effects, and ambience, and music that ducks under important cues. Built: music crossfades between tracks, ducks under checkpoints, level clears, knockouts and boss hits, and each sound has a loudness trim plus random pitch and volume spread (`SOUNDS` in `game/scripts/managers/audio_manager.gd`). Several copies of the same sound at once are capped, so a whole totem bursting doesn't blast.
 
 ---
 

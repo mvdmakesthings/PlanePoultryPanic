@@ -44,8 +44,17 @@ func _physics_process(delta: float) -> void:
 	if velocity == Vector2.ZERO:
 		return
 	velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+	var speed := velocity.length()
 	var hit_wall := move_and_slide() and get_slide_collision_count() > 0
 	if hit_wall:
+		# A hard slam into something solid jolts the screen.
+		if speed >= lethal_speed:
+			Juice.shake(2.0)
+			Juice.squash(_sprite, Vector2(0.85, 1.15), 0.15)
+			# Sparks fly back off whatever it hit.
+			var hit := get_slide_collision(0)
+			ParticleBurst.spawn(get_parent(), "spark", hit.get_position(), hit.get_normal())
+			ParticleBurst.spawn(get_parent(), "dust", global_position, Vector2.ZERO, 3)
 		velocity = Vector2.ZERO
 	# Spin the wheels while rolling.
 	_sprite.frame = int(Time.get_ticks_msec() / 80) % 2 if velocity != Vector2.ZERO else 0

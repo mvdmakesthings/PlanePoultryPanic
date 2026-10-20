@@ -19,6 +19,7 @@ func _ready() -> void:
 	GameManager.dry_run = true
 	await _layout_tests()
 	await _hair_test()
+	await _juice_test()
 	await _critical_path_test()
 	await _chicken_path_test()
 	await _chicken_animation_test()
@@ -285,6 +286,83 @@ func _checkpoint_tests() -> void:
 	_check(not level.has_node("Entities/MaintenanceKey"), "the key isn't lying in the staff room again")
 	_check(player.health == player.max_health, "the retry starts with full health")
 	_check(level.get_node("Entities/CheckpointBaggageClaim").is_active, "checkpoints already reached stay lit")
+	level.queue_free()
+
+
+## A hit shakes the camera by whole pixels, holds the moment, flashes and
+## squashes her, and everything settles back afterward.
+func _juice_test() -> void:
+	var level := await _fresh_level()
+	var player: Player = level.get_node("Entities/Player")
+	_kill_chickens()
+	await get_tree().physics_frame
+	var hud: Hud = level.get_node("UI/HUD")
+	_check(hud._pop_left.all(func(t: float) -> bool: return t == 0.0), "no slot pops on arrival")
+	player.add_snack()
+	_check(hud._pop_left[0] > 0.0, "picking up a snack pops its slot")
+	player._invincible_timer = 0.0
+	player.take_damage(Player.PECK, player.global_position + Vector2.LEFT)
+	_check(hud._hurt_left > 0.0, "a hit shakes the suitcases on the HUD")
+	_check(Engine.time_scale < 1.0, "a hit briefly slows time (hit-stop)")
+	_check(player._sprite.scale != Vector2.ONE, "a hit squashes her")
+	var material := player._sprite.material as ShaderMaterial
+	_check(material != null and material.get_shader_parameter("flash") > 0.5, "a hit flashes her")
+	var offsets: Array[Vector2] = []
+	for i in 6:
+		await get_tree().process_frame
+		offsets.append(Juice.shake_offset())
+	_check(offsets.any(func(o: Vector2) -> bool: return o != Vector2.ZERO), "a hit shakes the screen")
+	_check(offsets.all(func(o: Vector2) -> bool: return o == o.round()), "the shake moves by whole pixels")
+	await _wait(0.6)
+	_check(Engine.time_scale == 1.0, "time runs normally again after the hit-stop")
+	_check(Juice.shake_offset() == Vector2.ZERO and level.get_node("Entities/Player/Camera2D").offset == Vector2.ZERO,
+		"the camera settles back after shaking")
+	_check(player._sprite.scale == Vector2.ONE, "she springs back from the squash")
+
+	# Particles: every kind bursts out, then cleans itself up.
+	var entities := level.get_node("Entities")
+	var bursts: Array = []
+	for kind: String in ParticleBurst.STYLES:
+		bursts.append(ParticleBurst.spawn(entities, kind, player.global_position))
+	await get_tree().process_frame
+	_check(bursts.all(func(b: Variant) -> bool: return b.bit_count() > 0), "every kind of particle bursts out")
+	await _wait(3.0)
+	_check(bursts.all(func(b: Variant) -> bool: return not is_instance_valid(b)), "particles clean themselves up")
+	player.global_position = Vector2(240, 488)
+	var dusty := false
+	Input.action_press("run")
+	Input.action_press("move_right")
+	for i in 40:
+		await get_tree().physics_frame
+		if entities.get_children().any(func(n: Node) -> bool: return n is ParticleBurst):
+			dusty = true
+	Input.action_release("run")
+	Input.action_release("move_right")
+	_check(dusty, "running kicks up dust")
+	player.stamina = 1.0
+	player._update_stamina(true, 0.1)
+	_check(hud._exhausted, "the stamina bar flashes when she runs out of breath")
+	player._update_stamina(false, 10.0)
+	_check(not hud._exhausted, "it stops flashing once she can run again")
+
+	# Audio polish: tracks crossfade, big cues duck the music, and a pile
+	# of identical sounds at once is capped.
+	AudioManager.play_music("security")
+	await get_tree().process_frame
+	_check(AudioManager._music.playing and AudioManager._music_old.playing, "a new track crossfades with the old one")
+	await _wait(1.5)
+	_check(not AudioManager._music_old.playing and AudioManager.music_playing() == "security",
+		"the old track fades out and stops")
+	AudioManager.play("checkpoint")
+	_check(AudioManager._duck_db < 0.0, "a checkpoint ducks the music")
+	await _wait(1.0)
+	_check(AudioManager._duck_db == 0.0, "the music comes back up after the duck")
+	var playing_before := AudioManager._world.filter(func(p: AudioStreamPlayer2D) -> bool: return p.playing).size()
+	for i in 6:
+		AudioManager.play("poof", player.global_position)
+	var started := AudioManager._world.filter(func(p: AudioStreamPlayer2D) -> bool: return p.playing).size() - playing_before
+	_check(started == AudioManager.MAX_STACK, "six poofs at once only play %d copies (%d)" % [AudioManager.MAX_STACK, started])
+	AudioManager.play_music("arrivals")
 	level.queue_free()
 
 

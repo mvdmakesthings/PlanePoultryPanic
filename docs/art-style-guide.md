@@ -125,6 +125,16 @@ Clusters of 3-5 mushrooms growing out of carpet, planters, and spilled food. Eac
 - Favor **squash and stretch** and exaggerated poses. A few frames done well beat many stiff ones.
 - Every attack has a **wind-up frame** so the player has a chance to react.
 
+### Game-Feel Effects (Juice)
+Feedback drawn in code by the `Juice` autoload (`game/scripts/managers/juice.gd`) and `ParticleBurst` (`game/scripts/objects/particle_burst.gd`), so it needs no extra frames in any character sheet:
+
+- **Screen shake**: whole-pixel camera jolts that die away over a quarter second, 1-3 px for everyday hits and slams, up to 6-8 px for the boss. Players can turn it off in Settings (Screen Shake), so nothing may depend on it to be readable.
+- **Hit-stop**: the action nearly freezes for a few frames (0.04-0.1 s; 0.25 s when the boss falls) so big hits land.
+- **Hit flashes**: the whole sprite flashes one solid palette color, keeping its silhouette, and fades back within a fifth of a second. Amanda flashes the reserved danger red `#ff0044` when hurt; chickens and totems flash white `#ffffff`. Don't flash in other colors.
+- **Squash and stretch**: sprites briefly scale (about 1.3 x 0.7) around their feet and spring back. This is the one allowed exception to "no fractional scaling", because it lasts a fraction of a second.
+- **Particles**: small 8x8 bits from `effects_particles.png` (below) that arc up, land on the floor and blink out over the last fifth of their life. They never fade with transparency, and always sit on whole pixels.
+- **HUD**: suitcases jitter a pixel after a hit, a slot pops up two pixels when it changes, and the stamina bar blinks red and white while Amanda is out of breath.
+
 ### Animation Sets
 
 Left-facing frames are mirrored from right-facing ones, so each character only needs 3 drawn directions (down, up, right).
@@ -280,6 +290,21 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 **`roost.png`**: one 24x14 straw nest with a lost luggage tag and a feather, drawn flat on the floor. Totems themselves are built in code from `chicken_idle.png` frames stacked 10 px apart, with a `chicken_rage_walk.png` frame (the red spotted cap) on top.
 
 **`feather_poof.png`**: six 24x24 frames of a defeated chicken bursting into feathers. Play once at 12 FPS.
+
+**`effects_particles.png`**: 8x8 particle frames, made by `tools/sprites/effects.py`. One row per kind, 4 columns. The particle's position is the center of its frame. Particles have no outline, so they read as effects rather than pickups. "Life" rows play their 4 columns over the particle's life; "variant" rows hold 4 different bits and the game picks one at random.
+
+| Row | Kind | Columns | Used for |
+|---|---|---|---|
+| 0 | `dust` | Life: puff swells, breaks up, specks | Running footsteps, hop landings, cart slams, vent drops; a fast ring of it for stomps and topples |
+| 1 | `feather` | Variants | Pecks, vent drops |
+| 2 | `crumb` | Variants | Amanda or a chicken eating a snack |
+| 3 | `foam` | Life: puddle shrinking away | Left on the floor after a spray |
+| 4 | `egg` | Variants: shell and yolk bits | Egg splats |
+| 5 | `spark` | Life: star cooling and shrinking | Cart slams |
+| 6 | `sparkle` | Life: dot, cross, big cross, cross | Pickups, unlocked doors, vending payouts, checkpoints |
+| 7 | `confetti` | Variants: blue, red, green, yellow | Checkpoints |
+
+Dust is mid-gray `#8b9bb4` with white highlights so it shows on both light tile and dark carpet. Add new kinds as new rows at the bottom.
 
 **`departure_board.png`**: four 64x28 frames of the flight information display that hangs on the wall face. A "DEPARTURES" title over three flights; the destinations stay put while the statuses flip and flicker like a split-flap board. Loop at about 3 FPS. Text uses a 3x5 pixel font (in `tools/sprites/set_dressing.py`) with yellow titles, orange destinations, and red for cancellations.
 

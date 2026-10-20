@@ -37,6 +37,9 @@ func activate(quiet := false) -> void:
 		return
 	is_active = true
 	if not quiet:
+		# A little celebration over the map.
+		ParticleBurst.spawn(get_parent(), "confetti", global_position, Vector2.ZERO, 0, 24.0)
+		ParticleBurst.spawn(get_parent(), "sparkle", global_position, Vector2.ZERO, 0, 18.0)
 		reached.emit(self)
 
 

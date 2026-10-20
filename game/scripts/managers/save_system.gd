@@ -5,7 +5,7 @@ extends Node
 ## is one JSON file holding the latest checkpoint (see LevelState), with
 ## the run's stats (see RunStats). The best score has a file of its own, so
 ## it outlasts the save, which is cleared when the game is finished. Settings
-## (volumes, fullscreen, remapped controls) live in their own file and are
+## (volumes, fullscreen, screen shake, remapped controls) live in their own file and are
 ## applied at startup.
 
 const SAVE_PATH := "user://save.json"
@@ -23,6 +23,8 @@ var settings_path := SETTINGS_PATH
 ## Volumes (0-1) by bus name, and whether the window is fullscreen.
 var volumes := {}
 var fullscreen := false
+## Accessibility: whether hits and slams shake the screen (see Juice).
+var screen_shake := true
 
 
 func _ready() -> void:
@@ -96,6 +98,7 @@ func load_settings() -> void:
 		AudioManager.set_volume(bus, volumes[bus])
 	fullscreen = bool(config.get_value("video", "fullscreen", false))
 	_apply_fullscreen()
+	screen_shake = bool(config.get_value("accessibility", "screen_shake", true))
 	for action in REMAPPABLE:
 		var key: int = config.get_value("keys", action, KEY_NONE)
 		if key != KEY_NONE:
@@ -110,6 +113,7 @@ func save_settings() -> void:
 	for bus: String in volumes:
 		config.set_value("audio", bus, volumes[bus])
 	config.set_value("video", "fullscreen", fullscreen)
+	config.set_value("accessibility", "screen_shake", screen_shake)
 	for action in REMAPPABLE:
 		var key := primary_key(action)
 		if key != InputSetup.default_key(action):
@@ -129,6 +133,11 @@ func set_volume(bus: String, linear: float) -> void:
 func set_fullscreen(on: bool) -> void:
 	fullscreen = on
 	_apply_fullscreen()
+	save_settings()
+
+
+func set_screen_shake(on: bool) -> void:
+	screen_shake = on
 	save_settings()
 
 
@@ -167,6 +176,7 @@ func reset_audio_and_video() -> void:
 		AudioManager.set_volume(bus, volumes[bus])
 	fullscreen = false
 	_apply_fullscreen()
+	screen_shake = true
 	save_settings()
 
 

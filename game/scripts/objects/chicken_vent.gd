@@ -28,6 +28,8 @@ func spawn() -> Chicken:
 	chicken.alert()
 	_open_left = 0.6
 	AudioManager.play("vent", drop_point())
+	ParticleBurst.spawn(chicken.get_parent(), "feather", drop_point(), Vector2.ZERO, 3, 12.0)
+	ParticleBurst.spawn(chicken.get_parent(), "dust", drop_point(), Vector2.ZERO, 4)
 	return chicken
 
 

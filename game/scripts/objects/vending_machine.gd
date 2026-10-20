@@ -55,6 +55,8 @@ func unlock(quiet := false) -> void:
 	if quiet:
 		return
 	AudioManager.play("vend", global_position)
+	Juice.shake(1.0)
+	ParticleBurst.spawn(get_parent(), "sparkle", global_position, Vector2.DOWN, 0, 14.0)
 	for i in snacks:
 		var pickup := PICKUP_SCENE.instantiate() as ItemPickup
 		# Spread out in a little arc in front of the flap.

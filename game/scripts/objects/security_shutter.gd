@@ -86,6 +86,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _slam() -> void:
+	Juice.shake(2.5)
 	var crush := crush_rect()
 	for node in get_tree().get_nodes_in_group("chickens"):
 		var chicken := node as Chicken

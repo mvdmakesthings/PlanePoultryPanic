@@ -32,7 +32,10 @@ func _physics_process(delta: float) -> void:
 		if body is Player:
 			if dropped:
 				return
+			var before := count
 			count = (body as Player).pick_up(item, count)
+			if count < before:
+				ParticleBurst.spawn(get_parent(), "sparkle", global_position, Vector2.ZERO, 0, 7.0)
 			if count == 0:
 				queue_free()
 			return

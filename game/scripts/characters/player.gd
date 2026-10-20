@@ -208,6 +208,11 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 	health = maxi(health - amount, 0)
 	health_changed.emit(health, max_health)
 	AudioManager.play("hurt")
+	# A heavier hit shakes harder and holds the moment longer.
+	Juice.shake(1.5 + amount * 0.75)
+	Juice.hitstop(0.04 + 0.01 * amount)
+	Juice.flash(_sprite, Juice.DANGER, 0.2)
+	Juice.squash(_sprite, Vector2(1.25, 0.8))
 	_knockback = (global_position - from_position).normalized() * knockback_strength
 	put_down_suitcase()
 	if health == 0:
@@ -298,6 +303,7 @@ func eat_snack() -> void:
 	inventory.take_from(index)
 	RunStats.item_used()
 	AudioManager.play("eat")
+	ParticleBurst.spawn(get_parent(), "crumb", global_position, Vector2.ZERO, 0, 18.0)
 	_start_action("eat")
 	health = mini(health + SUITCASE, max_health)
 	health_changed.emit(health, max_health)
@@ -517,6 +523,9 @@ func _play_footstep() -> void:
 	var animation := String(_sprite.animation)
 	if (animation.begins_with("walk") or animation.begins_with("run")) and _sprite.frame % 2 == 0:
 		AudioManager.play("step")
+		# Running kicks up a little dust behind her.
+		if animation.begins_with("run"):
+			ParticleBurst.spawn(get_parent(), "dust", global_position - facing * 3.0, -facing)
 
 
 func _update_invincibility(delta: float) -> void:
