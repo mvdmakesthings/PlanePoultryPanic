@@ -43,3 +43,93 @@ def poof():
     for i in range(POOF_FRAMES):
         out.alpha_composite(to_image(poof_frame(i)), (i * POOF_SIZE, 0))
     return out
+
+
+# ---------- particles ----------
+# effects_particles.png: 8x8 frames, one row per kind, 4 columns. Rows whose
+# kind "animates" play their columns over the particle's life (dust, foam,
+# spark, sparkle); the rest are 4 variants the game picks from at random
+# (feather, crumb, egg, confetti). The particle's position is the frame's
+# center. Small bits have no outline, so they read as effects, not pickups.
+PARTICLE_SIZE = 8
+PARTICLE_KINDS = ["dust", "feather", "crumb", "foam", "egg", "spark", "sparkle", "confetti"]
+
+
+def _centered(pattern):
+    """Pads a small pattern (list of strings) into the middle of an 8x8 frame."""
+    h, w = len(pattern), max(len(r) for r in pattern)
+    top, left = (PARTICLE_SIZE - h) // 2, (PARTICLE_SIZE - w) // 2
+    g = ["." * PARTICLE_SIZE for _ in range(PARTICLE_SIZE)]
+    for y, row in enumerate(pattern):
+        put(g, top + y, left, row.ljust(w, "."))
+    return g
+
+
+PARTICLES = {
+    # A puff kicked up by a running foot: swells, breaks up, fades to specks.
+    # Mid gray with white highlights, so it shows on light tile and dark carpet.
+    "dust": [
+        [".ww.", "wLWw", ".ww."],
+        [".wL.", "wLWw", "wwWw", ".ww."],
+        ["w.L..", "wW..w", ".w.Ww", "..w.."],
+        ["w..w", "....", "..w."],
+    ],
+    # Loose feathers: white vanes, cream shading at the quill.
+    "feather": [
+        ["....Lc", "..LLc.", ".LLc..", "cc...."],
+        [".LLLc.", "cLLLLc"],
+        [".L.", "LLc", "LLc", ".Lc", ".c."],
+        ["..Lc", ".Lc.", "c..."],
+    ],
+    # Chip crumbs.
+    "crumb": [
+        ["YY", "Yy"],
+        ["Y"],
+        ["FY.", "YYy"],
+        ["y", "Y"],
+    ],
+    # Foam left on the floor: a puddle that shrinks away.
+    "foam": [
+        ["..LLW.", ".LLLLW", "WLLWww", ".Www.."],
+        [".LLW", "LLWw", ".Ww."],
+        ["L.W", ".W.", "W.."],
+        ["L.", ".W"],
+    ],
+    # Egg bits: shell shards and yolk drops.
+    "egg": [
+        ["LL", "Lc"],
+        ["FY", "YY"],
+        ["L.", "cL"],
+        ["Y"],
+    ],
+    # A spark off metal: a bright star that cools and shrinks.
+    "spark": [
+        ["..F..", ".FLF.", "FLLLF", ".FLF.", "..F.."],
+        [".Y.", "YFY", ".Y."],
+        ["y.", ".Y"],
+        ["y"],
+    ],
+    # A twinkle: grows into a cross, then shrinks.
+    "sparkle": [
+        ["L"],
+        [".F.", "FLF", ".F."],
+        ["..F..", "..L..", "FLLLF", "..L..", "..F.."],
+        [".F.", "FLF", ".F."],
+    ],
+    # Confetti: one bit per color.
+    "confetti": [
+        ["bb", "bB"],
+        ["RR", "r."],
+        ["ll.", ".lg"],
+        ["FY"],
+    ],
+}
+
+
+def particles():
+    s = PARTICLE_SIZE
+    out = Image.new("RGBA", (s * 4, s * len(PARTICLE_KINDS)), (0, 0, 0, 0))
+    for row, kind in enumerate(PARTICLE_KINDS):
+        for col, pattern in enumerate(PARTICLES[kind]):
+            out.alpha_composite(to_image(_centered(pattern)), (col * s, row * s))
+    return out

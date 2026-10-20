@@ -78,6 +78,7 @@ IMAGES = [
     ("extinguisher_cabinet.png", items.cabinet),
     ("ice_block.png", items.ice),
     ("feather_poof.png", effects.poof),
+    ("effects_particles.png", effects.particles),
     ("gate_door.png", gate.sheet),
     ("closet_door.png", closet.sheet),
     ("roost.png", roost.sheet),
