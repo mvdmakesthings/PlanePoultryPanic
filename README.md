@@ -97,7 +97,7 @@ The first covers the prototype room's systems (chickens, items, machinery); the 
 
 ## Build for the browser (itch.io)
 
-The project has a **Web** export preset (`game/export_presets.cfg`). It uses the single-threaded web build, so it runs on hosts that can't send special headers, like itch.io and GitHub Pages.
+The project has a **Web** export preset (`game/export_presets.cfg`). It uses the single-threaded web build, so it runs on hosts that can't send special headers, like itch.io.
 
 1. Install the web export templates once. In the Godot editor: **Editor > Manage Export Templates > Download and Install**. The templates must match your Godot version exactly.
 2. Export from the repo root:
@@ -132,7 +132,7 @@ cd build/web && zip -r ../plane-poultry-panic-web.zip . && cd -
 
 The latest browser build is playable at **https://planepoultrypanic.mvdmakesthings.com/** and on itch.io at **https://mvdmakesthings.itch.io/plane-poultry-panic**.
 
-- The website is GitHub Pages, served from a separate public repo, [plane-poultry-panic-play](https://github.com/mvdmakesthings/plane-poultry-panic-play), which holds only the exported files, so this repo (code, tools and docs) stays private. The domain is a CNAME record (`planepoultrypanic` → `mvdmakesthings.github.io`) in Vercel's DNS for `mvdmakesthings.com`, and the play repo's `CNAME` file tells GitHub to use it.
+- The website is hosted on Vercel (project `plane-poultry-panic` in the MVD Makes Things team), which deploys the separate public repo [plane-poultry-panic-play](https://github.com/mvdmakesthings/plane-poultry-panic-play) on every push. That repo holds only the exported files, so this repo (code, tools and docs) stays private. The domain is attached to the Vercel project, and Vercel handles its DNS and HTTPS certificate.
 - itch.io uploads go through [butler](https://itch.io/docs/butler/), installed at `~/.local/share/butler/butler` from itch.io's own download server (the Homebrew package called "butler" is an unrelated app). Log it in once with `~/.local/share/butler/butler login`.
 
 To publish a new version to both, set `config/version` in `game/project.godot`, then run from the repo root:
@@ -141,7 +141,7 @@ To publish a new version to both, set `config/version` in `game/project.godot`, 
 tools/publish_web.sh
 ```
 
-It exports the Web build, copies it into the play repo (keeping its README, `.nojekyll` and `CNAME`) and pushes, then pushes the same build to itch.io's `html5` channel. GitHub Pages updates a minute or two later. Set `SKIP_ITCH=1` to publish only the website. If the build hasn't changed, GitHub Pages is left alone and itch.io receives an almost empty patch.
+It exports the Web build, copies it into the play repo (keeping its README, `vercel.json` and `.gitignore`) and pushes, then pushes the same build to itch.io's `html5` channel. Vercel deploys it a minute or so later. Set `SKIP_ITCH=1` to publish only the website. If the build hasn't changed, the website is left alone and itch.io receives an almost empty patch.
 
 Browser build notes:
 
