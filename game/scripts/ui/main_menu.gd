@@ -1,7 +1,8 @@
 extends Control
 ## The main menu: the title on a departure-board sign, the menu as a board
 ## of "flights" (New Game, Continue, Settings, Quit), and a looping scene
-## along the floor of the passenger running from a few chickens.
+## along the floor of the passenger running from a few chickens. Once a
+## run has been finished, the best score shows under the board.
 
 const TILES := preload("res://assets/sprites/tiles_arrivals.png")
 const PLAYER_RUN := preload("res://assets/sprites/player_run.png")
@@ -14,17 +15,22 @@ const CHASE_SPEED := 70.0
 const CHASE_FLOOR_Y := 178.0
 ## Who's in the chase and how far behind the passenger each one runs.
 const CHASERS := [34.0, 52.0, 76.0]
+## Where the best score line sits.
+const BEST_Y := 149.0
 
 var _board: BoardMenu
 var _settings: SettingsMenu
 var _chase: Array[AnimatedSprite2D] = []
 var _chase_x := 340.0
 var _confirm_new_game := false
+## The best score and fastest finish, or {} before any finished run.
+var best: Dictionary = {}
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	AudioManager.stop_music()
+	best = SaveSystem.load_best()
 	_build_chase()
 	_board = BoardMenu.new()
 	_board.panel_top = 56.0
@@ -140,3 +146,17 @@ func _draw() -> void:
 		HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 16, BoardMenu.TITLE)
 	draw_string(font, Vector2(SIGN.position.x, SIGN.position.y + 35), TAGLINE,
 		HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 8, BoardMenu.STATUS)
+	if not best.is_empty():
+		# On a dark plate, like the board's footer.
+		var line := best_line()
+		var width := font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
+		draw_rect(Rect2(roundf((size.x - width) / 2.0) - 3, BEST_Y - 8, width + 6, 11), BoardMenu.BACK)
+		draw_string(font, Vector2(0, BEST_Y), line, HORIZONTAL_ALIGNMENT_CENTER, size.x, 8, BoardMenu.LABEL)
+
+
+## Like "BEST 8,450  FIRST CLASS   FASTEST 24:51".
+func best_line() -> String:
+	var line := "BEST %s  %s" % [ScoreScreen.format_points(int(best.get("total", 0))), best.get("rank", "")]
+	if best.has("time"):
+		line += "   FASTEST " + ScoreScreen.format_time(best["time"])
+	return line

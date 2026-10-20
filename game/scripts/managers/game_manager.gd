@@ -14,6 +14,8 @@ const MAIN_MENU := "res://scenes/ui/main_menu.tscn"
 const FIRST_LEVEL := "res://scenes/levels/level_01_arrivals.tscn"
 ## The cutscene New Game plays before the first level.
 const OPENING := "res://scenes/cutscenes/opening.tscn"
+## The end-of-run score screen, after the ending.
+const SCORE_SCREEN := "res://scenes/ui/score_screen.tscn"
 const FADE_TIME := 0.25
 
 ## The snapshot the next level should restore, taken with take_pending().
@@ -117,13 +119,13 @@ func take_pending(level_path: String) -> Dictionary:
 
 ## The run is over (the ending has played): it's scored (keeping any new
 ## best), the save is cleared, since there's nothing left to continue, and
-## it's back to the main menu.
+## the score screen shows how it went.
 func finish_game() -> void:
 	RunStats.finish_run()
 	SaveSystem.delete_game()
 	last_checkpoint = {}
 	pending = {}
-	change_scene(MAIN_MENU)
+	change_scene(SCORE_SCREEN)
 
 
 func quit_to_menu() -> void:

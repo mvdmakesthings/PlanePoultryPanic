@@ -25,6 +25,7 @@ func _ready() -> void:
 	await _time_out_test()
 	await _ending_test()
 	SaveSystem.delete_game()
+	SaveSystem.delete_best()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SaveSystem.settings_path))
 
 	get_tree().paused = false
@@ -184,7 +185,7 @@ func _time_out_test() -> void:
 
 
 ## The ending plays through to THE END (skippable), and from there goes
-## back to the main menu with the finished run's save cleared.
+## on to the score screen with the finished run's save cleared.
 func _ending_test() -> void:
 	get_tree().paused = false
 	SaveSystem.save_game({"level": LEVEL_PATH, "checkpoint": "escape"})
@@ -202,8 +203,8 @@ func _ending_test() -> void:
 	_tap("ui_accept")
 	await get_tree().process_frame
 	GameManager.scene_change_requested.disconnect(on_change)
-	_check(requested[0] == GameManager.MAIN_MENU and not SaveSystem.has_save(),
-		"THE END goes back to the main menu, and the finished run's save is cleared")
+	_check(requested[0] == GameManager.SCORE_SCREEN and not SaveSystem.has_save(),
+		"THE END goes on to the score screen, and the finished run's save is cleared")
 	ending.queue_free()
 
 
