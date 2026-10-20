@@ -6,6 +6,9 @@
   down, then wheels up with the engines' glow.
 - stowaway.png: one cabin window, 16x16, 3 frames: dark, a chicken's head
   popping up, the chicken winking with a glowing teal eye.
+- passenger_window.png: the next cabin window along, 16x16, 2 frames:
+  Amanda in profile facing the front of the plane, eyes open, then blinking,
+  happily unaware of the chicken one row back.
 """
 import math
 import random
@@ -146,3 +149,37 @@ def stowaway(frame):
 
 def stowaway_sheet():
     return _strip([stowaway(f) for f in range(3)], 16, 16)
+
+
+def passenger_window(frame):
+    """Amanda in her seat, seen through the window in profile, facing right
+    (the front of the plane): pink hair falling to her shoulders, a blue
+    headrest behind her. Frame 1 is a blink."""
+    g = _blank(16, 16)
+    _rect(g, 2, 1, 13, 14, "W")
+    _rect(g, 3, 2, 12, 13, "O")
+    _rect(g, 4, 3, 11, 12, "k")
+    # The seat's headrest behind her.
+    _rect(g, 4, 5, 5, 12, "B")
+    put(g, 5, 4, "b")
+    # Hair: lit on top, darker at the back, down to her shoulders.
+    _rect(g, 6, 4, 9, 4, "h")
+    _rect(g, 5, 5, 9, 10, "H")
+    _rect(g, 5, 8, 6, 11, "d")
+    put(g, 4, 6, "h")
+    # Face in profile: forehead, eye, nose, chin.
+    _rect(g, 8, 6, 10, 9, "S")
+    put(g, 6, 9, "H")
+    put(g, 7, 11, "S")
+    put(g, 9, 9, "s")
+    put(g, 7, 9, "O" if frame == 0 else "s")
+    put(g, 9, 10, "M")
+    # Neck and the gray tee at the bottom of the window.
+    put(g, 10, 8, "s")
+    _rect(g, 6, 11, 10, 12, "W")
+    put(g, 3, 4, "p")
+    return g
+
+
+def passenger_window_sheet():
+    return _strip([passenger_window(f) for f in range(2)], 16, 16)

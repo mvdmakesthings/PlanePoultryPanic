@@ -408,6 +408,8 @@ Made by `tools/sprites/ending.py`.
 
 **`stowaway.png`**: three 16x16 frames of a cabin window: empty, a chicken's head popping up, then the chicken winking with a glowing teal eye. Shown scaled up 6x as a deliberate close-up.
 
+**`passenger_window.png`**: two 16x16 frames of the next cabin window along: Amanda in profile facing the front of the plane, a blue headrest behind her pink hair, then the same with her eyes shut (a blink). Shown beside `stowaway.png` at the same 6x, so she sits one window ahead of the chicken, none the wiser.
+
 ### Import Settings (Godot)
 - Texture filter: Nearest
 - No mipmaps

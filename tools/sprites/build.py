@@ -126,6 +126,7 @@ IMAGES = [
     ("ending_sky.png", ending.sky),
     ("plane_side.png", ending.plane_sheet),
     ("stowaway.png", ending.stowaway_sheet),
+    ("passenger_window.png", ending.passenger_window_sheet),
     ("departure_board_security.png", lambda: set_dressing.departure_board_sheet("security")),
     ("departure_board_food_court.png", lambda: set_dressing.departure_board_sheet("food_court")),
     ("departure_board_gates.png", lambda: set_dressing.departure_board_sheet("gates")),

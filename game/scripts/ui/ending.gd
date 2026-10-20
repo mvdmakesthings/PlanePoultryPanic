@@ -2,7 +2,8 @@ class_name Ending
 extends Node2D
 ## The ending: Amanda crosses the tarmac and boards the last plane, it takes
 ## off into the night, and then a close-up of a cabin window: a chicken pops
-## up and winks, one eye glowing mushroom teal. THE END. Any confirm or
+## up and winks, one eye glowing mushroom teal, while in the next window
+## along Amanda faces forward, blinking contentedly, none the wiser. THE END. Any confirm or
 ## pause press skips ahead; on the end card it goes back to the main menu,
 ## and the finished run's save is cleared.
 
@@ -11,6 +12,7 @@ signal finished
 const SKY := preload("res://assets/sprites/ending_sky.png")
 const PLANE := preload("res://assets/sprites/plane_side.png")
 const STOWAWAY := preload("res://assets/sprites/stowaway.png")
+const PASSENGER := preload("res://assets/sprites/passenger_window.png")
 const WALK := preload("res://assets/sprites/player_walk.png")
 const BLACK := Color("181425")
 ## Where the plane waits, and where its door is along the fuselage.
@@ -24,6 +26,7 @@ var shot := ""
 var _plane: Sprite2D
 var _amanda: Sprite2D
 var _window: Sprite2D
+var _passenger: Sprite2D
 var _fuselage: Node2D
 var _overlay: ColorRect
 var _ui: Control
@@ -65,9 +68,17 @@ func _ready() -> void:
 	_window.texture = STOWAWAY
 	_window.hframes = 3
 	_window.scale = Vector2(6, 6)
-	_window.position = Vector2(160, 84)
+	_window.position = Vector2(104, 84)
 	_window.visible = false
 	add_child(_window)
+	# Amanda one window forward (to the right, the way the plane faces).
+	_passenger = Sprite2D.new()
+	_passenger.texture = PASSENGER
+	_passenger.hframes = 2
+	_passenger.scale = Vector2(6, 6)
+	_passenger.position = Vector2(216, 84)
+	_passenger.visible = false
+	add_child(_passenger)
 
 	var layer := CanvasLayer.new()
 	add_child(layer)
@@ -83,6 +94,12 @@ func _ready() -> void:
 	layer.add_child(_ui)
 	AudioManager.play_music("victory")
 	_play()
+
+
+func _process(_delta: float) -> void:
+	# A slow, contented blink: eyes shut for a moment every 1.6 seconds.
+	if _passenger.visible:
+		_passenger.frame = 1 if Time.get_ticks_msec() % 1600 < 160 else 0
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -136,6 +153,7 @@ func _play() -> void:
 	_fuselage.visible = true
 	_window.visible = true
 	_window.frame = 0
+	_passenger.visible = true
 	await _fade(0.0, 0.5)
 	await _wait(1.0)
 	_window.frame = 1

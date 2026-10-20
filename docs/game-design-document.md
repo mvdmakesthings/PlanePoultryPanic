@@ -502,4 +502,4 @@ game/
 | 2026-10-19 | Level 4 layout: Gates A, B, C joined by walkway corridors, with roosts in B and C and a shutter room in B | You |
 | 2026-10-19 | The final boss takes three hits, sheds chickens with each, ignores snacks, and is formed by eight waiting chickens when the player enters the arena | Proposed |
 | 2026-10-19 | The escape is a 30-second countdown with chickens from vents and a jet-bridge walkway; running out of time counts as a knockout, retried from the boss's fall | Proposed |
-| 2026-10-19 | The ending: Amanda boards, the plane takes off, a chicken winks from a cabin window with a glowing eye; THE END returns to the main menu and clears the save | Proposed |
+| 2026-10-19 | The ending: Amanda boards, the plane takes off, a chicken winks from a cabin window with a glowing eye while Amanda sits one window ahead, unaware (You); THE END returns to the main menu and clears the save | Proposed |
