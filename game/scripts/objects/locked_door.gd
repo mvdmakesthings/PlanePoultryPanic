@@ -109,6 +109,7 @@ func unlock(quiet := false) -> void:
 	_barrier.queue_free()
 	if not quiet:
 		AudioManager.play("unlock")
+		ParticleBurst.spawn(get_parent(), "sparkle", base_point(), Vector2.ZERO, 0, 12.0)
 	_sprite.frame = FRAME_CLOSED
 	_show_prompt = false
 	queue_redraw()
