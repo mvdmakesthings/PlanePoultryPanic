@@ -9,17 +9,32 @@ extends Node
 ## restore; with no snapshot a level starts from the beginning.
 
 signal scene_change_requested(path: String)
+## A secret (see SECRETS) was found for the first time this run. The score
+## screen counts these toward the Discovery score.
+signal secret_found(secret_id: String)
 
 const MAIN_MENU := "res://scenes/ui/main_menu.tscn"
 const FIRST_LEVEL := "res://scenes/levels/level_01_arrivals.tscn"
 ## The cutscene New Game plays before the first level.
 const OPENING := "res://scenes/cutscenes/opening.tscn"
 const FADE_TIME := 0.25
+## Every secret in the game, by id (the GDD's Secrets section).
+const SECRETS: Array[String] = [
+	"arrivals_bag", "arrivals_nest",
+	"security_bin", "security_storage",
+	"food_court_freezer", "food_court_hoard",
+	"gates_lounge", "gates_pilot_cap", "gates_fragile",
+	"final_crew_room", "final_pilot_cap",
+]
+const SECRETS_TOTAL := 11
 
 ## The snapshot the next level should restore, taken with take_pending().
 var pending: Dictionary = {}
 ## The latest checkpoint reached in this run, or {}.
 var last_checkpoint: Dictionary = {}
+## Ids of the secrets found so far this run. Saved with every checkpoint;
+## once found, a secret stays found for the rest of the run.
+var secrets_found: Array[String] = []
 ## Tests set this so scene changes are only announced, not made, since a
 ## real change would replace the test itself.
 var dry_run := false
@@ -47,6 +62,7 @@ func new_game() -> void:
 	SaveSystem.delete_game()
 	last_checkpoint = {}
 	pending = {}
+	secrets_found.clear()
 	change_scene(OPENING)
 
 
@@ -63,6 +79,7 @@ func continue_game() -> void:
 		return
 	last_checkpoint = save
 	pending = save
+	secrets_found.assign(save.get("secrets", []))
 	change_scene(save["level"])
 
 
@@ -100,8 +117,31 @@ func retry(level: String) -> void:
 ## Called by a level when the player reaches a checkpoint: remembers it and
 ## autosaves.
 func checkpoint_reached(snapshot: Dictionary) -> void:
+	snapshot["secrets"] = secrets_found.duplicate()
 	last_checkpoint = snapshot
 	SaveSystem.save_game(snapshot)
+
+
+## Marks a secret found. Returns true (and emits secret_found) only the
+## first time.
+func find_secret(secret_id: String) -> bool:
+	if secret_id in secrets_found:
+		return false
+	secrets_found.append(secret_id)
+	secret_found.emit(secret_id)
+	return true
+
+
+func has_secret(secret_id: String) -> bool:
+	return secret_id in secrets_found
+
+
+## True once every secret in the game has been found this run.
+func found_every_secret() -> bool:
+	for id in SECRETS:
+		if not id in secrets_found:
+			return false
+	return true
 
 
 ## The snapshot to restore, if any, for a level that has just loaded.
