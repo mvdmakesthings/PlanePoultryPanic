@@ -25,7 +25,10 @@ enum State { IDLE, STALK, STOMP_WINDUP, TOPPLING, FLYING }
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
 const RAGE_SHEET := preload("res://assets/sprites/chicken_rage_walk.png")
 const CHICKEN_SCENE := preload("res://scenes/characters/chicken.tscn")
-const EGG_SCENE := preload("res://scenes/objects/egg_projectile.tscn")
+## Loaded when first fired rather than preloaded: totem, chicken and egg
+## scenes preload each other, and a preload here could come back empty
+## depending on which of them loads first.
+const EGG_SCENE_PATH := "res://scenes/objects/egg_projectile.tscn"
 const POOF_SCENE := preload("res://scenes/objects/feather_poof.tscn")
 const CROWN_SHEET := preload("res://assets/sprites/boss_crown.png")
 ## Seconds a boss can't be hit again after a hit.
@@ -321,8 +324,9 @@ func _stomp() -> void:
 func _barrage() -> void:
 	_barrage_ready_in = barrage_cooldown
 	var aim := global_position.direction_to(_player.global_position)
+	var egg_scene := load(EGG_SCENE_PATH) as PackedScene
 	for degrees in barrage_spread:
-		var egg := EGG_SCENE.instantiate() as EggProjectile
+		var egg := egg_scene.instantiate() as EggProjectile
 		egg.direction = aim.rotated(deg_to_rad(degrees))
 		egg.position = position + egg.direction * 10.0
 		get_parent().add_child(egg)
