@@ -52,7 +52,7 @@ func _layout_tests() -> void:
 			"checkpoint", "level_clear", "ui_move", "ui_confirm", "ui_back"]:
 		_check(ResourceLoader.exists(AudioManager.SFX_DIR + sound + ".wav"), "the %s sound exists" % sound)
 	await get_tree().physics_frame
-	_check(hud._hint.contains("WASD"), "the first hint teaches moving")
+	_check(hud._hint.contains("{move}"), "the first hint teaches moving")
 
 	# The north wall stops the player below its face.
 	await _hold(["move_up"], 1.0)

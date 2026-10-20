@@ -22,6 +22,7 @@ func _ready() -> void:
 	await _main_menu_tests()
 	await _settings_tests()
 	await _remap_tests()
+	await _device_tests()
 
 	SaveSystem.reset_controls()
 	SaveSystem.delete_game()
@@ -133,6 +134,46 @@ func _remap_tests() -> void:
 	_check(int(config.get_value("keys", "move_up", KEY_NONE)) == KEY_I, "remapped keys are saved")
 	SaveSystem.reset_controls()
 	menu.queue_free()
+
+
+## Prompts follow the device: a gamepad press switches them to gamepad
+## buttons, a key press switches them back.
+func _device_tests() -> void:
+	var switches := [0]
+	var count := func(_gamepad: bool) -> void: switches[0] += 1
+	InputSetup.device_changed.connect(count)
+	var keyboard_width := ButtonGlyphs.width(ThemeDB.fallback_font, "{interact} push")
+	var button := InputEventJoypadButton.new()
+	button.button_index = JOY_BUTTON_A
+	button.pressed = true
+	Input.parse_input_event(button)
+	Input.flush_buffered_events()
+	await get_tree().process_frame
+	_check(InputLabels.gamepad, "pressing a gamepad button switches prompts to the gamepad")
+	_check(InputLabels.label("interact") == "B" and InputLabels.label("eat_snack") == "X",
+		"gamepad prompts name the gamepad buttons")
+	_check(InputLabels.label("move") == "L-STICK", "the gamepad's move prompt is the left stick")
+	var pad_width := ButtonGlyphs.width(ThemeDB.fallback_font, "{interact} push")
+	_check(pad_width != keyboard_width, "prompts are drawn with gamepad glyphs")
+	var stick := InputEventJoypadMotion.new()
+	stick.axis = JOY_AXIS_LEFT_X
+	stick.axis_value = 0.2
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_D
+	key.pressed = true
+	Input.parse_input_event(key)
+	Input.flush_buffered_events()
+	await get_tree().process_frame
+	_check(not InputLabels.gamepad and InputLabels.label("interact") == "F", "a key press switches prompts back to the keyboard")
+	Input.parse_input_event(stick)
+	Input.flush_buffered_events()
+	await get_tree().process_frame
+	_check(not InputLabels.gamepad, "a slightly drifting stick doesn't switch to the gamepad")
+	_check(switches[0] == 2, "each switch is announced once")
+	InputSetup.device_changed.disconnect(count)
+	var release := InputEventKey.new()
+	release.physical_keycode = KEY_D
+	Input.parse_input_event(release)
 
 
 func _fresh_menu() -> Node:

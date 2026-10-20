@@ -33,7 +33,7 @@ func _ready() -> void:
 	_settings.title = "SETTINGS"
 	_settings.panel_top = 34.0
 	_settings.flicker = false
-	_settings.footer = "{ui_accept} SELECT   ARROWS ADJUST   {ui_cancel} BACK"
+	_settings.footer = "{ui_accept} SELECT  {ui_left}{ui_right} ADJUST  {ui_cancel} BACK"
 	add_child(_settings)
 	_settings.chosen.connect(_on_settings_chosen)
 	_settings.changed.connect(_on_settings_changed)

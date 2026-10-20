@@ -86,7 +86,7 @@ Level 1 at close to final quality, start to finish.
 - [x] Sound effects and placeholder music (Level 1 plays a loop built from the cluck groove, `tools/music/arrivals.py`)
 - [x] Checkpoints, death and retry, and autosave
 - [x] Main menu, pause menu, basic settings (audio, fullscreen, remapping)
-- [ ] Context prompts that switch between keyboard and gamepad icons
+- [x] Context prompts that switch between keyboard and gamepad icons
 - [ ] Runs well on Steam Deck, or a low-end PC as a stand-in
 - [ ] 3-5 friends play it without help; watch silently and take notes
 - [ ] **Measure how long M4 took** and re-plan M5-M8 from that

@@ -125,4 +125,4 @@ func _draw() -> void:
 		return
 	var player := get_tree().get_first_node_in_group("player") as Player
 	var has_key := player != null and player.inventory.has_key_item(key_item)
-	InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "F unlock" if has_key else "F locked")
+	InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "{interact} unlock" if has_key else "{interact} locked")

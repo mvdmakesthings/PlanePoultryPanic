@@ -63,6 +63,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	visibility_changed.connect(queue_redraw)
+	InputSetup.device_changed.connect(func(_gamepad: bool) -> void: queue_redraw())
 
 
 ## Replaces the items. Keeps the selection on the same id if it's still there.
@@ -228,8 +229,7 @@ func _draw() -> void:
 	draw_rect(panel.grow(2), BEZEL)
 	draw_rect(Rect2(panel.position - Vector2(2, 2), Vector2(panel.size.x + 4, 1)), BEZEL_LIGHT)
 	draw_rect(panel, BACK)
-	draw_string(font, panel.position + Vector2(0, 11), InputLabels.format(title), HORIZONTAL_ALIGNMENT_CENTER,
-		panel.size.x, FONT_SIZE, TITLE)
+	ButtonGlyphs.draw_centered(self, font, panel.get_center().x, panel.position.y + 11, title, TITLE)
 	draw_rect(Rect2(panel.position + Vector2(PAD, TITLE_HEIGHT - 3), Vector2(panel.size.x - PAD * 2, 1)), DIVIDER)
 
 	_row_rects.clear()
@@ -254,11 +254,9 @@ func _draw() -> void:
 			row.size.x - PAD, FONT_SIZE, status_color)
 
 	if footer != "":
-		var text := InputLabels.format(footer)
-		var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x
-		draw_rect(Rect2(roundf(panel.get_center().x - width / 2.0) - 3, panel.end.y + 5, width + 6, 11), BACK)
-		draw_string(font, Vector2(panel.position.x, panel.end.y + 13), text,
-			HORIZONTAL_ALIGNMENT_CENTER, panel.size.x, FONT_SIZE, FOOTER)
+		var width := ButtonGlyphs.width(font, footer)
+		draw_rect(Rect2(roundf(panel.get_center().x - width / 2.0) - 3, panel.end.y + 4, width + 6, 13), BACK)
+		ButtonGlyphs.draw_centered(self, font, panel.get_center().x, panel.end.y + 13, footer, FOOTER)
 
 
 func _scramble(text: String) -> String:

@@ -274,7 +274,7 @@ Five connected areas played in order, each introducing something new. Each level
 Kept minimal so the game stays readable at 320x180.
 - **Top left**: Health as luggage icons; stamina bar underneath
 - **Bottom**: The 6 inventory slots with the selected one highlighted and stack counts; key items shown as small icons next to them
-- **Near objects**: Context prompts showing the right button for the current input device (keyboard or gamepad)
+- **Near objects**: Context prompts showing the right button for the current input device (keyboard or gamepad). Buttons are drawn as icons: keycaps for the keyboard; for a gamepad, round A, B, X and Y buttons in their Xbox colors and small pills for the rest. The last device touched decides, so prompts switch the moment the player picks up a controller or touches a key. Tutorial hints and menu footers use the same icons.
 
 ### Menus
 - **Main menu**: Departure-board style with flickering text over a looping airport scene (Amanda running from chickens across the terminal floor). New Game, Continue, Settings, Credits, Quit. Credits comes later.

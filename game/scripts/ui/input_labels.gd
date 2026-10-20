@@ -1,11 +1,13 @@
 class_name InputLabels
 extends RefCounted
-## Names the button bound to an action ("F", "SPACE"), so prompts and hints
-## always match the player's bindings. Text can name actions in braces,
-## like "{interact} push", and format() fills in the buttons.
+## Names the button bound to an action ("F", "SPACE", or "B" on a gamepad),
+## so prompts and hints always match the player's bindings and the device
+## they're using. Text can name actions in braces, like "{interact} push";
+## format() fills in the names and ButtonGlyphs draws them as buttons.
 
 ## Actions that are really a group of bindings, named as one.
 const GROUPS := {"move": "WASD"}
+const PAD_GROUPS := {"move": "L-STICK"}
 ## Shorter names for keys whose full names crowd a prompt.
 const SHORT := {"ESCAPE": "ESC", "ENTER": "ENTER", "BACKSPACE": "BKSP"}
 
@@ -19,10 +21,20 @@ const BUTTON_NAMES := {
 	JOY_BUTTON_DPAD_LEFT: "D-LEFT", JOY_BUTTON_DPAD_RIGHT: "D-RIGHT",
 }
 
+## True while the player is using a gamepad (InputSetup watches for it).
+static var gamepad := false
+
 static var _token := RegEx.create_from_string("\\{(\\w+)\\}")
 
 
 static func label(action: String) -> String:
+	if gamepad:
+		if PAD_GROUPS.has(action):
+			return PAD_GROUPS[action]
+		if InputMap.has_action(action):
+			for event in InputMap.action_get_events(action):
+				if event is InputEventJoypadButton:
+					return button_name((event as InputEventJoypadButton).button_index)
 	if GROUPS.has(action):
 		return GROUPS[action]
 	if not InputMap.has_action(action):

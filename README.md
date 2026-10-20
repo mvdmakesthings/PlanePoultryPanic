@@ -35,7 +35,7 @@ The one-room prototype is still there as a test bed for chicken behavior and ite
 | Pause (Resume, Settings, Quit to Menu) | Esc | Start |
 | Restart the prototype room (after winning or losing) | R | Start |
 
-Every control can be remapped in Settings > Controls. Menus work with the arrow keys or WASD, Enter, and Esc, or a gamepad, or the mouse.
+Every control can be remapped in Settings > Controls. Prompts and hints show keyboard keys or gamepad buttons, whichever you touched last. Menus work with the arrow keys or WASD, Enter, and Esc, or a gamepad, or the mouse.
 
 In Level 1, find the maintenance key and use it on the locked door to **SECURITY**. Hints at the top of the screen teach the controls as you go. The "YOU ARE HERE" map stands are checkpoints: reaching one autosaves, and after a knockout you retry from the latest one. Continue in the main menu picks up from there. In the prototype room, reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
 

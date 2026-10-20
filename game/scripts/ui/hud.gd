@@ -17,7 +17,7 @@ const SLOT_SELECTED := Color("feae34")
 const SLOT_SIZE := 14.0
 const SLOT_GAP := 1.0
 const FONT_SIZE := 8
-const CONTROLS_HINT := "SPACE use  Q/R switch  E eat  F act  G drop"
+const CONTROLS_HINT := "{use_item}use {prev_item}{next_item}switch {eat_snack}eat {interact}act {drop_item}drop"
 ## Tutorial hints use the departure-board look: dark panel, yellow text.
 const HINT_BACK := Color("181425")
 const HINT_EDGE := Color("3a4466")
@@ -43,6 +43,18 @@ func _ready() -> void:
 		_icons[item] = load(Inventory.KEY_ITEMS[item]["icon"])
 
 
+func _enter_tree() -> void:
+	InputSetup.device_changed.connect(_on_device_changed)
+
+
+func _exit_tree() -> void:
+	InputSetup.device_changed.disconnect(_on_device_changed)
+
+
+func _on_device_changed(_gamepad: bool) -> void:
+	queue_redraw()
+
+
 func bind_player(player: Player) -> void:
 	_player = player
 	player.health_changed.connect(_on_health_changed)
@@ -56,11 +68,10 @@ func show_message(text: String) -> void:
 
 
 ## Shows a tutorial hint at the top of the screen ("" hides it). Action
-## names in braces become their buttons, like "{run}" -> "SHIFT".
+## names in braces are drawn as their buttons, like "{run}" -> [SHIFT].
 func show_hint(text: String) -> void:
-	var formatted := InputLabels.format(text)
-	if formatted != _hint:
-		_hint = formatted
+	if text != _hint:
+		_hint = text
 		queue_redraw()
 
 
@@ -87,7 +98,9 @@ func _draw() -> void:
 
 	if _player:
 		_draw_inventory(font)
-	_draw_text(font, Vector2(0, size.y - 5), controls_hint, HORIZONTAL_ALIGNMENT_RIGHT, size.x - 4)
+	if controls_hint != "":
+		var hint_x := size.x - 4 - ButtonGlyphs.width(font, controls_hint)
+		ButtonGlyphs.draw(self, font, Vector2(hint_x, size.y - 5), controls_hint, TEXT, TEXT_OUTLINE)
 	if _hint != "":
 		_draw_hint(font)
 
@@ -101,19 +114,21 @@ func _draw() -> void:
 			y += 12.0
 
 
-## A dark panel centered at the top, one line of yellow text per hint line.
+## A dark panel centered at the top, one line of yellow text per hint line,
+## with buttons drawn as glyphs.
 func _draw_hint(font: Font) -> void:
 	var lines := _hint.split("\n")
 	var width := 0.0
 	for line in lines:
-		width = maxf(width, font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x)
-	var panel := Rect2(roundf((size.x - width) / 2.0) - 4, 3, width + 8, lines.size() * 10 + 3)
+		width = maxf(width, ButtonGlyphs.width(font, line))
+	# Lines are a little taller than the text so button glyphs fit.
+	var panel := Rect2(roundf((size.x - width) / 2.0) - 4, 3, width + 8, lines.size() * 11 + 3)
 	draw_rect(panel.grow(1), HINT_EDGE)
 	draw_rect(panel, HINT_BACK)
-	var y := panel.position.y + 9
+	var y := panel.position.y + 10
 	for line in lines:
-		draw_string(font, Vector2(panel.position.x, y), line, HORIZONTAL_ALIGNMENT_CENTER, panel.size.x, FONT_SIZE, HINT_TEXT)
-		y += 10
+		ButtonGlyphs.draw_centered(self, font, panel.get_center().x, y, line, HINT_TEXT)
+		y += 11
 
 
 ## One suitcase per Player.SUITCASE health units; partly lost suitcases are

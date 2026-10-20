@@ -34,6 +34,7 @@ func _ready() -> void:
 	_settings = SettingsMenu.new()
 	add_child(_settings)
 	_settings.closed.connect(_on_settings_closed)
+	InputSetup.device_changed.connect(func(_gamepad: bool) -> void: queue_redraw())
 	hide()
 
 
@@ -136,9 +137,7 @@ func _draw() -> void:
 	if _hint == "":
 		return
 	var font := get_theme_default_font()
-	var lines := InputLabels.format(_hint).split("\n")
 	var y := 34.0
-	for line in lines:
-		draw_string_outline(font, Vector2(0, y), line, HORIZONTAL_ALIGNMENT_CENTER, size.x, 8, 2, HINT_OUTLINE)
-		draw_string(font, Vector2(0, y), line, HORIZONTAL_ALIGNMENT_CENTER, size.x, 8, HINT)
-		y += 10.0
+	for line in _hint.split("\n"):
+		ButtonGlyphs.draw_centered(self, font, size.x / 2.0, y, line, HINT, HINT_OUTLINE)
+		y += 11.0

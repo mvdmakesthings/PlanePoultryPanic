@@ -50,4 +50,4 @@ func interact(player: Player) -> void:
 
 func _draw() -> void:
 	if _show_prompt:
-		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "F take")
+		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "{interact} take")

@@ -80,4 +80,4 @@ func _release() -> void:
 
 func _draw() -> void:
 	if _show_prompt:
-		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "F leave" if occupant else "F hide")
+		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "{interact} leave" if occupant else "{interact} hide")

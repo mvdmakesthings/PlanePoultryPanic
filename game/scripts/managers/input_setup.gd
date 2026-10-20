@@ -1,5 +1,10 @@
 extends Node
-## Registers the default control bindings at startup.
+## Registers the default control bindings at startup, and notices whether
+## the player is using the keyboard or a gamepad so prompts can show the
+## right buttons.
+
+## The player switched between keyboard (and mouse) and a gamepad.
+signal device_changed(gamepad: bool)
 ##
 ## Bindings live in code rather than project.godot so they stay readable in
 ## review. The Settings menu remaps them through SaveSystem.
@@ -51,6 +56,9 @@ const MOUSE_BUTTON_BINDINGS := {
 }
 
 const STICK_DEADZONE := 0.2
+## A stick has to move this far to count as switching to the gamepad, so
+## a drifting stick doesn't flip prompts while typing.
+const DEVICE_SWITCH_AXIS := 0.5
 
 ## Extra bindings for the menus' built-in ui_* actions, so WASD and the
 ## gamepad work in every menu too.
@@ -66,6 +74,10 @@ const UI_BUTTONS := {
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	get_tree().root.window_input.connect(_on_window_input)
+	# Start with gamepad prompts if one is plugged in (a Steam Deck, say).
+	InputLabels.gamepad = not Input.get_connected_joypads().is_empty()
 	for action: String in KEY_BINDINGS:
 		_ensure_action(action)
 		for key: Key in KEY_BINDINGS[action]:
@@ -96,6 +108,27 @@ func _ready() -> void:
 		InputMap.action_add_event(action, event)
 
 	_add_ui_bindings()
+
+
+## Sees every event before any menu or node can handle it, so a press
+## that a menu uses still switches the prompts.
+func _on_window_input(event: InputEvent) -> void:
+	var pad := (event is InputEventJoypadButton and event.is_pressed()) \
+		or (event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) > DEVICE_SWITCH_AXIS)
+	var keyboard := ((event is InputEventKey or event is InputEventMouseButton) and event.is_pressed()) \
+		or (event is InputEventMouseMotion and (event as InputEventMouseMotion).relative.length() > 4.0)
+	if pad and not InputLabels.gamepad:
+		set_gamepad(true)
+	elif keyboard and InputLabels.gamepad:
+		set_gamepad(false)
+
+
+## Switches prompts to gamepad (true) or keyboard (false) buttons.
+func set_gamepad(on: bool) -> void:
+	InputLabels.gamepad = on
+	# Everything that draws a prompt redraws with the other buttons.
+	get_tree().call_group("interactables", "queue_redraw")
+	device_changed.emit(on)
 
 
 ## The key an action starts with (its first default key), or KEY_NONE.
