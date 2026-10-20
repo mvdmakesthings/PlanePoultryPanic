@@ -137,14 +137,11 @@ func _tracking_test() -> void:
 	player.eat_snack()
 	_check(RunStats.used == 3 and RunStats.hits == 1, "eating a snack uses it and doesn't count as a hit")
 
-	var found: Array[String] = []
-	var on_found := func(id: String) -> void: found.append(id)
-	RunStats.secret_found.connect(on_found)
-	RunStats.record_secret_found("test_secret")
-	RunStats.record_secret_found("test_secret")
-	RunStats.secret_found.disconnect(on_found)
-	_check(RunStats.secrets.size() == 1 and found == ["test_secret"], "a secret counts once, and is announced")
-	_check(RunStats.summary()["secret_total"] == RunStats.SECRETS.size(), "the discovery total comes from the list of secrets")
+	# Secrets are GameManager's (from the secrets work); 0 of 0 until then.
+	var found: Variant = GameManager.get("secrets_found")
+	var total: int = GameManager.get_script().get_script_constant_map().get("SECRETS_TOTAL", 0)
+	_check(RunStats.summary()["secrets"] == (found.size() if found is Array else 0)
+		and RunStats.summary()["secret_total"] == total, "discovery counts GameManager's secrets found and total")
 	level.queue_free()
 	await get_tree().process_frame
 
@@ -182,7 +179,6 @@ func _retry_and_continue_test() -> void:
 	_check(RunStats.chickens.size() == _chickens_in(level).size(), "the same chickens aren't met twice")
 
 	# Quitting to the menu and choosing Continue.
-	RunStats.record_secret_found("test_secret")
 	await _wait(0.2)
 	var time_at_quit := RunStats.time
 	GameManager.quit_to_menu()
@@ -190,8 +186,8 @@ func _retry_and_continue_test() -> void:
 	await get_tree().process_frame
 	RunStats.reset()
 	GameManager.continue_game()
-	_check(is_equal_approx(RunStats.time, time_at_quit) and RunStats.hits == 2 and RunStats.knockouts == 1
-		and RunStats.secrets == ["test_secret"], "Continue brings back the time, hits, knockouts and secrets")
+	_check(is_equal_approx(RunStats.time, time_at_quit) and RunStats.hits == 2 and RunStats.knockouts == 1,
+		"Continue brings back the time, hits and knockouts")
 	level = await _fresh_level(LEVEL_1, false)
 	_check(RunStats.chickens.size() == _chickens_in(level).size(), "and the level's chickens")
 	level.queue_free()

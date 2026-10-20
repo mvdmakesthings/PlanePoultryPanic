@@ -340,6 +340,7 @@ How the stats are counted:
 - **The clock** only runs in levels: not in cutscenes, while paused, or on the level-clear and retry screens. A knockout still costs the time spent before it.
 - **Items** are snacks (one each) and extinguishers (one each, whatever their charges); key items don't count. A snack is used when thrown or eaten, an extinguisher once it's empty. Dropping something takes it off the collected count, so picking it up again doesn't count twice.
 - **Chickens met** are all the chickens in the levels played, including ones that arrive later from vents. A chicken has spotted Amanda once it chases her, including when another chicken alerted it.
+- **Secrets** are counted from the ones found this run against the total, and only show on the score screen.
 - **Retries**: the level resets after a knockout, so items, chickens and defeats go back to what they were at the checkpoint, while time, hits and knockouts stay. Every stat is saved with each checkpoint, and hits, knockouts and the time are written to the save again as they change, so Continue picks up exactly where things stood.
 
 ### Achievements (Steam)

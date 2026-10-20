@@ -3,9 +3,9 @@ extends Node
 ## (autoload: RunStats).
 ##
 ## Two kinds of stats:
-##   run-wide   - time (in all and per level), hits taken, knockouts and
-##                secrets found. These never go back: a knockout still
-##                costs the time and the hit.
+##   run-wide   - time (in all and per level), hits taken and knockouts.
+##                These never go back: a knockout still costs the time
+##                and the hit.
 ##   checkpoint - items collected and used, chickens met and spotted, and
 ##                chickens defeated. The level resets on a retry, so these
 ##                go back to what they were at the checkpoint, and nothing
@@ -19,13 +19,6 @@ extends Node
 ## Dropping an item takes it off the collected count, so picking it up
 ## again doesn't count twice. A chicken has spotted Amanda once it chases
 ## her, including when another chicken alerted it.
-
-## A secret was found for the first time this run.
-signal secret_found(id: String)
-
-## Every secret's id. The secrets work fills this in and calls
-## record_secret_found() when one is found.
-const SECRETS: Array[String] = []
 
 const TIME_MAX := 3000
 ## Full time points at this many seconds or under, none at TIME_ZERO.
@@ -63,7 +56,6 @@ var time := 0.0
 var level_times := {}
 var hits := 0
 var knockouts := 0
-var secrets: Array[String] = []
 
 # ---------- rolled back to the checkpoint on a retry ----------
 ## Items picked up (plus the snacks the run starts with), and used.
@@ -99,7 +91,6 @@ func reset() -> void:
 	level_times = {}
 	hits = 0
 	knockouts = 0
-	secrets = []
 	collected = 0
 	used = 0
 	defeated = 0
@@ -178,15 +169,6 @@ func item_dropped(slot: Dictionary) -> void:
 	collected = maxi(collected - _item_count([slot]), 0)
 
 
-## Called by the secrets when one is found. Each counts once per run.
-func record_secret_found(id: String) -> void:
-	if id in secrets:
-		return
-	secrets.append(id)
-	secret_found.emit(id)
-	persist()
-
-
 func _on_node_added(node: Node) -> void:
 	if node.is_in_group("chickens") and is_instance_valid(_level) and _level.is_ancestor_of(node):
 		_watch(node)
@@ -251,8 +233,6 @@ func restore(state: Dictionary) -> void:
 	level_times = (run.get("level_times", {}) as Dictionary).duplicate()
 	hits = int(run.get("hits", 0))
 	knockouts = int(run.get("knockouts", 0))
-	for id: String in run.get("secrets", []):
-		secrets.append(id)
 	_restore_checkpoint(state.get("checkpoint", {}))
 
 
@@ -273,7 +253,6 @@ func _run_state() -> Dictionary:
 		"level_times": level_times.duplicate(),
 		"hits": hits,
 		"knockouts": knockouts,
-		"secrets": secrets.duplicate(),
 	}
 
 
@@ -314,9 +293,21 @@ func summary() -> Dictionary:
 		"defeated": defeated,
 		"hits": hits,
 		"knockouts": knockouts,
-		"secrets": secrets.size(),
-		"secret_total": SECRETS.size(),
+		"secrets": secrets_found(),
+		"secret_total": secrets_total(),
 	}
+
+
+## Secrets are kept by GameManager (secrets_found, saved with the run, and
+## SECRETS_TOTAL), which the secrets work adds. Until it's there, these
+## read 0 of 0.
+static func secrets_found() -> int:
+	var found: Variant = GameManager.get("secrets_found")
+	return (found as Array).size() if found is Array else 0
+
+
+static func secrets_total() -> int:
+	return int(GameManager.get_script().get_script_constant_map().get("SECRETS_TOTAL", 0))
 
 
 ## Scores a run's summary: points per category, bonuses, total and rank.
