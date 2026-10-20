@@ -9,28 +9,66 @@ extends Node
 ##
 ## play("cluck", position) plays a sound in the world, quieter the further
 ## it is from the camera; play("pickup") without a position plays it flat.
+##
+## Music crossfades when the track changes, and dips for a moment under
+## big cues (a checkpoint, the boss being hit) so they come through.
 
 const BUSES: Array[String] = ["Music", "Effects", "Ambience"]
 const SFX_DIR := "res://assets/audio/sfx/"
 const MUSIC_DIR := "res://assets/audio/music/"
-## Per-sound volume trim (dB) and random pitch spread, so repeated sounds
-## don't sound robotic. Sounds not listed play as recorded.
+## Per-sound mix settings, so everything sits at a sensible level:
+##   db     volume trim. Frequent sounds (steps, pecks) sit low; big
+##          moments (boss hits, checkpoints) sit high. Set from each
+##          file's measured loudness, so redone sounds may need new trims.
+##   pitch  random pitch spread, so repeats don't sound robotic. Musical
+##          stings (checkpoint, level clear) have none, to stay in tune.
+##   vol    random volume spread in dB, for the same reason
+##   duck   [dB, seconds]: dip the music this much, recovering over this long
+## Sounds not listed play as recorded.
 const SOUNDS := {
-	"step": {"db": -10.0, "pitch": 0.12},
+	"step": {"db": -9.0, "pitch": 0.12, "vol": 3.0},
 	"pickup": {"db": -2.0, "pitch": 0.05},
-	"throw": {"db": 0.0, "pitch": 0.1},
+	"throw": {"db": 0.0, "pitch": 0.1, "vol": 1.5},
 	"eat": {"db": 0.0, "pitch": 0.05},
-	"hurt": {"db": -3.0, "pitch": 0.05},
-	"peck": {"db": -2.0, "pitch": 0.15},
-	"splat": {"db": -2.0, "pitch": 0.1},
-	"poof": {"db": 0.0, "pitch": 0.1},
-	"cluck": {"db": -4.0, "pitch": 0.15},
+	"hurt": {"db": -3.0, "pitch": 0.05, "vol": 1.0},
+	"peck": {"db": -2.0, "pitch": 0.15, "vol": 2.0},
+	"splat": {"db": -4.0, "pitch": 0.1, "vol": 2.0},
+	"poof": {"db": -3.0, "pitch": 0.1, "vol": 1.5},
+	"cluck": {"db": -6.0, "pitch": 0.15, "vol": 2.0},
 	"spray": {"db": 0.0, "pitch": 0.05},
-	"shove": {"db": -2.0, "pitch": 0.1},
-	"locked": {"db": -2.0, "pitch": 0.0},
-	"door": {"db": -4.0, "pitch": 0.05},
-	"closet": {"db": -2.0, "pitch": 0.1},
+	"shove": {"db": -4.0, "pitch": 0.1, "vol": 1.5},
+	"locked": {"db": -3.5, "pitch": 0.0},
+	"door": {"db": -3.0, "pitch": 0.05},
+	"closet": {"db": -4.0, "pitch": 0.1},
+	"key": {"db": -3.0, "duck": [-5.0, 0.6]},
+	"switch": {"db": -3.0, "pitch": 0.1},
+	"shutter": {"db": -2.0, "pitch": 0.05},
+	"vend": {"db": -2.0, "pitch": 0.05},
+	"vent": {"db": -4.0, "pitch": 0.1},
+	"whoosh": {"db": -2.0, "pitch": 0.12, "vol": 1.5},
+	"beep": {"db": -1.5, "pitch": 0.03},
+	"flap": {"pitch": 0.15, "vol": 2.0},
+	"stamp": {"pitch": 0.05},
+	"boss_hit": {"db": -1.0, "pitch": 0.05, "duck": [-6.0, 0.6]},
+	"crown_burst": {"duck": [-8.0, 1.0]},
+	"checkpoint": {"db": -1.0, "duck": [-6.0, 0.8]},
+	"level_clear": {"duck": [-10.0, 1.5]},
+	"death": {"duck": [-10.0, 1.2]},
+	"pa_chime": {"duck": [-6.0, 1.6]},
 }
+## Per-track trims (dB) so every loop plays at about the same loudness.
+const MUSIC := {"arrivals": -1.7, "boss": -1.4, "gates": -0.3, "security": -0.2, "victory": 0.0}
+## Seconds to crossfade between tracks, to fade a track in from silence,
+## and to fade one out when the music stops.
+const CROSSFADE_TIME := 1.2
+const FADE_IN_TIME := 0.4
+const FADE_OUT_TIME := 0.6
+## The same sound starting again within this many msec stacks up (four
+## chickens poofing at once): each extra copy is quieter, and past
+## MAX_STACK they're skipped.
+const STACK_MSEC := 40
+const MAX_STACK := 3
+const STACK_DB := -4.0
 ## How many sounds can play at once, flat and in the world.
 const POOL_SIZE := 12
 ## Beyond this distance from the camera, world sounds are silent.
@@ -43,8 +81,20 @@ var _world: Array[AudioStreamPlayer2D] = []
 var _loops: Array[AudioStreamPlayer2D] = []
 var _next_flat := 0
 var _next_world := 0
+## Two music players, so one can fade out while the other fades in.
+## _music is the current one.
 var _music: AudioStreamPlayer
+var _music_old: AudioStreamPlayer
 var _music_name := ""
+## Each player's fade (0 silent to 1 full), where it's heading, and how
+## fast (per second).
+var _fades := {}
+## The music dip under a big cue, in dB (0 or less), and how fast it recovers.
+var _duck_db := 0.0
+var _duck_recover := 0.0
+## When each sound last started (msec) and how many copies are stacked.
+var _last_start := {}
+var _stack := {}
 
 
 func _ready() -> void:
@@ -68,8 +118,33 @@ func _ready() -> void:
 		add_child(world)
 		_world.append(world)
 	_music = AudioStreamPlayer.new()
-	_music.bus = "Music"
-	add_child(_music)
+	_music_old = AudioStreamPlayer.new()
+	for player in [_music, _music_old]:
+		player.bus = "Music"
+		add_child(player)
+		_fades[player] = {"fade": 0.0, "target": 0.0, "rate": 1.0}
+
+
+func _process(delta: float) -> void:
+	# Count time as it really passes, even during a hit-stop.
+	var real := delta / maxf(Engine.time_scale, 0.01)
+	for player: AudioStreamPlayer in _fades:
+		var f: Dictionary = _fades[player]
+		f["fade"] = move_toward(f["fade"], f["target"], f["rate"] * real)
+		if f["fade"] <= 0.0 and f["target"] <= 0.0 and player.playing:
+			player.stop()
+	_duck_db = minf(_duck_db + _duck_recover * real, 0.0)
+	_apply_music_volume()
+
+
+func _apply_music_volume() -> void:
+	for player: AudioStreamPlayer in _fades:
+		var trim := float(MUSIC.get(_track_of(player), 0.0))
+		player.volume_db = trim + linear_to_db(maxf(_fades[player]["fade"], 0.0001)) + _duck_db
+
+
+func _track_of(player: AudioStreamPlayer) -> String:
+	return player.stream.resource_path.get_file().get_basename() if player.stream else ""
 
 
 func _exit_tree() -> void:
@@ -87,7 +162,11 @@ func silence() -> void:
 
 func _release_all() -> void:
 	_music_name = ""
-	var players: Array[Node] = [_music]
+	_duck_db = 0.0
+	for player: AudioStreamPlayer in _fades:
+		_fades[player]["fade"] = 0.0
+		_fades[player]["target"] = 0.0
+	var players: Array[Node] = [_music, _music_old]
 	players.append_array(_flat)
 	players.append_array(_world)
 	players.append_array(_loops)
@@ -104,7 +183,16 @@ func play(sound: String, at: Variant = null) -> void:
 		return
 	var info: Dictionary = SOUNDS.get(sound, {})
 	var pitch := 1.0 + randf_range(-1.0, 1.0) * float(info.get("pitch", 0.0))
-	var db := float(info.get("db", 0.0))
+	var db := float(info.get("db", 0.0)) + randf_range(-1.0, 1.0) * float(info.get("vol", 0.0))
+	var now := Time.get_ticks_msec()
+	var stacked := int(_stack.get(sound, 0)) + 1 if now - int(_last_start.get(sound, -100000)) < STACK_MSEC else 0
+	if stacked >= MAX_STACK:
+		return
+	_stack[sound] = stacked
+	_last_start[sound] = now
+	db += STACK_DB * stacked
+	if info.has("duck"):
+		duck(info["duck"][0], info["duck"][1])
 	if at is Vector2:
 		var player := _pick(_world, _next_world) as AudioStreamPlayer2D
 		_next_world = (_next_world + 1) % POOL_SIZE
@@ -143,18 +231,43 @@ func playing_loops() -> Array[AudioStreamPlayer2D]:
 	return _loops.filter(func(p: AudioStreamPlayer2D) -> bool: return p.playing)
 
 
-## Starts a music track by name (it loops). Does nothing if it's already playing.
+## Starts a music track by name (it loops), crossfading from whatever was
+## playing. Does nothing if it's already playing.
 func play_music(track: String) -> void:
 	if track == _music_name and _music.playing:
 		return
+	var crossfade := _music.playing
+	# The playing track becomes the old one and fades out.
+	var old := _music
+	_music = _music_old
+	_music_old = old
+	_fade(_music_old, 0.0, CROSSFADE_TIME)
 	_music_name = track
 	_music.stream = _looping(_stream(MUSIC_DIR, track))
+	_fades[_music]["fade"] = 0.0
+	_fade(_music, 1.0, CROSSFADE_TIME if crossfade else FADE_IN_TIME)
+	_apply_music_volume()
 	_music.play()
 
 
+## Fades the music out.
 func stop_music() -> void:
 	_music_name = ""
-	_music.stop()
+	_fade(_music, 0.0, FADE_OUT_TIME)
+	_fade(_music_old, 0.0, FADE_OUT_TIME)
+
+
+## Dips the music by db (negative) for a big cue, recovering over seconds.
+func duck(db: float, seconds: float) -> void:
+	if db < _duck_db:
+		_duck_db = db
+		_duck_recover = -db / seconds
+
+
+func _fade(player: AudioStreamPlayer, target: float, seconds: float) -> void:
+	var f: Dictionary = _fades[player]
+	f["target"] = target
+	f["rate"] = 1.0 / seconds
 
 
 func music_playing() -> String:

@@ -344,6 +344,25 @@ func _juice_test() -> void:
 	_check(hud._exhausted, "the stamina bar flashes when she runs out of breath")
 	player._update_stamina(false, 10.0)
 	_check(not hud._exhausted, "it stops flashing once she can run again")
+
+	# Audio polish: tracks crossfade, big cues duck the music, and a pile
+	# of identical sounds at once is capped.
+	AudioManager.play_music("security")
+	await get_tree().process_frame
+	_check(AudioManager._music.playing and AudioManager._music_old.playing, "a new track crossfades with the old one")
+	await _wait(1.5)
+	_check(not AudioManager._music_old.playing and AudioManager.music_playing() == "security",
+		"the old track fades out and stops")
+	AudioManager.play("checkpoint")
+	_check(AudioManager._duck_db < 0.0, "a checkpoint ducks the music")
+	await _wait(1.0)
+	_check(AudioManager._duck_db == 0.0, "the music comes back up after the duck")
+	var playing_before := AudioManager._world.filter(func(p: AudioStreamPlayer2D) -> bool: return p.playing).size()
+	for i in 6:
+		AudioManager.play("poof", player.global_position)
+	var started := AudioManager._world.filter(func(p: AudioStreamPlayer2D) -> bool: return p.playing).size() - playing_before
+	_check(started == AudioManager.MAX_STACK, "six poofs at once only play %d copies (%d)" % [AudioManager.MAX_STACK, started])
+	AudioManager.play_music("arrivals")
 	level.queue_free()
 
 
