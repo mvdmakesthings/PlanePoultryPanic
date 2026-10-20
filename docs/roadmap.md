@@ -121,8 +121,8 @@ Build each level fully before starting the next, so the game is always playable 
 - [ ] Steam achievements
 - [ ] Speedrun mode with level splits
 - [ ] Full settings and accessibility options
-- [ ] Screen shake, particles, hit flashes, and other feedback
-- [ ] Music transitions and final audio mix
+- [x] Screen shake (with a Settings toggle), particles, hit flashes, squash and stretch, hit-stop, and HUD feedback
+- [x] Music transitions (crossfades, ducking under big cues) and a balanced sound mix
 - [ ] Secrets and easter eggs
 
 ## M7: Beta
