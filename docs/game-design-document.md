@@ -211,7 +211,7 @@ Behavior priority, highest first:
 |---|---|
 | Luggage cart | Shove it with Interact and it rolls about 4 tiles. A chicken it hits while rolling fast is defeated. Eggs splat against the whole cart, luggage included, so the player can hide behind one. A cart shoved into a wall slides along it instead, so it can never get stuck in a corner. |
 | Rolling suitcase | Abandoned luggage lying around the terminal. Pick it up with Interact and the player holds it overhead in both hands, so it doesn't use an inventory slot. While carrying it they walk a little slower, can't run, and can't use, eat, or drop items or hide. Use throws it about 5 tiles the way the player is facing; Interact puts it down. A chicken it hits while it's still moving fast is defeated, and the suitcase bursts open in a shower of clothes and is gone, so each suitcase defeats one chicken at most. A throw that misses lands and can be picked up again. Taking a hit while carrying it drops it at the player's feet. |
-| Vending machine | Opened with a maintenance key. Drops 2-3 snacks. |
+| Vending machine | Opened with a maintenance key (used up). Drops 2-3 snacks in front of it. Stays open after a retry if it was opened before the checkpoint. |
 | Boarding-pass gate | The way out of Security: glass paddle gates in a doorway that open when the player scans the boarding pass (Interact). The pass is only read, not used up. |
 | Boarding gate | A door set into the back wall with a lit gate sign. Its glass doors slide open as the player approaches; walking into the doorway reaches the gate. |
 | Emergency exit | Shortcut. Some are blocked, and some lead past extra danger. |
@@ -250,6 +250,7 @@ Five connected areas played in order, each introducing something new. Each level
 - **Chickens**: High density, several mushroom patches
 - **Teaches**: Totems, vending machines, choosing between stocking up and moving on
 - **Goal**: Topple or escape the first totem and reach the gates
+- **As built (M5)**: Amanda comes in from Security at the bottom of a big court ringed by four restaurant fronts (Cluck Shack, Pizza Plane, Noodle Gate, Java Jet; names Proposed), with two seating areas, about 16 snacks lying around and 14 chickens. Three vending machines stand near the entrance, but there are only two maintenance keys: one in the staff kitchen behind Pizza Plane, one beside a lost bag on the east side. Mushroom patches: rage by Cluck Shack, flight by Noodle Gate, egg shooter by the east seating. The door to ALL GATES (no key needed) is behind a sunken wooden seating plaza whose roost has four chickens ready to stack into the first totem, with two luggage carts and an extinguisher cabinet nearby. Restroom stalls in the top right are hiding spots. Map-stand checkpoints at the arrival and before the plaza. It shares Security's music.
 
 ### Level 4: Gate Areas (about 10 minutes)
 - **Purpose**: Peak challenge using everything learned
@@ -297,7 +298,7 @@ Kept minimal so the game stays readable at 320x180.
 ### Saving
 - The game autosaves at every checkpoint, and when a level starts. There's no manual save, which keeps the tension.
 - **Continue** resumes from the latest checkpoint. **New Game** asks before replacing a save.
-- Checkpoints are "YOU ARE HERE" map stands that light up when reached. Level 1 has two: where Amanda comes down into Baggage Claim, and in the staff room. Level 2 has two: in the screening area and in the corridor to the Food Court.
+- Checkpoints are "YOU ARE HERE" map stands that light up when reached. Level 1 has two: where Amanda comes down into Baggage Claim, and in the staff room. Level 2 has two: in the screening area and in the corridor to the Food Court. Level 3 has two: at the arrival and before the totem plaza.
 - Leaving a level through its exit autosaves at the start of the next one, with the inventory carried over, so Continue resumes there.
 
 ### Difficulty Modes
@@ -487,3 +488,5 @@ game/
 | 2026-10-19 | Level 2 layout: queue hall, three scanner lanes (one with a shutter on a switch), screening area with the boarding pass, restroom stalls for hiding | You |
 | 2026-10-19 | The way out of Security is a gate that scans the boarding pass without using it up | Proposed |
 | 2026-10-19 | The inventory carries over between levels; clearing a level autosaves at the start of the next | Proposed |
+| 2026-10-19 | Level 3 layout: restaurant-ringed court, three vending machines but two keys, the first totem at a seating plaza in front of the exit | You |
+| 2026-10-19 | Security and the Food Court share one placeholder track, as in the music list | Proposed |

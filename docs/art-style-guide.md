@@ -291,7 +291,7 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`security_door.png`**: four 48x32 frames of the locked door to Security (locked with barrier tape and a red light, unlocked with a green light, opening, open). It sits on the wall face like the boarding gate, with the same doorway.
 
-**`signs.png`**: 64x11 wayfinding signs for the wall face, one per frame: BAGGAGE CLAIM (down arrow), SECURITY (left arrow), STAFF ONLY (white on red), ARRIVALS (right arrow), LOST+FOUND, RESTROOMS (left arrow), FOOD COURT (right arrow), SCREENING (white on blue). Add new signs as new frames at the end.
+**`signs.png`**: 64x11 wayfinding signs for the wall face, one per frame: BAGGAGE CLAIM (down arrow), SECURITY (left arrow), STAFF ONLY (white on red), ARRIVALS (right arrow), LOST+FOUND, RESTROOMS (left arrow), FOOD COURT (right arrow), SCREENING (white on blue). The 3x5 font has every letter but Q. Add new signs as new frames at the end.
 
 **`maintenance_cart.png`**: one 24x24 janitor's cart (mop bucket, spray bottles, trash bag). A solid floor prop; its base is about 22x6.
 
@@ -336,6 +336,23 @@ Made by `tools/sprites/security.py`.
 **`pass_gate.png`**: four 48x32 frames of the boarding-pass gate set into the back wall, laid out like `security_door.png`: a FOOD COURT sign over glass paddle gates and a pass reader (locked with a red light, unlocked green, paddles folding back, open). The corridor beyond is warm wood, a hint of the Food Court.
 
 **`security_litter.png`**: four 16x16 floor decals: a spilled screening bin, a lost shoe, a pecked-through belt, a confiscated water bottle.
+
+### Food Court (Level 3)
+Made by `tools/sprites/foodcourt.py`.
+
+**`tiles_food_court.png`**: the same layout and tile names as `tiles_arrivals.png`, in warm colors: `tile` is a cream and butterscotch checker floor (8px squares), `carpet` rust carpet (along the restaurant fronts), `wood` the honey planks of the seating plaza, `carpet_pattern` red diner carpet with a yellow dot lattice (seating areas). Walls are cream plaster with an orange stripe over terracotta tiles; wall tops are dark brown.
+
+**`restaurant_fronts.png`**: 64x32 restaurant fronts for the wall face, one per frame: CLUCK SHACK (red), PIZZA PLANE (green), NOODLE GATE (charcoal and orange), JAVA JET (brown). Each has a lit name sign, a striped awning, a dark kitchen window with menu boards, and a counter along the bottom. Add new restaurants as frames at the end.
+
+**`food_table.png`**: one 32x24 round orange table with a chair on each side and a tray of fries. A solid floor prop; its base is about 26x6.
+
+**`vending_machine.png`**: two 20x30 frames of a blue snack machine: stocked with colorful bags, then broken open and empty. A solid floor prop; its base is about 18x6.
+
+**`trash_bin.png`**: one 12x16 overflowing trash bin. A solid floor prop.
+
+**`food_litter.png`**: four 16x16 floor decals: spilled fries, a soda puddle with its cup, a dropped tray, a burger wrapper.
+
+**`gates_door.png`**: four 48x32 frames of the door to the gates, laid out like `security_door.png` (closed, closed, opening, open): the boarding gate's glass doors under an ALL GATES sign.
 
 ### Import Settings (Godot)
 - Texture filter: Nearest

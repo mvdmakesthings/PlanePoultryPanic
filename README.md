@@ -37,13 +37,13 @@ The one-room prototype is still there as a test bed for chicken behavior and ite
 | Switch inventory slot | Q / R, or mouse wheel | LB / Y |
 | Drop the selected slot | G | Back |
 | Eat a snack (heal) | E | X |
-| Interact: push a cart, take an extinguisher, lift or put down a suitcase, unlock a door, scan a boarding pass, flip a switch, hide in a closet or stall | F | B |
+| Interact: push a cart, take an extinguisher, lift or put down a suitcase, unlock a door or vending machine, scan a boarding pass, flip a switch, hide in a closet or stall | F | B |
 | Pause (Resume, Settings, Quit to Menu) | Esc | Start |
 | Restart the prototype room (after winning or losing) | R | Start |
 
 Every control can be remapped in Settings > Controls. Prompts and hints show keyboard keys or gamepad buttons, whichever you touched last. Menus work with the arrow keys or WASD, Enter, and Esc, or a gamepad, or the mouse.
 
-In Level 1, find the maintenance key and use it on the locked door to **SECURITY**. That leads on to Level 2, the Security Checkpoint: take a fire extinguisher, get past the first powered chickens and up through a scanner lane, find your boarding pass in the screening bins, and scan it at the gate to the **FOOD COURT**. Your inventory carries over from level to level. Hints at the top of the screen teach the controls as you go. The "YOU ARE HERE" map stands are checkpoints: reaching one autosaves, and after a knockout you retry from the latest one. Continue in the main menu picks up from there. In the prototype room, reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
+In Level 1, find the maintenance key and use it on the locked door to **SECURITY**. That leads on to Level 2, the Security Checkpoint: take a fire extinguisher, get past the first powered chickens and up through a scanner lane, find your boarding pass in the screening bins, and scan it at the gate to the **FOOD COURT**. In Level 3, the Food Court, stock up (maintenance keys open vending machines) and get past the first chicken totem to the door to **ALL GATES**. Your inventory carries over from level to level. Hints at the top of the screen teach the controls as you go. The "YOU ARE HERE" map stands are checkpoints: reaching one autosaves, and after a knockout you retry from the latest one. Continue in the main menu picks up from there. In the prototype room, reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
 
 ## Run the smoke tests
 
@@ -63,7 +63,11 @@ In Level 1, find the maintenance key and use it on the locked door to **SECURITY
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/level_02_smoke.tscn
 ```
 
-The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1: its layout, its path from the start to the Security door, checkpoints, retrying and pausing; the third covers the main menu, settings and remapping; the fourth covers Level 2: arriving from Level 1 with the inventory, the extinguisher and mushroom patch, the scanner lanes, the shutter, hiding, the boarding pass and its gate, and checkpoints. The tests use their own save and settings files, so they never touch yours. They drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
+```bash
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/level_03_smoke.tscn
+```
+
+The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1: its layout, its path from the start to the Security door, checkpoints, retrying and pausing; the third covers the main menu, settings and remapping; the fourth covers Level 2: arriving from Level 1 with the inventory, the extinguisher and mushroom patch, the scanner lanes, the shutter, hiding, the boarding pass and its gate, and checkpoints; the fifth covers Level 3: the kitchen key, vending machines, the totem forming at the roost, the exit and checkpoints. Every level test also checks that nothing was placed inside a wall. The tests use their own save and settings files, so they never touch yours. They drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
 
 ## Build for the browser (itch.io)
 
@@ -138,7 +142,7 @@ Each sound is a short recipe in `tools/audio/build.py`. In the game, the AudioMa
 python3 tools/music/arrivals.py
 ```
 
-Level 2 has its own loop in the same style, in D minor and a little more urgent:
+Levels 2 and 3 (Security and the Food Court, one track in the GDD) share their own loop in the same style, in D minor and a little more urgent:
 
 ```bash
 python3 tools/music/security.py
