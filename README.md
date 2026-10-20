@@ -128,6 +128,18 @@ cd build/web && zip -r ../plane-poultry-panic-web.zip . && cd -
 
 5. On itch.io, create or edit the project, set **Kind of project** to **HTML**, upload the zip and tick **This file will be played in the browser**. Set the embed size to 1280 × 720 (16:9, a clean multiple of the 320 × 180 game) and turn on the **Fullscreen button**. Leave **SharedArrayBuffer support** off; this build doesn't need it.
 
+### Publish to GitHub Pages
+
+The latest browser build is playable at **https://mvdmakesthings.github.io/plane-poultry-panic-play/**. That page is served from a separate public repo, [plane-poultry-panic-play](https://github.com/mvdmakesthings/plane-poultry-panic-play), which holds only the exported files, so this repo (code, tools and docs) stays private.
+
+To publish a new version, set `config/version` in `game/project.godot`, then run from the repo root:
+
+```bash
+tools/publish_web.sh
+```
+
+It exports the Web build, copies it into the play repo, and pushes; GitHub Pages updates a minute or two later. If the build hasn't changed, it says so and publishes nothing.
+
 Browser build notes:
 
 - The download is about 10 MB zipped (the engine is most of it; the game itself is under 200 KB), so expect a few seconds of loading on first visit.
