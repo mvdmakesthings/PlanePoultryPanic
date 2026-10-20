@@ -291,7 +291,7 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`security_door.png`**: four 48x32 frames of the locked door to Security (locked with barrier tape and a red light, unlocked with a green light, opening, open). It sits on the wall face like the boarding gate, with the same doorway.
 
-**`signs.png`**: 64x11 wayfinding signs for the wall face, one per frame: BAGGAGE CLAIM (down arrow), SECURITY (left arrow), STAFF ONLY (white on red), ARRIVALS (right arrow), LOST+FOUND. Add new signs as new frames at the end.
+**`signs.png`**: 64x11 wayfinding signs for the wall face, one per frame: BAGGAGE CLAIM (down arrow), SECURITY (left arrow), STAFF ONLY (white on red), ARRIVALS (right arrow), LOST+FOUND, RESTROOMS (left arrow), FOOD COURT (right arrow), SCREENING (white on blue). Add new signs as new frames at the end.
 
 **`maintenance_cart.png`**: one 24x24 janitor's cart (mop bucket, spray bottles, trash bag). A solid floor prop; its base is about 22x6.
 
@@ -311,6 +311,31 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 | 9 | `chute`: a `top` piece with the baggage chute opening and rubber flaps |
 
 Build any size of carousel (at least 2x2 tiles) as a rectangle: corners at the corners, `top` and `bottom` along the long edges, `left` and `right` along the short edges, and `island` filling the middle. The bottom pieces include the front skirt, so the carousel looks raised off the floor. Draw the carousel on a tile layer above the floor, since the outside of each corner is transparent.
+
+### Security (Level 2)
+Made by `tools/sprites/security.py`.
+
+**`tiles_security.png`**: the same layout and tile names as `tiles_arrivals.png`, so text maps work unchanged, in Security's colors: `carpet` is slate rubber matting with ribs (the queue), `tile` is cool gray tile, `wood` is black-and-yellow hazard striping (scanner lanes), `carpet_pattern` is dark tread with blue and white studs (screening). Wall faces are steel gray with a scanner-blue line and a hazard-striped baseboard.
+
+**`stanchion.png`**: one 48x16 run of three chrome queue posts joined by a sagging blue belt. A solid floor prop; its base is about 48x4.
+
+**`xray_machine.png`**: one 24x48 baggage X-ray machine beside a lane, its belt running away from the camera: a long top with a monitor, the front face with the lead-curtain tunnel, rollers and a hazard edge at the floor. Its footprint (about 22x34) is solid.
+
+**`metal_detector.png`**: two 32x34 frames of a walk-through arch: idle (green light, blue sensor lights), then beeping (red). Only the feet of its two posts are solid; walking between them beeps.
+
+**`bin_table.png`**: one 48x20 roller table with three gray screening bins (a shoe, a red jacket, empty). A solid floor prop; its legs are about 46x6.
+
+**`item_boarding_pass.png`**: one 12x8 boarding pass with a blue header, a barcode and a stub, for the pickup and the HUD's key-item row.
+
+**`security_shutter.png`**: four 32x32 frames of a steel grille rolling down out of its ceiling housing, from rolled up to closed with a hazard-striped bottom bar. Placed with its bottom edge on the floor line across a 2-tile passage.
+
+**`shutter_switch.png`**: two 10x14 frames of the wall box with a big lever: up with a green light (shutter open), down with a red light (closed).
+
+**`stall_door.png`**: two 16x30 frames of a restroom stall door on the wall face, like `closet_door.png`: closed with a green "vacant" slider, then open onto the toilet.
+
+**`pass_gate.png`**: four 48x32 frames of the boarding-pass gate set into the back wall, laid out like `security_door.png`: a FOOD COURT sign over glass paddle gates and a pass reader (locked with a red light, unlocked green, paddles folding back, open). The corridor beyond is warm wood, a hint of the Food Court.
+
+**`security_litter.png`**: four 16x16 floor decals: a spilled screening bin, a lost shoe, a pecked-through belt, a confiscated water bottle.
 
 ### Import Settings (Godot)
 - Texture filter: Nearest

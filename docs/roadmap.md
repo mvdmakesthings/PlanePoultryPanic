@@ -103,7 +103,7 @@ Business steps once the slice is solid:
 
 Build each level fully before starting the next, so the game is always playable from the start.
 
-- [ ] Level 2: Security Checkpoint (boarding pass, first powered chickens, extinguisher, hiding)
+- [x] Level 2: Security Checkpoint (boarding pass, first powered chickens, extinguisher, hiding; played and approved 2026-10-19)
 - [ ] Level 3: Food Court (first totem, vending machines)
 - [ ] Level 4: Gate Areas A, B, C (walkways, all systems combined, mid-level checkpoints)
 - [ ] Level 5: Final Departure Gate (final boss, escape sequence)
