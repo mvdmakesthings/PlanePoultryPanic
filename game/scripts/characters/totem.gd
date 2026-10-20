@@ -10,6 +10,15 @@ extends CharacterBody2D
 ## luggage cart, or lure it onto the carousel belt, and it topples, defeating
 ## any chicken it lands on while its own chickens scatter, dazed. Three
 ## snacks dropped beside it break it apart without any defeats.
+##
+## The final boss is a totem with more chickens, several hits to break
+## (each hit sheds chickens off its base instead of toppling it for good),
+## a giant glowing mushroom crown, and no interest in snacks.
+
+## Emitted when a boss totem takes a hit that doesn't finish it.
+signal staggered(hits_left: int)
+## Emitted when the totem comes apart for good. fell: toppled, not scattered.
+signal broken(fell: bool)
 
 enum State { IDLE, STALK, STOMP_WINDUP, TOPPLING, FLYING }
 
@@ -18,6 +27,9 @@ const RAGE_SHEET := preload("res://assets/sprites/chicken_rage_walk.png")
 const CHICKEN_SCENE := preload("res://scenes/characters/chicken.tscn")
 const EGG_SCENE := preload("res://scenes/objects/egg_projectile.tscn")
 const POOF_SCENE := preload("res://scenes/objects/feather_poof.tscn")
+const CROWN_SHEET := preload("res://assets/sprites/boss_crown.png")
+## Seconds a boss can't be hit again after a hit.
+const REEL_TIME := 2.0
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.45)
 const SHOCKWAVE_COLOR := Color("ffffff")
 const LANDING_WARNING_COLOR := Color(0.894, 0.231, 0.267, 0.45)
@@ -31,6 +43,12 @@ const LAYER_HEIGHT := 10.0
 var members := 4
 ## The roost this totem formed at, which rests after it falls.
 var home: Roost = null
+## Hits it takes to come apart for good; each earlier hit sheds chickens.
+var max_hits := 1
+## Wears the giant glowing mushroom crown (the final boss).
+var crowned := false
+## Ignores snacks laid beside it.
+var snack_proof := false
 var state := State.IDLE
 
 @export var speed := 45.0
@@ -78,6 +96,10 @@ var _topple_dir := Vector2.RIGHT
 var _time := 0.0
 var _flight_ready_in := 4.0
 var _flight_elapsed := 0.0
+var _hits_taken := 0
+## After a hit, a moment when it can't be hit again.
+var _reeling := 0.0
+var _crown: Sprite2D
 
 @onready var _agent: NavigationAgent2D = $NavigationAgent2D
 @onready var _hitbox: Area2D = $Hitbox
@@ -86,6 +108,13 @@ var _flight_elapsed := 0.0
 func _ready() -> void:
 	add_to_group("totems")
 	_player = get_tree().get_first_node_in_group("player") as Player
+	_build_layers()
+
+
+func _build_layers() -> void:
+	for layer in _layers:
+		layer.queue_free()
+	_layers.clear()
 	for i in members:
 		var layer := Sprite2D.new()
 		var atlas := AtlasTexture.new()
@@ -96,6 +125,17 @@ func _ready() -> void:
 		layer.offset = Vector2(0, -8)
 		add_child(layer)
 		_layers.append(layer)
+	if crowned and _crown == null:
+		_crown = Sprite2D.new()
+		_crown.texture = CROWN_SHEET
+		_crown.hframes = 2
+		_crown.offset = Vector2(0, -10)
+		add_child(_crown)
+
+
+## Hits it can still take, counting the one that finishes it.
+func hits_left() -> int:
+	return max_hits - _hits_taken
 
 
 func _physics_process(delta: float) -> void:
@@ -105,6 +145,7 @@ func _physics_process(delta: float) -> void:
 	_barrage_ready_in -= delta
 	_shockwave -= delta
 	_flight_ready_in -= delta
+	_reeling -= delta
 
 	match state:
 		State.FLYING:
@@ -136,11 +177,41 @@ func _physics_process(delta: float) -> void:
 
 ## Knocks the totem over in a direction. Safe to call more than once.
 func topple(direction: Vector2) -> void:
-	if state == State.TOPPLING:
+	if state == State.TOPPLING or _reeling > 0.0:
 		return
+	if _hits_taken + 1 < max_hits:
+		_stagger(direction)
+		return
+	_hits_taken += 1
 	state = State.TOPPLING
 	_timer = topple_time
 	_topple_dir = direction.normalized() if direction != Vector2.ZERO else Vector2.RIGHT
+
+
+## A hit that doesn't finish a boss: the bottom chickens are knocked out
+## from under it and land dazed along the hit, the rest drop down a level,
+## and it reels for a moment, then comes on faster.
+func _stagger(direction: Vector2) -> void:
+	_hits_taken += 1
+	_reeling = REEL_TIME
+	var shed := maxi(1, (members - 2) / (max_hits - _hits_taken + 1))
+	var dir := direction.normalized() if direction != Vector2.ZERO else Vector2.RIGHT
+	for i in shed:
+		var chicken := CHICKEN_SCENE.instantiate() as Chicken
+		chicken.position = position + dir.rotated((i - shed / 2.0) * 0.5) * (fall_spacing * 2.0)
+		get_parent().add_child(chicken)
+		chicken.stun(scatter_daze)
+	members -= shed
+	_build_layers()
+	speed *= 1.15
+	flight_interval *= 0.85
+	state = State.STALK
+	_shockwave = 0.3
+	AudioManager.play("boss_hit", global_position)
+	var poof := POOF_SCENE.instantiate() as Node2D
+	poof.position = position + dir * 10.0
+	get_parent().add_child(poof)
+	staggered.emit(hits_left())
 
 
 ## The extinguisher froze the base chicken: the whole stack tips over,
@@ -259,6 +330,8 @@ func _check_contact() -> void:
 
 
 func _check_snack_scatter() -> void:
+	if snack_proof:
+		return
 	var nearby := 0
 	for node in get_tree().get_nodes_in_group("snack_lures"):
 		if global_position.distance_to((node as Node2D).global_position) <= snack_scatter_radius:
@@ -296,6 +369,9 @@ func _break_apart(fell: bool) -> void:
 	get_parent().add_child(poof)
 	if is_instance_valid(home):
 		home.start_cooldown()
+	if crowned:
+		AudioManager.play("crown_burst", global_position)
+	broken.emit(fell)
 	queue_free()
 
 
@@ -327,6 +403,13 @@ func _update_layers() -> void:
 			layer.position = Vector2(roundf(sway) + shake, -i * LAYER_HEIGHT - _altitude())
 			layer.scale = Vector2(1.1, 0.9) if i == 0 and members > 1 else Vector2.ONE
 		layer.flip_h = _player != null and _player.global_position.x < global_position.x
+		# Flicker while reeling from a hit.
+		layer.visible = _reeling <= 0.0 or int(_reeling * 12.0) % 2 == 0
+	if _crown:
+		var top := _layers[-1].position if not _layers.is_empty() else Vector2.ZERO
+		_crown.position = top + Vector2(0, -12)
+		_crown.frame = int(_time * 3.0) % 2
+		_crown.visible = state != State.TOPPLING
 
 
 func _draw() -> void:

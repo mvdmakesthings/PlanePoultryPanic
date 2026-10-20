@@ -199,6 +199,28 @@ func _on_door_locked(door: LockedDoor) -> void:
 		show_event_hint(locked_hints[door.name])
 
 
+## Fades to black, calls middle (for example to move the player somewhere
+## else in the level), and fades back in.
+func fade_through(middle: Callable) -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 50
+	var black := ColorRect.new()
+	black.color = Color("181425")
+	black.set_anchors_preset(Control.PRESET_FULL_RECT)
+	black.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	black.modulate.a = 0.0
+	layer.add_child(black)
+	add_child(layer)
+	var tween := create_tween()
+	tween.tween_property(black, "modulate:a", 1.0, 0.25)
+	await tween.finished
+	middle.call()
+	tween = create_tween()
+	tween.tween_property(black, "modulate:a", 0.0, 0.25)
+	await tween.finished
+	layer.queue_free()
+
+
 # ---------- the end of the level ----------
 
 func _on_exit_entered() -> void:
@@ -261,6 +283,7 @@ func _save_checkpoint(id: String) -> void:
 		"inventory": LevelState.capture_inventory(_player.inventory),
 		"collected": LevelState.collected(self, _pickups),
 		"unlocked": unlocked,
+		"extra": _extra_state(),
 	})
 
 
@@ -291,7 +314,13 @@ func _restore(data: Dictionary) -> void:
 	GameManager.last_checkpoint = data
 
 
-## Called after a checkpoint is restored, for anything level-specific.
+## Anything level-specific to keep in a checkpoint (plain JSON values).
+func _extra_state() -> Dictionary:
+	return {}
+
+
+## Called after a checkpoint is restored, for anything level-specific
+## (data["extra"] holds what _extra_state() returned).
 func _restored(_data: Dictionary) -> void:
 	pass
 

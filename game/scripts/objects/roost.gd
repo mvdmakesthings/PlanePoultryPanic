@@ -21,6 +21,16 @@ const WARNING_COLOR := Color("e43b44")
 ## Where totems are added: the room's depth-sorted entity layer. The roost
 ## itself sits outside it, so the nest always draws flat on the floor.
 @export var entities_path: NodePath = ^"../Entities"
+@export_group("Totem")
+## The totem's settings: the final boss is taller, takes several hits,
+## wears the mushroom crown and ignores snacks.
+@export var totem_hits := 1
+@export var totem_crowned := false
+@export var totem_snack_proof := false
+## A dormant roost draws no chickens until wake() is called.
+@export var dormant := false
+## Forms only once: after its totem is broken it stays empty.
+@export var once := false
 
 var _forming_time := 0.0
 var _cooldown_left := 0.0
@@ -32,7 +42,11 @@ func _ready() -> void:
 
 
 func is_open() -> bool:
-	return _cooldown_left <= 0.0
+	return _cooldown_left <= 0.0 and not dormant
+
+
+func wake() -> void:
+	dormant = false
 
 
 ## Hands out settling spots in turn, so no two chickens aim for the same one.
@@ -53,6 +67,8 @@ func is_forming() -> bool:
 
 func start_cooldown() -> void:
 	_cooldown_left = cooldown
+	if once:
+		dormant = true
 
 
 func _physics_process(delta: float) -> void:
@@ -81,6 +97,9 @@ func _form(members: Array[Chicken]) -> void:
 	var totem := TOTEM_SCENE.instantiate() as Totem
 	totem.members = members.size()
 	totem.home = self
+	totem.max_hits = totem_hits
+	totem.crowned = totem_crowned
+	totem.snack_proof = totem_snack_proof
 	totem.position = position
 	for chicken in members:
 		chicken.queue_free()

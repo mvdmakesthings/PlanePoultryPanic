@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/locked_door.gd" id="1_door"]
+[ext_resource type="Texture2D" path="res://assets/sprites/plane_door.png" id="2_texture"]
+
+[node name="PlaneDoor" type="Node2D"]
+script = ExtResource("1_door")
+start_unlocked = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_texture")
+centered = false
+hframes = 4

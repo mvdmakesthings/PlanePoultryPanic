@@ -31,6 +31,9 @@ const DOORWAY := Rect2(8, 18, 32, 14)
 @export var unlocked_text := "Unlocked!"
 ## Starts unlocked, for an exit that needs no key.
 @export var start_unlocked := false
+## Won't open at all, key or not, until the level unseals it.
+@export var sealed := false
+@export var sealed_text := "Sealed"
 @export var reach := 26.0
 @export var open_distance := 56.0
 @export var frames_per_second := 12.0
@@ -81,6 +84,11 @@ func can_interact(player: Player) -> bool:
 
 
 func interact(player: Player) -> void:
+	if sealed:
+		FloatText.spawn(player, sealed_text)
+		AudioManager.play("locked")
+		interacted_locked.emit()
+		return
 	var has_key := player.inventory.has_key_item(key_item)
 	if has_key and consume_key:
 		player.inventory.use_key_item(key_item)

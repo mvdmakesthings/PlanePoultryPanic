@@ -12,6 +12,8 @@ const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 @export var id := ""
 ## How close the player must come to reach it.
 @export var radius := 24.0
+## Off: walking up to it does nothing; the level activates it itself.
+@export var automatic := true
 
 var is_active := false
 
@@ -42,7 +44,7 @@ func _physics_process(delta: float) -> void:
 	_time += delta
 	# Off, or lit with the "you are here" dot blinking.
 	_sprite.frame = 0 if not is_active else 1 + int(_time * 2.0) % 2
-	if is_active:
+	if is_active or not automatic:
 		return
 	var player := get_tree().get_first_node_in_group("player") as Player
 	if player and not player.is_dead and player.global_position.distance_to(global_position) <= radius:

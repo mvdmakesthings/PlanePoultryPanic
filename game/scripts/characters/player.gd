@@ -218,6 +218,19 @@ func take_damage(amount: int, from_position: Vector2) -> bool:
 	return true
 
 
+## Knocked out by something other than a hit, like missing the flight.
+## reason becomes last_hit, for the retry screen's hint.
+func knock_out(reason: String) -> void:
+	if is_dead:
+		return
+	if is_hidden and hidden_in:
+		hidden_in.interact(self)
+	last_hit = reason
+	health = 0
+	health_changed.emit(health, max_health)
+	_die()
+
+
 ## Picks up count of an item. Returns how many didn't fit, so pickups can
 ## leave the rest lying where they were.
 func pick_up(item: String, count: int) -> int:

@@ -34,6 +34,11 @@ var _player: Player
 var _message := ""
 var _hint := ""
 var _icons := {}
+## Seconds left on the escape countdown, or negative when there isn't one.
+var _countdown := -1.0
+## The boss's hits left and total, or 0 total when there's no boss.
+var _boss_hits := 0
+var _boss_max := 0
 
 
 func _ready() -> void:
@@ -69,6 +74,20 @@ func show_message(text: String) -> void:
 
 ## Shows a tutorial hint at the top of the screen ("" hides it). Action
 ## names in braces are drawn as their buttons, like "{run}" -> [SHIFT].
+## Shows the escape countdown at the top right; negative hides it.
+func show_countdown(seconds: float) -> void:
+	if ceilf(seconds) != ceilf(_countdown):
+		queue_redraw()
+	_countdown = seconds
+
+
+## Shows the boss's hits left as pips at the top right; maximum 0 hides it.
+func show_boss(hits_left: int, maximum: int) -> void:
+	_boss_hits = hits_left
+	_boss_max = maximum
+	queue_redraw()
+
+
 func show_hint(text: String) -> void:
 	if text != _hint:
 		_hint = text
@@ -103,6 +122,15 @@ func _draw() -> void:
 		ButtonGlyphs.draw(self, font, Vector2(hint_x, size.y - 5), controls_hint, TEXT, TEXT_OUTLINE)
 	if _hint != "":
 		_draw_hint(font)
+	if _boss_max > 0:
+		_draw_board_box(font, "SUPREME TOTEM", "")
+		for i in _boss_max:
+			var pip := Rect2(size.x - 10 - (_boss_max - i) * 8, 15, 6, 4)
+			draw_rect(pip.grow(1), TEXT_OUTLINE)
+			draw_rect(pip, Color("e43b44") if i < _boss_hits else STAMINA_BACK)
+	if _countdown >= 0.0:
+		var secs := int(ceilf(_countdown))
+		_draw_board_box(font, "DOORS CLOSE", "0:%02d" % secs, secs <= 10 and secs % 2 == 0)
 
 	if _message != "":
 		draw_rect(Rect2(Vector2.ZERO, size), Color(TEXT_OUTLINE, 0.6))
@@ -129,6 +157,17 @@ func _draw_hint(font: Font) -> void:
 	for line in lines:
 		ButtonGlyphs.draw_centered(self, font, panel.get_center().x, y, line, HINT_TEXT)
 		y += 11
+
+
+## A small departure-board box at the top right: a label and a value.
+func _draw_board_box(font: Font, label: String, value: String, flash := false) -> void:
+	var text := label + ("  " + value if value != "" else "")
+	var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x
+	var box := Rect2(size.x - width - 12, 3, width + 8, 10)
+	draw_rect(box.grow(1), HINT_EDGE)
+	draw_rect(box, HINT_BACK)
+	draw_string(font, box.position + Vector2(4, 8), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE,
+		Color("e43b44") if flash else Color("f77622"))
 
 
 ## One suitcase per Player.SUITCASE health units; partly lost suitcases are

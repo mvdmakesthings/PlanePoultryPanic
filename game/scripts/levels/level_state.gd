@@ -8,6 +8,7 @@ extends RefCounted
 ##   inventory    - the player's slots, selection and key items
 ##   collected    - paths (from the level) of item pickups already taken
 ##   unlocked     - paths of doors and vending machines already unlocked
+##   extra        - anything level-specific, like a beaten boss
 ## Chickens, carts and thrown items start fresh on a retry.
 
 
