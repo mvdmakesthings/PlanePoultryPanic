@@ -23,6 +23,7 @@ PALETTE = {
     "k": "262b44",  # backpack dark
     "P": "262b44",  # leggings
     "p": "3a4466",  # leggings light
+    "i": "5a6988",  # leggings shine
     "N": "262b44",  # boots
     "G": "8b9bb4",  # boot shine
     # chicken

@@ -2,7 +2,7 @@
 
 Base poses face down (FRONT), up (BACK), and right (SIDE). Walk cycles are
 4 frames per direction: contact, passing, contact with the other leg,
-passing. Left-facing frames are mirrored from right-facing ones.
+passing with the other leg. Left-facing frames are mirrored from right-facing ones.
 """
 from palette import blank_rows, mirror, put
 
@@ -28,13 +28,13 @@ FRONT = [
     ".OTOwWWWWWWwOSO.",
     ".OSOwwWWWWwwOSO.",
     ".OsOOPPPPPPOOsO.",
-    "..OOOPPPPPPOOO..",
-    "....OPpPPpPO....",
-    "....OPpPPpPO....",
-    "....OPpOOpPO....",
-    "....OPpOOpPO....",
-    "....OPpOOpPO....",
-    "....OPPOOPPO....",
+    "..OOOppppppOOO..",
+    "....OpippipO....",
+    "....OpippipO....",
+    "....OpiOOipO....",
+    "....OpiOOipO....",
+    "....OpiOOipO....",
+    "....OppOOppO....",
     "...OGNNOONNGO...",
     "...ONNNOONNNO...",
     "...OOOOOOOOOO...",
@@ -63,13 +63,13 @@ BACK = [
     ".OTOkbBBBBBkOSO.",
     ".OSOkkBBBBkkOSO.",
     ".OsOOkkkkkkOOsO.",
-    "..OOOPPPPPPOOO..",
-    "....OPPPPPPO....",
-    "....OPPPPPPO....",
-    "....OPpOOpPO....",
-    "....OPpOOpPO....",
-    "....OPpOOpPO....",
-    "....OPPOOPPO....",
+    "..OOOppppppOOO..",
+    "....OppppppO....",
+    "....OppppppO....",
+    "....OpiOOipO....",
+    "....OpiOOipO....",
+    "....OpiOOipO....",
+    "....OppOOppO....",
     "...OGNNOONNGO...",
     "...ONNNOONNNO...",
     "...OOOOOOOOOO...",
@@ -98,54 +98,70 @@ SIDE = [
     "ObBkBOwWSTWO....",
     "OkBBBOwwSSwO....",
     ".OkkkOPPsSPO....",
-    "..OOOPPPOOPO....",
-    ".....OPpPPPO....",
-    ".....OPpPPPO....",
-    ".....OPpPPPO....",
-    ".....OPpPPPO....",
-    ".....OPpPPPO....",
-    ".....OPPPPPO....",
+    "..OOOpppOOpO....",
+    ".....OpipppO....",
+    ".....OpipppO....",
+    ".....OpipppO....",
+    ".....OpipppO....",
+    ".....OpipppO....",
+    ".....OpppppO....",
     ".....OGNNNNOO...",
     ".....ONNNNNNO...",
     ".....OOOOOOOO...",
     "................",
 ]
 
-# Side-view legs, rows 23-30, near (lit) leg in front.
-SIDE_STRIDE_NEAR_FRONT = [
-    ".....OPPPpPO....",
-    ".....OPPOPpO....",
-    "....OPPO.OPpO...",
-    "....OPPO.OPpO...",
-    "...OPPO...OPpO..",
-    "...OGNNO..OGNNO.",
-    "..ONNNNO.ONNNNO.",
-    "..OOOOOO.OOOOOO.",
+# Side-view legs. The near leg is lit (p with an i shine), the far leg is
+# in shadow (P), so the two read as separate limbs even when they cross.
+
+# Contact, rows 23-30: near leg planted in front, far leg pushing off behind.
+SIDE_CONTACT_NEAR_FRONT = [
+    ".....OPPpipO....",
+    ".....OPPOpipO...",
+    "....OPPO.OpipO..",
+    "....OPPO..OpiO..",
+    "...OPPO...OpiO..",
+    "...ONNO...ONNGO.",
+    "..ONNNO...ONNNNO",
+    "..OOOO....OOOOOO",
 ]
 
-# Side-view legs, rows 23-30, near (lit) leg behind.
-SIDE_STRIDE_NEAR_BACK = [
-    ".....OPpPPPO....",
-    ".....OPpOPPO....",
-    "....OPpO.OPPO...",
-    "....OPpO.OPPO...",
-    "...OPpO...OPPO..",
-    "...OGNNO..OGNNO.",
-    "..ONNNNO.ONNNNO.",
-    "..OOOOOO.OOOOOO.",
+# Contact, rows 23-30: far leg planted in front, near leg pushing off behind.
+SIDE_CONTACT_NEAR_BACK = [
+    ".....OpipPPO....",
+    "....OpipOPPO....",
+    "....OpiO.OPPO...",
+    "...OpiO...OPPO..",
+    "...OpiO...OPPO..",
+    "..ONNGO...ONNNO.",
+    "..ONNNO...ONNNNO",
+    "..OOOO....OOOOOO",
 ]
 
-# Side-view legs, rows 22-30, back foot lifting.
-SIDE_PASSING = [
-    ".....OPpPPPO....",
-    ".....OPpPPPO....",
-    ".....OPpPPPO....",
-    ".....OPpPPPO....",
-    "....OPPOPpPO....",
-    "...OPPOOPpPO....",
-    "...ONNOOGNNNOO..",
-    "....OO.ONNNNNO..",
-    ".......OOOOOOO..",
+# Passing, rows 22-30: near leg straight under the body, far boot kicked up behind.
+SIDE_PASSING_NEAR_PLANTED = [
+    ".....OPPpipO....",
+    ".....OPPpipO....",
+    "....OPPOpipO....",
+    "...OPPO.OpipO...",
+    "..OPPO..OpipO...",
+    "..ONNO..OpipO...",
+    "..ONGO..ONNGNO..",
+    "...OO...ONNNNNO.",
+    "........OOOOOOO.",
+]
+
+# Passing, rows 22-30: far leg straight under the body, near boot kicked up behind.
+SIDE_PASSING_FAR_PLANTED = [
+    ".....OpipPPO....",
+    ".....OpipPPO....",
+    "....OpiOPPPO....",
+    "...OpiO.OPPO....",
+    "..OpiO..OPPO....",
+    "..ONNO..OPPO....",
+    "..ONGO..ONNNNO..",
+    "...OO...ONNNNNO.",
+    "........OOOOOOO.",
 ]
 
 
@@ -196,11 +212,14 @@ def front_back_walk(base):
 def side_walk(base):
     upper = base[:22]
     # Contact frames: legs spread, so the hips (and whole upper body) drop 1px.
+    # Each passing frame plants the leg that just landed in front.
     lowered = ["." * 16] + upper
-    f0 = lowered + SIDE_STRIDE_NEAR_FRONT + ["." * 16]
-    f2 = lowered + SIDE_STRIDE_NEAR_BACK + ["." * 16]
-    passing = upper + SIDE_PASSING + ["." * 16]
-    return [f0, passing, f2, passing]
+    return [
+        lowered + SIDE_CONTACT_NEAR_FRONT + ["." * 16],
+        upper + SIDE_PASSING_NEAR_PLANTED + ["." * 16],
+        lowered + SIDE_CONTACT_NEAR_BACK + ["." * 16],
+        upper + SIDE_PASSING_FAR_PLANTED + ["." * 16],
+    ]
 
 
 def walk_cycle():
