@@ -153,8 +153,8 @@ The action poses are built by stamping small hand-drawn pieces (raised arms, a f
 |---|---|---|---|
 | Idle and peck | 4 | 3 | M2 style test |
 | Walk | 4 | 4 | M2 style test |
-| Chase (fast walk, wings out) | 4 | 4 | M4 |
-| Eat snack | 1 | 3 | M4 |
+| Chase (fast walk, wings out) | 4 | 4 | M4, done |
+| Eat snack | 1 | 3 | M4, done |
 | Flight hop | 4 | 4 | M3 risk prototypes |
 | Egg shot (wind-up and fire) | 4 | 3 | M3 |
 | Feather poof | 1 | 6 | M3 |
@@ -223,6 +223,8 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 | `player_ko.png` | 32x20 | 2, in one row (not per direction) | Game over: flat on their back, head to the left, X eyes, with stars circling above the head. Loop slowly (about 3 FPS). Drawn centered over the spot the player fell. |
 | `chicken_walk.png` | 16x16 | 4 per direction | Head bobs forward on side-view contact frames; front and back views waddle. |
 | `chicken_idle.png` | 16x16 | 3 per direction | Stand, dip, peck. Hold the first frame and play the peck now and then. |
+| `chicken_chase.png` | 16x16 | 4 per direction | The walk's poses with the wings flapping: up on contact frames (lifted off the back in profile, raised out from the shoulders front and back), flicked down on passing frames. In profile the beak opens in a squawk on the up-strokes. Front and back keep the body centered so both wings fit. Plays at 12 FPS while chasing. |
+| `chicken_eat.png` | 16x16 | 3, in one row (facing the camera only) | Peck at the snack on the floor, head up with a chip in its beak, chomp with crumbs flying. Loops at 6 FPS while eating a snack or a mushroom; the snack itself is drawn by the game, not in these frames. |
 | `chicken_flight_walk.png` | 16x16 | 4 per direction | Teal glowcap, glowing wings, drifting sparkles |
 | `chicken_rage_walk.png` | 16x16 | 4 per direction | Red spotted cap, flickering flames behind the body |
 | `chicken_egg_walk.png` | 16x16 | 4 per direction | Purple spotted cap and a loaded throat: a pink pouch from the front, pink cheeks from behind, a bulge in profile |

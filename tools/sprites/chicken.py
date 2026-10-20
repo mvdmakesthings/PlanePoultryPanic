@@ -145,6 +145,98 @@ def idle_cycle():
     }
 
 
+# ---------- chase and eat ----------
+# Chasing: the walk's poses with the wings flapping (up on contact frames,
+# flicked down on passing frames) and, from the side, the beak open in a
+# squawk. Eating: facing the camera, a peck at the snack on the floor, the
+# head up with a chip in the beak, then a chomp with crumbs flying.
+
+# Side view: the near wing lifted above the back, drawn behind the head.
+SIDE_WING_UP = [
+    "..OO.",
+    ".OCCO",
+    "OCcCO",
+    "OCcO.",
+]
+# Side view: feather tips flicked out behind the tail on the down-stroke.
+SIDE_WING_DOWN = ["O", "c", "C", "O"]
+# Front and back: wings raised out from the shoulders, or flicked out low.
+WING_UP_LEFT = ["OO.", "CCO", "OcO"]
+WING_DOWN_LEFT = [".O", "OC", "Cc", "OO"]
+
+
+def _squawk(grid):
+    """Opens the side view's beak: the lower half drops a row."""
+    g = list(grid)
+    for r, row in enumerate(g):
+        if "YY" in row and r + 1 < len(g):
+            c = row.index("YY")
+            put(g, r, c, "YO")
+            put(g, r + 1, c, "yy")
+            return g
+    return g
+
+
+def _flap_side(grid, up):
+    if up:
+        return overlay(grid, SIDE_WING_UP, first_filled_row(grid, 4) - 3, 3)
+    return overlay(grid, SIDE_WING_DOWN, first_filled_row(grid, 2) + 1, 0)
+
+
+def _flap_front(grid, up):
+    """Wings out from the body's widest rows (the shoulders), which shift
+    a pixel as the chicken waddles."""
+    widths = [len(row.strip(".")) for row in grid[:14]]
+    top = widths.index(max(widths))
+    left = grid[top].index("O")
+    right = grid[top].rindex("O")
+    if up:
+        g = overlay(grid, WING_UP_LEFT, top - 2, left - 2)
+        return overlay(g, [row[::-1] for row in WING_UP_LEFT], top - 2, right)
+    g = overlay(grid, WING_DOWN_LEFT, top + 1, left - 2)
+    return overlay(g, [row[::-1] for row in WING_DOWN_LEFT], top + 1, right + 1)
+
+
+def chase_cycle():
+    """Chase frames keyed by direction: down, up, right, left."""
+    walk = walk_cycle()
+    right = [_flap_side(_squawk(f) if i % 2 == 0 else f, i % 2 == 0)
+             for i, f in enumerate(walk["right"])]
+    # Front and back keep the body centered (the waddle's sideways shift would
+    # push a wing off the frame) and take only the waddle's stepping legs.
+    bodies = {"down": FRONT, "up": BACK}
+    out = {direction: [_flap_front(bodies[direction][:14] + f[14:], i % 2 == 0)
+                       for i, f in enumerate(walk[direction])]
+           for direction in ("down", "up")}
+    out["right"] = right
+    out["left"] = [mirror(f) for f in right]
+    return out
+
+
+CRUMB = "F"
+
+
+def eat_frames():
+    """Facing the camera: peck at the snack, chip in beak, chomp with crumbs."""
+    peck = dip_head(FRONT, (0, 7), (3, 13), 3)
+    peck = overlay(peck, ["F.F", ".F."], 13, 6)
+    chip = overlay(FRONT, ["FF"], 7, 7, behind=False)
+    chip = overlay(chip, ["F..", "...", "..F"], 1, 3)
+    chomp = dip_head(FRONT, (0, 7), (3, 13), 1)
+    chomp = overlay(chomp, ["F....F", "......", ".F..F."], 2, 5)
+    return [peck, chip, chomp]
+
+
+def eat_sheet():
+    """Three 16x16 frames in one row (facing the camera only)."""
+    from PIL import Image
+    from palette import to_image
+    out = Image.new("RGBA", (16 * 3, 16), (0, 0, 0, 0))
+    for i, frame in enumerate(eat_frames()):
+        out.alpha_composite(to_image(frame), (i * 16, 0))
+    return out
+
+
 # ---------- powered-up chickens ----------
 
 # Mushroom cap, centered on the comb. X = cap, x = cap shade, S = spot.
