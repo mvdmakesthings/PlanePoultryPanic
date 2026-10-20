@@ -533,6 +533,11 @@ func _update_power(delta: float) -> void:
 		power = ""
 
 
+## True while a flight chicken is in the air.
+func is_hopping() -> bool:
+	return _is_hopping()
+
+
 func _is_hopping() -> bool:
 	return _hop_time > 0.0
 

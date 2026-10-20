@@ -22,6 +22,7 @@ const ITEMS := {
 ## player is told when they pick one up.
 const KEY_ITEMS := {
 	"maintenance_key": {"name": "Maintenance key", "icon": "res://assets/sprites/item_maintenance_key.png"},
+	"boarding_pass": {"name": "Boarding pass", "icon": "res://assets/sprites/item_boarding_pass.png"},
 }
 
 ## Each slot is {} when empty, or {"item": String, "count": int}.
