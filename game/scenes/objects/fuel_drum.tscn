@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/floor_prop.gd" id="1_prop"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fuel_drum.png" id="2_texture"]
+[ext_resource type="Script" path="res://scripts/objects/flipbook_sprite.gd" id="3_flipbook"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_base"]
+size = Vector2(10, 5)
+
+[node name="FuelDrum" type="StaticBody2D" groups=["nav_obstacles"]]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_prop")
+shadow_radius = 7.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_texture")
+offset = Vector2(0, -10)
+hframes = 2
+script = ExtResource("3_flipbook")
+fps = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_base")
