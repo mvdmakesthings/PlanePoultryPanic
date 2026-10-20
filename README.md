@@ -9,7 +9,7 @@ A 16-bit top-down action game: get through a chicken-overrun airport and catch t
 ## Play
 
 1. Install Godot 4 (on macOS: `brew install --cask godot`).
-2. Run the game from the repo root. It starts in Level 1, Arrivals / Baggage Claim:
+2. Run the game from the repo root. It opens on the main menu; New Game starts Level 1, Arrivals / Baggage Claim:
 
 ```bash
 /Applications/Godot.app/Contents/MacOS/Godot --path game
@@ -32,9 +32,12 @@ The one-room prototype is still there as a test bed for chicken behavior and ite
 | Drop the selected slot | G | Back |
 | Eat a snack (heal) | E | X |
 | Push a cart, take an extinguisher, pick up or put down a suitcase | F | B |
+| Pause (Resume, Settings, Quit to Menu) | Esc | Start |
 | Restart the prototype room (after winning or losing) | R | Start |
 
-In Level 1, find the maintenance key and use it on the locked door to **SECURITY**. Hints at the top of the screen teach the controls as you go. In the prototype room, reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
+Every control can be remapped in Settings > Controls. Menus work with the arrow keys or WASD, Enter, and Esc, or a gamepad, or the mouse.
+
+In Level 1, find the maintenance key and use it on the locked door to **SECURITY**. Hints at the top of the screen teach the controls as you go. The "YOU ARE HERE" map stands are checkpoints: reaching one autosaves, and after a knockout you retry from the latest one. Continue in the main menu picks up from there. In the prototype room, reach the green **GATE** without losing all five suitcases. Chickens chase you when they see you; throw a snack and they'll go eat it instead.
 
 ## Run the smoke tests
 
@@ -46,7 +49,11 @@ In Level 1, find the maintenance key and use it on the locked door to **SECURITY
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/level_01_smoke.tscn
 ```
 
-The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1's layout and its path from the start to the Security door. Both drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
+```bash
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/menus_smoke.tscn
+```
+
+The first covers the prototype room's systems (chickens, items, machinery); the second covers Level 1: its layout, its path from the start to the Security door, checkpoints, retrying and pausing; the third covers the main menu, settings and remapping. The tests use their own save and settings files, so they never touch yours. Both drive the player with simulated input and exit non-zero on failure. Godot script errors don't fail them on their own, so also check the output for any `ERROR` or `WARNING` lines. In a fresh checkout, run `--headless --path game --import` once first so Godot knows the project's classes.
 
 ## Rebuild the sprites
 

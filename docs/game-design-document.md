@@ -76,7 +76,7 @@ Steam Deck support means full gamepad support from the start, not as a late addi
 Reach the Final Departure Gate alive, holding the boarding pass, and defeat or escape the final chicken totem to board the plane.
 
 ### Failure
-When health reaches zero, the player restarts from the last checkpoint with their inventory as it was when they reached it. A short hint about what went wrong appears on the retry screen.
+When health reaches zero, the player restarts from the last checkpoint with their inventory as it was when they reached it, and full health. A short hint about what went wrong appears on the retry screen (based on what landed the last hit), with Retry from Checkpoint and Main Menu. Pickups already taken and doors already unlocked stay that way; chickens, carts and thrown items start fresh.
 
 ---
 
@@ -277,9 +277,9 @@ Kept minimal so the game stays readable at 320x180.
 - **Near objects**: Context prompts showing the right button for the current input device (keyboard or gamepad)
 
 ### Menus
-- **Main menu**: Departure-board style with flickering text over a looping airport scene. New Game, Continue, Settings, Credits, Quit.
+- **Main menu**: Departure-board style with flickering text over a looping airport scene (Amanda running from chickens across the terminal floor). New Game, Continue, Settings, Credits, Quit. Credits comes later.
 - **Pause menu**: Resume, Map (once the map is found), Settings, Quit to Menu
-- **Settings**: Controls (remapping), Audio (master, music, effects), Video (fullscreen, window scale), Accessibility. Changes apply immediately, and each category has Reset to Defaults.
+- **Settings**: Controls (remapping), Audio (master, music, effects), Video (fullscreen, window scale), Accessibility. Changes apply immediately, and each category has Reset to Defaults. Built so far: music, effects and ambience volume, fullscreen, and remapping each action's main key and gamepad button (a binding already in use swaps with it).
 
 ### Accessibility
 - Full remapping for keyboard and gamepad
@@ -292,8 +292,9 @@ Kept minimal so the game stays readable at 320x180.
 ## Progression and Replay
 
 ### Saving
-- The game autosaves at every checkpoint. There's no manual save, which keeps the tension.
-- **Continue** resumes from the latest checkpoint.
+- The game autosaves at every checkpoint, and when a level starts. There's no manual save, which keeps the tension.
+- **Continue** resumes from the latest checkpoint. **New Game** asks before replacing a save.
+- Checkpoints are "YOU ARE HERE" map stands that light up when reached. Level 1 has two: where Amanda comes down into Baggage Claim, and in the staff room.
 
 ### Difficulty Modes
 | Mode | Changes |
@@ -472,4 +473,6 @@ game/
 | 2026-10-19 | Player sprite is 16x32 (up from 16x24) so the look from the reference photos fits; chickens stay 16x16 | You |
 | 2026-10-19 | The player's hair gets messier as her health drops | You |
 | 2026-10-19 | The player character is named Amanda (she/her) | You |
+| 2026-10-19 | Retrying from a checkpoint restores full health (the inventory is as it was) | Proposed |
+| 2026-10-19 | Checkpoints are "YOU ARE HERE" map stands | Proposed |
 | 2026-10-19 | Arrivals music should be energetic and dystopian, not slow and sad; until the composer's tracks arrive, the game plays no music | You |

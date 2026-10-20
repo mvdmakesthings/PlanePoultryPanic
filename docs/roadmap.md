@@ -81,11 +81,11 @@ Still mostly gray-box. Each item should be playable in the prototype room.
 
 Level 1 at close to final quality, start to finish.
 
-- [ ] Full Level 1 layout built from tiles, with the tutorial flow
-- [ ] Final-quality art for everything in the level, with animations
-- [ ] Sound effects and placeholder music
-- [ ] Checkpoints, death and retry, and autosave
-- [ ] Main menu, pause menu, basic settings (audio, fullscreen, remapping)
+- [x] Full Level 1 layout built from tiles, with the tutorial flow
+- [ ] Final-quality art for everything in the level, with animations (done: run cycle, messy hair, the Security door, key, signs, seats, litter, checkpoint stands; still to come: Amanda's throw, eat, hurt and defeat animations, and the chickens' chase and eat)
+- [x] Sound effects and placeholder music (music is left out of the game for now by choice; placeholder loops are in `tools/audio/music.py`)
+- [x] Checkpoints, death and retry, and autosave
+- [x] Main menu, pause menu, basic settings (audio, fullscreen, remapping)
 - [ ] Context prompts that switch between keyboard and gamepad icons
 - [ ] Runs well on Steam Deck, or a low-end PC as a stand-in
 - [ ] 3-5 friends play it without help; watch silently and take notes
