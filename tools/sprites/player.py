@@ -250,9 +250,11 @@ def idle_cycle():
 
 
 # ---------- running ----------
-# Run frames: push off (legs wide, body low), flight (both feet off the
-# floor), push off with the other leg, flight. Longer stride than the walk,
-# knees driven high, arms pumping, and the backpack bouncing a beat behind.
+# Run frames, 6 per direction: contact (one foot lands in front, body low),
+# passing (that leg under her, the other swinging through), flight (the
+# swinging knee driven up in front, the landed leg pushing off behind), then
+# the same three with the legs swapped. Longer stride than the walk, knees
+# driven high, arms pumping, and the backpack bouncing a beat behind.
 
 
 def _lowered(grid, rows=1):
@@ -315,7 +317,8 @@ SIDE_RUN_LEGS = {
 
 
 def _side_run_frame(legs, landing):
-    g = list(SIDE[:22]) + SIDE_RUN_LEGS[legs] + ["." * 16]
+    rows = SIDE_RUN_LEGS[legs] if legs in SIDE_RUN_LEGS else SIDE_PASSING[legs]
+    g = list(SIDE[:22]) + rows + ["." * 16]
     if landing:
         g = _lowered(g)
         # The backpack lags the landing by another pixel.
@@ -325,12 +328,24 @@ def _side_run_frame(legs, landing):
     return g
 
 
+# The walk's passing legs work as the run's passing frames: one leg straight
+# under the body, the other boot swinging through behind it.
+SIDE_PASSING = {
+    "pass_near_planted": SIDE_PASSING_NEAR_PLANTED,
+    "pass_far_planted": SIDE_PASSING_FAR_PLANTED,
+}
+
+
 def side_run():
+    # After the near foot lands in front, the far leg swings through and its
+    # knee drives up while the near leg pushes off behind; then the reverse.
     return [
         _side_run_frame("near_front", True),
-        _side_run_frame("flight_near_up", False),
-        _side_run_frame("near_back", True),
+        _side_run_frame("pass_near_planted", True),
         _side_run_frame("flight_far_up", False),
+        _side_run_frame("near_back", True),
+        _side_run_frame("pass_far_planted", True),
+        _side_run_frame("flight_near_up", False),
     ]
 
 
@@ -345,7 +360,10 @@ def front_back_run(base):
     push_a = _lowered(pump(with_legs(base, long_leg(left), very_short_leg(right)), (12, 15)))
     push_b = _lowered(pump(with_legs(base, very_short_leg(left), long_leg(right)), (1, 4)))
     flight = with_legs(base, short_leg(left), short_leg(right))
-    return [push_a, flight, push_b, flight]
+    # Passing: the landed leg straight under her, the other coming through.
+    pass_a = _lowered(swing_arm(with_legs(base, left, short_leg(right)), (12, 15)))
+    pass_b = _lowered(swing_arm(with_legs(base, short_leg(left), right), (1, 4)))
+    return [push_a, pass_a, flight, push_b, pass_b, flight]
 
 
 def run_cycle():

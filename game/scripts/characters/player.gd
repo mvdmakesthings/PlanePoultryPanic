@@ -124,8 +124,8 @@ func _ready() -> void:
 	SpriteSheets.add_directional(frames, "idle", IDLE_SHEET, FRAME_SIZE, 2.0)
 	SpriteSheets.add_directional(frames, "walk_ext", WALK_EXTINGUISHER_SHEET, FRAME_SIZE, 8.0)
 	SpriteSheets.add_directional(frames, "idle_ext", IDLE_EXTINGUISHER_SHEET, FRAME_SIZE, 2.0)
-	SpriteSheets.add_directional(frames, "run", RUN_SHEET, FRAME_SIZE, 12.0)
-	SpriteSheets.add_directional(frames, "run_ext", RUN_EXTINGUISHER_SHEET, FRAME_SIZE, 12.0)
+	SpriteSheets.add_directional(frames, "run", RUN_SHEET, FRAME_SIZE, 14.0)
+	SpriteSheets.add_directional(frames, "run_ext", RUN_EXTINGUISHER_SHEET, FRAME_SIZE, 14.0)
 	SpriteSheets.add_directional(frames, "throw", THROW_SHEET, FRAME_SIZE, 10.0, false)
 	SpriteSheets.add_directional(frames, "hurt", HURT_SHEET, FRAME_SIZE, 1.0, false)
 	# Eating is only drawn facing the camera.

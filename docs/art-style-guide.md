@@ -117,7 +117,7 @@ Clusters of 3-5 mushrooms growing out of carpet, planters, and spilled food. Eac
 |---|---|---|
 | Idle | 2-4 | 4-6 FPS |
 | Walk | 4 | 8-10 FPS |
-| Run | 4-6 | 12 FPS |
+| Run | 4-6 | 12-14 FPS |
 | Chicken peck | 3-4 | 8 FPS |
 | Hit / damage | 2 + blink | Fast |
 | Feather poof (defeat) | 5-6 | 12 FPS |
@@ -135,7 +135,7 @@ Left-facing frames are mirrored from right-facing ones, so each character only n
 |---|---|---|---|
 | Idle | 4 | 2 | M2 style test |
 | Walk | 4 | 4 | M2 style test |
-| Run | 4 | 4 (longer stride, forward lean, hair and backpack bounce) | M4 vertical slice |
+| Run | 4 | 6 (contact, passing, flight on each leg; longer stride, hair and backpack bounce) | M4 vertical slice |
 | Throw | 4 | 3 (wind-up, release, follow-through) | M4, done |
 | Eat | 1 (facing down) | 3 (bite, chew, yum) | M4, done |
 | Hurt | 4 | 1, plus blinking | M4, done |
@@ -214,7 +214,7 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 | `player_walk.png` | 16x32 | 4 per direction | Contact, passing, contact, passing. In side views each passing frame plants the leg that just landed and kicks the other boot up behind; the near leg is lit and the far leg is in shadow so they read apart. |
 | `player_walk_extinguisher.png`, `player_idle_extinguisher.png` | 16x32 | Same as walk and idle | The same cycles with a small extinguisher in the player's left hand, placed at the hand in every frame so it swings with the arm |
 | `player_idle.png` | 16x32 | 2 per direction | Breathing: the head sinks 1px on the second frame. Play slowly (about 2 FPS). |
-| `player_run.png`, `player_run_extinguisher.png` | 16x32 | 4 per direction | Push off, flight, push off with the other leg, flight. The body lands a pixel lower on push-off frames and the backpack bounces a beat behind. Play at 12 FPS. |
+| `player_run.png`, `player_run_extinguisher.png` | 16x32 | 6 per direction | Contact (near foot lands in front), passing (near leg under her, far leg swinging through), flight (far knee up, near leg pushing off behind), then the same with the legs swapped. The body is a pixel lower on contact and passing frames and the backpack bounces a beat behind. Play at 14 FPS. |
 | `player_hair_mess.png` | 24x20 | 3 per direction (one per mess level) | Flyaway hair drawn over the player: a cowlick (below 75% health), puffed-out tufts (below 50%), wild frizz with a lock over the face (below 25%). Each frame covers the player frame's top 16 rows plus a 4 px margin above and to each side. The game lines it up with the top of the head in each animation frame, so redrawn sheets keep working as long as the head is the topmost thing drawn. |
 | `player_throw.png` | 16x32 | 3 per direction | Wind-up (arm raised high beside the head; pulled back in profile), release (fist toward the camera, or arm flung forward in profile, body a pixel lower), follow-through (hand swung low). Throws snacks and suitcases; plays at 10 FPS. |
 | `player_eat.png` | 16x32 | 3, in one row (facing the camera only) | Bite with the bag at her mouth, chew with happy closed eyes, yum with a crumb falling. Plays at 7 FPS. |
