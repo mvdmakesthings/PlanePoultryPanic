@@ -131,10 +131,17 @@ func _ready() -> void:
 	for checkpoint in _checkpoints():
 		checkpoint.reached.connect(_on_checkpoint_reached)
 	var restore := GameManager.take_pending(scene_file_path)
+	RunStats.level_started(self, _player, restore)
 	if restore.is_empty():
 		_save_checkpoint("start")
 	else:
 		_restore(restore)
+
+
+## True until the level ends (cleared, or the player knocked out). The run's
+## clock only runs while it's true.
+func is_playing() -> bool:
+	return not _level_over
 
 
 ## Fills in the level's details (see the variables above).

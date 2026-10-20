@@ -2,7 +2,9 @@ extends Node
 ## Saves and loads the game and the player's settings (autoload: SaveSystem).
 ##
 ## The game autosaves at every checkpoint; there's no manual save. The save
-## is one JSON file holding the latest checkpoint (see LevelState). Settings
+## is one JSON file holding the latest checkpoint (see LevelState), with
+## the run's stats (see RunStats). The best score has a file of its own, so
+## it outlasts the save, which is cleared when the game is finished. Settings
 ## (volumes, fullscreen, remapped controls) live in their own file and are
 ## applied at startup.
 
@@ -52,6 +54,36 @@ func load_game() -> Dictionary:
 func delete_game() -> void:
 	if has_save():
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))
+
+
+# ---------- the best score ----------
+
+## Next to the save and named after it, so tests that move the save move
+## this too.
+func best_path() -> String:
+	return save_path.get_basename() + "_best.json"
+
+
+## The best score and fastest finish ({"total", "rank", "time"}), or {} if
+## no run has been finished yet.
+func load_best() -> Dictionary:
+	if not FileAccess.file_exists(best_path()):
+		return {}
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(best_path()))
+	return data if data is Dictionary else {}
+
+
+func save_best(data: Dictionary) -> void:
+	var file := FileAccess.open(best_path(), FileAccess.WRITE)
+	if file == null:
+		push_warning("Couldn't write the best score: %s" % error_string(FileAccess.get_open_error()))
+		return
+	file.store_string(JSON.stringify(data, "\t"))
+
+
+func delete_best() -> void:
+	if FileAccess.file_exists(best_path()):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(best_path()))
 
 
 # ---------- settings ----------

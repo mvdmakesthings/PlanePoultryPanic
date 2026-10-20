@@ -45,6 +45,7 @@ func _ready() -> void:
 ## calls start_first_level().
 func new_game() -> void:
 	SaveSystem.delete_game()
+	RunStats.reset()
 	last_checkpoint = {}
 	pending = {}
 	change_scene(OPENING)
@@ -61,6 +62,7 @@ func continue_game() -> void:
 	var save := SaveSystem.load_game()
 	if save.is_empty():
 		return
+	RunStats.restore(save.get("stats", {}))
 	last_checkpoint = save
 	pending = save
 	change_scene(save["level"])
@@ -100,6 +102,7 @@ func retry(level: String) -> void:
 ## Called by a level when the player reaches a checkpoint: remembers it and
 ## autosaves.
 func checkpoint_reached(snapshot: Dictionary) -> void:
+	snapshot["stats"] = RunStats.capture()
 	last_checkpoint = snapshot
 	SaveSystem.save_game(snapshot)
 
@@ -112,9 +115,11 @@ func take_pending(level_path: String) -> Dictionary:
 	return snapshot if snapshot.get("level", "") == level_path else {}
 
 
-## The run is over (the ending has played): the save is cleared, since
-## there's nothing left to continue, and it's back to the main menu.
+## The run is over (the ending has played): it's scored (keeping any new
+## best), the save is cleared, since there's nothing left to continue, and
+## it's back to the main menu.
 func finish_game() -> void:
+	RunStats.finish_run()
 	SaveSystem.delete_game()
 	last_checkpoint = {}
 	pending = {}
@@ -122,6 +127,7 @@ func finish_game() -> void:
 
 
 func quit_to_menu() -> void:
+	RunStats.persist()
 	change_scene(MAIN_MENU)
 
 

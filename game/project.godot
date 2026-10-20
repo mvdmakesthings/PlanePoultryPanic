@@ -21,6 +21,7 @@ config/icon="res://icon.png"
 InputSetup="*res://scripts/managers/input_setup.gd"
 AudioManager="*res://scripts/managers/audio_manager.gd"
 SaveSystem="*res://scripts/managers/save_system.gd"
+RunStats="*res://scripts/managers/run_stats.gd"
 GameManager="*res://scripts/managers/game_manager.gd"
 
 [display]

@@ -243,11 +243,13 @@ func pick_up(item: String, count: int) -> int:
 		return 0
 	if Inventory.ITEMS[item]["stack"] > 1:
 		var added := inventory.add_stackable(item, count)
+		RunStats.item_collected(added)
 		if added > 0:
 			AudioManager.play("pickup")
 		return count - added
 	if not inventory.add_single(item, count):
 		return count
+	RunStats.item_collected()
 	AudioManager.play("pickup")
 	# A newly picked up tool goes straight into the player's hand.
 	if item == "extinguisher":
@@ -274,6 +276,7 @@ func throw_snack() -> void:
 	if index < 0:
 		return
 	inventory.take_from(index)
+	RunStats.item_used()
 	var snack := THROWN_SNACK_SCENE.instantiate() as ThrownSnack
 	snack.direction = facing
 	snack.position = position
@@ -293,6 +296,7 @@ func eat_snack() -> void:
 		FloatText.spawn(self, "Full!")
 		return
 	inventory.take_from(index)
+	RunStats.item_used()
 	AudioManager.play("eat")
 	_start_action("eat")
 	health = mini(health + SUITCASE, max_health)
@@ -311,6 +315,8 @@ func spray() -> void:
 	if index < 0:
 		return
 	inventory.take_from(index)
+	if inventory.slots[index].is_empty():
+		RunStats.item_used()
 	facing = _spray_aim()
 	var foam := SPRAY_SCENE.instantiate() as ExtinguisherSpray
 	foam.direction = facing
@@ -367,6 +373,7 @@ func drop_item() -> void:
 	var slot := inventory.remove_selected()
 	if slot.is_empty():
 		return
+	RunStats.item_dropped(slot)
 	var pickup := ITEM_PICKUP_SCENE.instantiate() as ItemPickup
 	pickup.item = slot["item"]
 	pickup.count = slot["count"]
