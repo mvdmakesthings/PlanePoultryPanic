@@ -87,7 +87,7 @@ Level 1 at close to final quality, start to finish.
 - [x] Checkpoints, death and retry, and autosave
 - [x] Main menu, pause menu, basic settings (audio, fullscreen, remapping)
 - [x] Context prompts that switch between keyboard and gamepad icons
-- [ ] Runs well on Steam Deck, or a low-end PC as a stand-in
+- [ ] Runs well on Steam Deck, or a low-end PC as a stand-in (measured on an Apple M1: 1.4 ms a frame in normal play, 2.4 ms with 46 chickens, worst frames under 9 ms, 40 MB of memory. Run `game/tests/level_01_perf.tscn` on a Deck or low-end PC to tick this off; see the README)
 - [ ] 3-5 friends play it without help; watch silently and take notes
 - [ ] **Measure how long M4 took** and re-plan M5-M8 from that
 

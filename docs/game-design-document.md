@@ -233,6 +233,7 @@ Five connected areas played in order, each introducing something new. Each level
 - **Chickens**: Few, all normal
 - **Teaches**: Movement, running, snack throwing and eating, interacting, the carousel as a hazard
 - **Goal**: Find a maintenance key and unlock the door to Security
+- **As built (M4)**: Amanda steps out of Gate 1 into an arrival lounge (walking, picking up snacks), crosses a hallway (running, a first chicken to distract with a snack, a luggage cart to shove), and comes down into Baggage Claim right beside the locked SECURITY door. The key is in a staff room in the far corner, past the big carousel and its chickens; an optional Lost & Found holds extra snacks. Hints at the top of the screen teach each control as she reaches it, plus one-offs the first time she's hurt, tries the locked door, or finds the key. Two map-stand checkpoints: at the bottom of the stairs into Baggage Claim, and in the staff room.
 
 ### Level 2: Security Checkpoint (about 5 minutes)
 - **Purpose**: First powered chickens and the boarding pass
@@ -378,6 +379,7 @@ Positional audio for chickens and machinery, separate audio buses for music, eff
 ### Performance Targets
 - 60 FPS on Steam Deck and on a dual-core 2.0 GHz PC with integrated graphics
 - Under 512 MB of RAM and under 500 MB installed
+- **Measured (M4, Level 1)** with `game/tests/level_01_perf.tscn` on an Apple M1: about 1.4 ms a frame in normal play (worst 1% about 6 ms), 1.5 ms with every chicken chasing, 2.4 ms with 46 chickens (worst 1% about 8.5 ms); about 40 MB of memory; 2.9 MB of assets. Still to check on a Steam Deck or a low-end PC.
 
 ### Display
 - Base resolution 320x180 with the viewport stretched by whole-number multiples only, for crisp pixels

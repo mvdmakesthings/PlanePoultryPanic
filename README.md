@@ -96,6 +96,14 @@ Browser build notes:
 - Browsers block sound until the player clicks or presses a key. The game has no audio yet; when it does, don't rely on a sound playing before the first input.
 - Browser builds run slower than desktop ones, especially on laptops on battery. If a playtester reports stutter, ask which browser they used.
 
+## Check performance
+
+```bash
+/Applications/Godot.app/Contents/MacOS/Godot --path game res://tests/level_01_perf.tscn
+```
+
+Runs Level 1 in a window with vsync off for three scenarios (normal play, every chicken chasing, 46 chickens) and prints frame times, draw calls and memory. The target is 60 FPS, which is 16.7 ms a frame, on a Steam Deck or a dual-core laptop, so the worst-1% numbers should stay well under that. On an Apple M1 a normal frame takes about 1.4 ms.
+
 ## Rebuild the sprites
 
 Sprites are generated from Python sources in `tools/sprites/` (needs Pillow):
