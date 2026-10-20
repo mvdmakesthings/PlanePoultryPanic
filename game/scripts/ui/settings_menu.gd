@@ -1,7 +1,7 @@
 class_name SettingsMenu
 extends Control
 ## Settings, shared by the main menu and the pause menu: music, effects and
-## ambience volume, fullscreen, and a Controls page for remapping. Changes
+## ambience volume, fullscreen, screen shake, and a Controls page for remapping. Changes
 ## apply right away and are saved by SaveSystem.
 ##
 ## On the Controls page, choosing an action waits for the next key or
@@ -75,6 +75,7 @@ func _refresh_settings() -> void:
 		rows.append({"id": id, "label": id.to_upper(), "kind": "slider",
 			"value": int(roundf(AudioManager.get_volume(VOLUME_ROWS[id]) * BoardMenu.SLIDER_STEPS))})
 	rows.append({"id": "fullscreen", "label": "FULLSCREEN", "kind": "toggle", "value": SaveSystem.fullscreen})
+	rows.append({"id": "screen_shake", "label": "SCREEN SHAKE", "kind": "toggle", "value": SaveSystem.screen_shake})
 	rows.append({"id": "controls", "label": "CONTROLS", "kind": "button", "status": ">"})
 	rows.append({"id": "reset", "label": "RESET TO DEFAULTS", "kind": "button", "status": ""})
 	rows.append({"id": "back", "label": "BACK", "kind": "button", "status": ""})
@@ -101,6 +102,8 @@ func _on_settings_changed(id: String, value: Variant) -> void:
 			AudioManager.play("pickup")
 	elif id == "fullscreen":
 		SaveSystem.set_fullscreen(value)
+	elif id == "screen_shake":
+		SaveSystem.set_screen_shake(value)
 
 
 func _on_settings_chosen(id: String) -> void:

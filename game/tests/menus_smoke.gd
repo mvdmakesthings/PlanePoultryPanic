@@ -92,9 +92,19 @@ func _settings_tests() -> void:
 	_tap("ui_accept")
 	_check(board.item("fullscreen")["value"] == true and SaveSystem.fullscreen, "Fullscreen toggles")
 	_tap("ui_accept")
+	_check(SaveSystem.screen_shake, "screen shake starts on")
+	_tap("ui_down")
+	_tap("ui_accept")
+	_check(board.item("screen_shake")["value"] == false and not SaveSystem.screen_shake,
+		"Screen Shake toggles off")
+	config.load(SaveSystem.settings_path)
+	_check(config.get_value("accessibility", "screen_shake", true) == false, "the screen shake setting is saved")
+	Juice.shake(5.0)
+	_check(Juice._shake_left <= 0.0, "with screen shake off, nothing shakes")
 	_tap("ui_cancel")
 	_check(not settings.visible and menu._board.visible, "backing out of Settings returns to the main menu")
 	SaveSystem.reset_audio_and_video()
+	_check(SaveSystem.screen_shake, "Reset to Defaults turns screen shake back on")
 	_check(is_equal_approx(AudioManager.get_volume("Effects"), AudioManager.DEFAULT_VOLUMES["Effects"]),
 		"Reset to Defaults restores the volumes")
 	menu.queue_free()
@@ -112,7 +122,7 @@ func _remap_tests() -> void:
 	var settings: SettingsMenu = menu._settings
 	menu._board.close()
 	settings.open()
-	for i in 4:
+	for i in 5:
 		_tap("ui_down")
 	_tap("ui_accept")
 	_check(settings._controls.visible, "Controls opens from Settings")
