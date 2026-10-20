@@ -382,6 +382,9 @@ SIGNS = [
     ("STAFF ONLY", "r", "C", "C"),
     ("ARRIVALS >", "k", "F", "F"),
     ("LOST+FOUND", "k", "F", "F"),
+    ("< RESTROOMS", "k", "F", "F"),
+    ("FOOD COURT >", "k", "F", "F"),
+    ("SCREENING", "B", "C", "C"),
 ]
 
 
@@ -391,8 +394,9 @@ def sign(frame):
     _rect(g, 0, 0, SIGN_W - 1, SIGN_H - 1, "O")
     _rect(g, 1, 1, SIGN_W - 2, SIGN_H - 2, panel)
     # Lit top edge, shaded bottom edge.
-    _rect(g, 1, 1, SIGN_W - 2, 1, "p" if panel == "k" else "R")
-    _rect(g, 1, SIGN_H - 2, SIGN_W - 2, SIGN_H - 2, "O" if panel == "k" else "v")
+    lit, shade = {"k": ("p", "O"), "r": ("R", "v"), "B": ("b", "O")}[panel]
+    _rect(g, 1, 1, SIGN_W - 2, 1, lit)
+    _rect(g, 1, SIGN_H - 2, SIGN_W - 2, SIGN_H - 2, shade)
     _text(g, (SIGN_W - _text_width(text)) // 2, 3, text, ink)
     return g
 

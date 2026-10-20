@@ -22,6 +22,7 @@ import items
 import mushrooms
 import player
 import roost
+import security
 import security_door
 import set_dressing
 import tiles
@@ -84,6 +85,18 @@ IMAGES = [
     ("seating.png", set_dressing.seating_sheet),
     ("floor_litter.png", set_dressing.litter_sheet),
     ("map_stand.png", set_dressing.map_stand_sheet),
+    ("tiles_security.png", security.tiles_sheet),
+    ("stanchion.png", lambda: to_image(security.stanchion())),
+    ("xray_machine.png", lambda: to_image(security.xray_machine())),
+    ("metal_detector.png", lambda: set_dressing._strip(
+        [security.metal_detector(f) for f in range(2)], 32, 34)),
+    ("bin_table.png", lambda: to_image(security.bin_table())),
+    ("item_boarding_pass.png", security.boarding_pass),
+    ("security_shutter.png", security.shutter_sheet),
+    ("shutter_switch.png", security.shutter_switch_sheet),
+    ("stall_door.png", security.stall_sheet),
+    ("pass_gate.png", security.pass_gate_sheet),
+    ("security_litter.png", security.litter_sheet),
 ]
 
 
@@ -193,6 +206,7 @@ def main():
             img.resize((img.width * 8, img.height * 8), Image.NEAREST).save(
                 args.preview / name.replace(".png", "_8x.png"))
         mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_arrivals_4x.png")
+        security.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_security_4x.png")
         wall = set_dressing.wall_preview(tiles.by_name())
         wall.resize((wall.width * 4, wall.height * 4), Image.NEAREST).save(
             args.preview / "mock_wall_4x.png")
