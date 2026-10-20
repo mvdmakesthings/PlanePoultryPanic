@@ -260,58 +260,62 @@ def _lowered(grid, rows=1):
     return ["." * 16 for _ in range(rows)] + grid[:len(grid) - rows]
 
 
-def _draw_leg(g, points, near):
-    """A 2px-wide leg along points (hip to ankle), then a boot at the ankle.
-    The near leg gets a lit edge; the far leg is all shadow."""
-    for (x0, y0), (x1, y1) in zip(points, points[1:]):
-        steps = max(abs(x1 - x0), abs(y1 - y0), 1)
-        for i in range(steps + 1):
-            x = round(x0 + (x1 - x0) * i / steps)
-            y = round(y0 + (y1 - y0) * i / steps)
-            put(g, y, x, "P")
-            put(g, y, x + 1, "p" if near else "P")
-            if abs(x1 - x0) > abs(y1 - y0):
-                # A mostly flat stretch (a foot kicked back) needs height too.
-                put(g, y + 1, x, "P")
-                put(g, y + 1, x + 1, "P")
-    ax, ay = points[-1]
-    put(g, ay + 1, ax, "GNN")
-    put(g, ay + 2, ax - 1, "NNNN")
-
-
-def _outline_below(g, top):
-    """Outline the legs: transparent pixels from row top down that touch them."""
-    out = list(g)
-    for y in range(top, len(g)):
-        for x in range(16):
-            if g[y][x] != ".":
-                continue
-            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < 16 and top <= ny < len(g) and g[ny][nx] not in ".O":
-                    put(out, y, x, "O")
-                    break
-    return out
-
-
-# Side-view leg poses as (far leg points, near leg points), hip to ankle,
-# for a body whose hips sit on row 22.
+# Side-view run legs, rows 22-30 under hips on row 22. Like the walk, the
+# near leg is lit (p with an i shine) and the far leg is in shadow (P).
 SIDE_RUN_LEGS = {
-    # Push off: near leg reaching forward, far leg pushing back.
-    "near_front": ([(6, 22), (4, 25), (2, 27)], [(7, 22), (9, 25), (11, 27)]),
-    "near_back": ([(7, 22), (9, 25), (11, 27)], [(6, 22), (4, 25), (2, 27)]),
-    # Flight: one knee driven up in front, the other foot kicked up behind.
-    "flight_near_up": ([(6, 22), (5, 25), (2, 24)], [(7, 22), (10, 23), (9, 26)]),
-    "flight_far_up": ([(7, 22), (10, 23), (9, 26)], [(6, 22), (5, 25), (2, 24)]),
+    # Push off: near leg reaching forward, far leg pushing off its toe behind.
+    "near_front": [
+        ".....OPPpipO....",
+        "....OPPOOpipO...",
+        "...OPPO..OpipO..",
+        "..OPPO....OpiO..",
+        ".OPPO.....OpiO..",
+        ".ONNO.....ONNGO.",
+        "ONNO......ONNNNO",
+        "OOO.......OOOOOO",
+        "................",
+    ],
+    # Push off with the other leg: far leg reaching forward, near leg behind.
+    "near_back": [
+        ".....OpipPPO....",
+        "....OpipOOPPO...",
+        "...OpiO..OPPO...",
+        "..OpiO....OPPO..",
+        ".OpiO.....OPPO..",
+        ".ONGO.....ONNNO.",
+        "ONNO......ONNNNO",
+        "OOO.......OOOOOO",
+        "................",
+    ],
+    # Flight: near knee driven up in front, far boot kicked up behind.
+    "flight_near_up": [
+        ".....OPPppipO...",
+        "....OPPOOpppiO..",
+        ".OOOPPO..OOpiO..",
+        "ONNPPO....OpiO..",
+        "ONGOO.....ONNGO.",
+        ".OO.......ONNNNO",
+        "..........OOOOOO",
+        "................",
+        "................",
+    ],
+    # Flight: far knee driven up in front, near boot kicked up behind.
+    "flight_far_up": [
+        ".....OpipPPPO...",
+        "....OpiOOPPPPO..",
+        ".OOOpiO..OOPPO..",
+        "ONNpiO....OPPO..",
+        "ONGOO.....ONNNO.",
+        ".OO.......ONNNNO",
+        "..........OOOOOO",
+        "................",
+        "................",
+    ],
 }
 
 
 def _side_run_frame(legs, landing):
-    g = list(SIDE[:22]) + blank_rows(10)
-    far, near = SIDE_RUN_LEGS[legs]
-    _draw_leg(g, far, near=False)
-    _draw_leg(g, near, near=True)
-    g = _outline_below(g, 22)
+    g = list(SIDE[:22]) + SIDE_RUN_LEGS[legs] + ["." * 16]
     if landing:
         g = _lowered(g)
         # The backpack lags the landing by another pixel.
