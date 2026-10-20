@@ -136,12 +136,14 @@ Left-facing frames are mirrored from right-facing ones, so each character only n
 | Idle | 4 | 2 | M2 style test |
 | Walk | 4 | 4 | M2 style test |
 | Run | 4 | 4 (longer stride, forward lean, hair and backpack bounce) | M4 vertical slice |
-| Throw | 4 | 3 | M4 |
-| Eat | 1 (facing down) | 3 | M4 |
-| Hurt | 4 | 1, plus blinking | M4 |
-| Defeat | 1 | 4 | M4 |
+| Throw | 4 | 3 (wind-up, release, follow-through) | M4, done |
+| Eat | 1 (facing down) | 3 (bite, chew, yum) | M4, done |
+| Hurt | 4 | 1, plus blinking | M4, done |
+| Defeat | 1 | 4, then the knocked-out loop | M4, done |
 
-Running is a core mechanic tied to stamina, so it has its own cycle: players can see at a glance when they're spending stamina. The run cycle is done (M4); throw, eat, hurt and defeat are still to come.
+Running is a core mechanic tied to stamina, so it has its own cycle: players can see at a glance when they're spending stamina. Every M4 player animation is done: run, throw, eat, hurt and defeat. Action animations (throw, eat, hurt) play for a moment over the walk or idle, then hand back.
+
+The action poses are built by stamping small hand-drawn pieces (raised arms, a fist, the snack bag, faces) onto the base views in `tools/sprites/player.py`, so redrawing a base view by hand means redrawing these sheets too.
 
 **Messy hair**: the player's hair gets messier as she loses health (see the GDD). Rather than a messy copy of every sheet, one overlay sheet holds flyaway tufts that are drawn over whatever animation is playing.
 
@@ -214,6 +216,10 @@ python3 tools/sprites/build.py --preview /tmp/sprite-previews
 | `player_idle.png` | 16x32 | 2 per direction | Breathing: the head sinks 1px on the second frame. Play slowly (about 2 FPS). |
 | `player_run.png`, `player_run_extinguisher.png` | 16x32 | 4 per direction | Push off, flight, push off with the other leg, flight. The body lands a pixel lower on push-off frames and the backpack bounces a beat behind. Play at 12 FPS. |
 | `player_hair_mess.png` | 24x20 | 3 per direction (one per mess level) | Flyaway hair drawn over the player: a cowlick (below 75% health), puffed-out tufts (below 50%), wild frizz with a lock over the face (below 25%). Each frame covers the player frame's top 16 rows plus a 4 px margin above and to each side. The game lines it up with the top of the head in each animation frame, so redrawn sheets keep working as long as the head is the topmost thing drawn. |
+| `player_throw.png` | 16x32 | 3 per direction | Wind-up (arm raised high beside the head; pulled back in profile), release (fist toward the camera, or arm flung forward in profile, body a pixel lower), follow-through (hand swung low). Throws snacks and suitcases; plays at 10 FPS. |
+| `player_eat.png` | 16x32 | 3, in one row (facing the camera only) | Bite with the bag at her mouth, chew with happy closed eyes, yum with a crumb falling. Plays at 7 FPS. |
+| `player_hurt.png` | 16x32 | 1 per direction | A flinch: arms flung up, eyes squeezed shut, mouth open. Shown for a moment after a hit, blinking. |
+| `player_defeat.png` | 32x32 | 4, in one row | Flinch, knees buckle, falling back (lying 4px off the floor), flat with dust puffs. Plays once at 8 FPS, then `player_ko.png` takes over; the lying frames line up with it. |
 | `player_ko.png` | 32x20 | 2, in one row (not per direction) | Game over: flat on their back, head to the left, X eyes, with stars circling above the head. Loop slowly (about 3 FPS). Drawn centered over the spot the player fell. |
 | `chicken_walk.png` | 16x16 | 4 per direction | Head bobs forward on side-view contact frames; front and back views waddle. |
 | `chicken_idle.png` | 16x16 | 3 per direction | Stand, dip, peck. Hold the first frame and play the peck now and then. |
