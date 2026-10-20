@@ -61,6 +61,7 @@ func consume() -> bool:
 	if _consumed:
 		return false
 	_consumed = true
+	ParticleBurst.spawn(get_parent(), "crumb", global_position)
 	queue_free()
 	return true
 

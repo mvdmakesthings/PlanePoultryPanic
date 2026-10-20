@@ -313,6 +313,27 @@ func _juice_test() -> void:
 	_check(Juice.shake_offset() == Vector2.ZERO and level.get_node("Entities/Player/Camera2D").offset == Vector2.ZERO,
 		"the camera settles back after shaking")
 	_check(player._sprite.scale == Vector2.ONE, "she springs back from the squash")
+
+	# Particles: every kind bursts out, then cleans itself up.
+	var entities := level.get_node("Entities")
+	var bursts: Array = []
+	for kind: String in ParticleBurst.STYLES:
+		bursts.append(ParticleBurst.spawn(entities, kind, player.global_position))
+	await get_tree().process_frame
+	_check(bursts.all(func(b: Variant) -> bool: return b.bit_count() > 0), "every kind of particle bursts out")
+	await _wait(3.0)
+	_check(bursts.all(func(b: Variant) -> bool: return not is_instance_valid(b)), "particles clean themselves up")
+	player.global_position = Vector2(240, 488)
+	var dusty := false
+	Input.action_press("run")
+	Input.action_press("move_right")
+	for i in 40:
+		await get_tree().physics_frame
+		if entities.get_children().any(func(n: Node) -> bool: return n is ParticleBurst):
+			dusty = true
+	Input.action_release("run")
+	Input.action_release("move_right")
+	_check(dusty, "running kicks up dust")
 	level.queue_free()
 
 

@@ -47,9 +47,18 @@ func _physics_process(_delta: float) -> void:
 func _process(delta: float) -> void:
 	_time += delta
 	if _time >= lifetime:
+		_leave_foam()
 		queue_free()
 		return
 	queue_redraw()
+
+
+## Leaves a few puddles of foam on the floor along the cone, which fade
+## away after a couple of seconds. Just for show: they freeze nothing.
+func _leave_foam() -> void:
+	for i in range(0, _puffs.size(), 5):
+		var p := _puffs[i]
+		ParticleBurst.spawn(get_parent(), "foam", global_position + Vector2(p.x, p.y), Vector2.ZERO, 1)
 
 
 ## True if a floor position is inside the spray cone, measured from the

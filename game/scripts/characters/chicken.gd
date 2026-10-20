@@ -634,6 +634,7 @@ func _update_hop(delta: float) -> void:
 	collision_mask = WORLD_LAYER | CHICKEN_LAYER
 	_sprite.position.y = 0.0
 	Juice.squash(_sprite, Vector2(1.3, 0.7), 0.15)
+	ParticleBurst.spawn(get_parent(), "dust", global_position, Vector2.ZERO, 3)
 
 
 func _overlaps_world() -> bool:
@@ -727,6 +728,8 @@ func _check_hit() -> void:
 	for body in _hitbox.get_overlapping_bodies():
 		if body is Player and (body as Player).take_damage(Player.PECK, global_position):
 			AudioManager.play("peck", global_position)
+			ParticleBurst.spawn(get_parent(), "feather", global_position.lerp(body.global_position, 0.5),
+				Vector2.ZERO, 3)
 			Juice.squash(_sprite, Vector2(0.8, 1.2), 0.15)
 			# Bounce back off the player and stay dazed for a moment.
 			state = State.RECOIL

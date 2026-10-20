@@ -313,6 +313,7 @@ func _stomp() -> void:
 	_shockwave = 0.3
 	Juice.squash(self, Vector2(1.3, 0.7), 0.25, "stack_squash")
 	Juice.shake(4.0)
+	ParticleBurst.spawn(get_parent(), "stomp", global_position)
 	if _player and global_position.distance_to(_player.global_position) <= stomp_radius:
 		_player.take_damage(Player.SUITCASE, global_position)
 
@@ -364,6 +365,7 @@ func _finish_topple() -> void:
 	# The boss coming down is the biggest moment in the game.
 	Juice.hitstop(0.25 if crowned else 0.1)
 	Juice.shake(8.0 if crowned else 5.0)
+	ParticleBurst.spawn(get_parent(), "stomp", global_position + _topple_dir * fall_spacing * members / 2.0)
 	_break_apart(true)
 
 
