@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/metal_detector.gd" id="1_detector"]
+[ext_resource type="Texture2D" path="res://assets/sprites/metal_detector.png" id="2_texture"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_post"]
+size = Vector2(6, 4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gap"]
+size = Vector2(18, 6)
+
+[node name="MetalDetector" type="StaticBody2D" groups=["nav_obstacles"]]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_detector")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_texture")
+offset = Vector2(0, -17)
+hframes = 2
+
+[node name="LeftPost" type="CollisionShape2D" parent="."]
+position = Vector2(-13, -2)
+shape = SubResource("RectangleShape2D_post")
+
+[node name="RightPost" type="CollisionShape2D" parent="."]
+position = Vector2(13, -2)
+shape = SubResource("RectangleShape2D_post")
+
+[node name="Gap" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Gap"]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_gap")

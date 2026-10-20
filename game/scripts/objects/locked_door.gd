@@ -2,7 +2,7 @@ class_name LockedDoor
 extends Node2D
 ## A locked door in the back wall, like the door to Security. Interact
 ## below it while holding the right key item to unlock it (the key is used
-## up). Once unlocked, its doors slide open as the player gets close, and
+## up, unless consume_key is off, as for the boarding-pass gates). Once unlocked, its doors slide open as the player gets close, and
 ## walking up into the doorway goes through.
 ## Position this node at the door's top-left corner on the wall face, and
 ## leave the wall tiles behind its lower face row open: the door brings its
@@ -23,6 +23,14 @@ const DOORWAY := Rect2(8, 18, 32, 14)
 
 ## The key item that opens it.
 @export var key_item := "maintenance_key"
+## False for a pass that's only shown, like the boarding pass at a gate.
+@export var consume_key := true
+## Prompts, with and without the key, and what pops up on unlocking.
+@export var unlock_prompt := "{interact} unlock"
+@export var locked_prompt := "{interact} locked"
+@export var unlocked_text := "Unlocked!"
+## Starts unlocked, for an exit that needs no key.
+@export var start_unlocked := false
 @export var reach := 26.0
 @export var open_distance := 56.0
 @export var frames_per_second := 12.0
@@ -52,6 +60,9 @@ func _ready() -> void:
 		if child is StaticBody2D:
 			child.position = -global_position
 	_sprite.frame = FRAME_LOCKED
+	add_to_group("unlockables")
+	if start_unlocked:
+		unlock(true)
 
 
 ## The wall tiles (in tile coordinates) this door replaces: its lower face row.
@@ -70,13 +81,16 @@ func can_interact(player: Player) -> bool:
 
 
 func interact(player: Player) -> void:
-	if not player.inventory.use_key_item(key_item):
+	var has_key := player.inventory.has_key_item(key_item)
+	if has_key and consume_key:
+		player.inventory.use_key_item(key_item)
+	if not has_key:
 		FloatText.spawn(player, "It's locked")
 		AudioManager.play("locked")
 		interacted_locked.emit()
 		return
 	unlock()
-	FloatText.spawn(player, "Unlocked!")
+	FloatText.spawn(player, unlocked_text)
 
 
 ## Unlocks the door. quiet skips the sound, for restoring a save.
@@ -125,4 +139,4 @@ func _draw() -> void:
 		return
 	var player := get_tree().get_first_node_in_group("player") as Player
 	var has_key := player != null and player.inventory.has_key_item(key_item)
-	InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "{interact} unlock" if has_key else "{interact} locked")
+	InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, unlock_prompt if has_key else locked_prompt)

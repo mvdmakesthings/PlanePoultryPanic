@@ -93,7 +93,7 @@ frame = 2
 position = Vector2(576, 36)
 texture = ExtResource("17_signs")
 centered = false
-hframes = 5
+hframes = 8
 
 [node name="BaggageBoard" type="Sprite2D" parent="WallDecor"]
 position = Vector2(296, 225)
@@ -106,14 +106,14 @@ script = ExtResource("12_flipbook")
 position = Vector2(72, 418)
 texture = ExtResource("17_signs")
 centered = false
-hframes = 5
+hframes = 8
 frame = 2
 
 [node name="LostFoundSign" type="Sprite2D" parent="WallDecor"]
 position = Vector2(828, 228)
 texture = ExtResource("17_signs")
 centered = false
-hframes = 5
+hframes = 8
 frame = 4
 
 [node name="FloorLitter" type="Node2D" parent="."]

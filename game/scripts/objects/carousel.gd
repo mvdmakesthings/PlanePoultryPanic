@@ -42,17 +42,18 @@ func push_at(pos: Vector2) -> Vector2:
 	return Vector2.LEFT * belt_speed
 
 
-## Total belt velocity from every carousel at a world position.
+## Total belt velocity at a world position from everything in the
+## conveyors group (carousels and moving walkways all have push_at()).
 static func push_for(tree: SceneTree, pos: Vector2) -> Vector2:
 	var total := Vector2.ZERO
 	for node in tree.get_nodes_in_group("conveyors"):
-		total += (node as Carousel).push_at(pos)
+		total += node.push_at(pos)
 	return total
 
 
 ## True if the position is inside any carousel's chute.
 static func in_any_chute(tree: SceneTree, pos: Vector2) -> bool:
 	for node in tree.get_nodes_in_group("conveyors"):
-		if (node as Carousel).chute.has_point(pos):
+		if node is Carousel and (node as Carousel).chute.has_point(pos):
 			return true
 	return false

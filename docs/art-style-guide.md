@@ -291,7 +291,7 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`security_door.png`**: four 48x32 frames of the locked door to Security (locked with barrier tape and a red light, unlocked with a green light, opening, open). It sits on the wall face like the boarding gate, with the same doorway.
 
-**`signs.png`**: 64x11 wayfinding signs for the wall face, one per frame: BAGGAGE CLAIM (down arrow), SECURITY (left arrow), STAFF ONLY (white on red), ARRIVALS (right arrow), LOST+FOUND. Add new signs as new frames at the end.
+**`signs.png`**: 64x11 wayfinding signs for the wall face, one per frame: BAGGAGE CLAIM (down arrow), SECURITY (left arrow), STAFF ONLY (white on red), ARRIVALS (right arrow), LOST+FOUND, RESTROOMS (left arrow), FOOD COURT (right arrow), SCREENING (white on blue). The 3x5 font has every letter but Q, and every digit. Add new signs as new frames at the end.
 
 **`maintenance_cart.png`**: one 24x24 janitor's cart (mop bucket, spray bottles, trash bag). A solid floor prop; its base is about 22x6.
 
@@ -311,6 +311,74 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 | 9 | `chute`: a `top` piece with the baggage chute opening and rubber flaps |
 
 Build any size of carousel (at least 2x2 tiles) as a rectangle: corners at the corners, `top` and `bottom` along the long edges, `left` and `right` along the short edges, and `island` filling the middle. The bottom pieces include the front skirt, so the carousel looks raised off the floor. Draw the carousel on a tile layer above the floor, since the outside of each corner is transparent.
+
+### Security (Level 2)
+Made by `tools/sprites/security.py`.
+
+**`tiles_security.png`**: the same layout and tile names as `tiles_arrivals.png`, so text maps work unchanged, in Security's colors: `carpet` is slate rubber matting with ribs (the queue), `tile` is cool gray tile, `wood` is black-and-yellow hazard striping (scanner lanes), `carpet_pattern` is dark tread with blue and white studs (screening). Wall faces are steel gray with a scanner-blue line and a hazard-striped baseboard.
+
+**`stanchion.png`**: one 48x16 run of three chrome queue posts joined by a sagging blue belt. A solid floor prop; its base is about 48x4.
+
+**`xray_machine.png`**: one 24x48 baggage X-ray machine beside a lane, its belt running away from the camera: a long top with a monitor, the front face with the lead-curtain tunnel, rollers and a hazard edge at the floor. Its footprint (about 22x34) is solid.
+
+**`metal_detector.png`**: two 32x34 frames of a walk-through arch: idle (green light, blue sensor lights), then beeping (red). Only the feet of its two posts are solid; walking between them beeps.
+
+**`bin_table.png`**: one 48x20 roller table with three gray screening bins (a shoe, a red jacket, empty). A solid floor prop; its legs are about 46x6.
+
+**`item_boarding_pass.png`**: one 12x8 boarding pass with a blue header, a barcode and a stub, for the pickup and the HUD's key-item row.
+
+**`security_shutter.png`**: four 32x32 frames of a steel grille rolling down out of its ceiling housing, from rolled up to closed with a hazard-striped bottom bar. Placed with its bottom edge on the floor line across a 2-tile passage.
+
+**`shutter_switch.png`**: two 10x14 frames of the wall box with a big lever: up with a green light (shutter open), down with a red light (closed).
+
+**`stall_door.png`**: two 16x30 frames of a restroom stall door on the wall face, like `closet_door.png`: closed with a green "vacant" slider, then open onto the toilet.
+
+**`pass_gate.png`**: four 48x32 frames of the boarding-pass gate set into the back wall, laid out like `security_door.png`: a FOOD COURT sign over glass paddle gates and a pass reader (locked with a red light, unlocked green, paddles folding back, open). The corridor beyond is warm wood, a hint of the Food Court.
+
+**`security_litter.png`**: four 16x16 floor decals: a spilled screening bin, a lost shoe, a pecked-through belt, a confiscated water bottle.
+
+### Food Court (Level 3)
+Made by `tools/sprites/foodcourt.py`.
+
+**`tiles_food_court.png`**: the same layout and tile names as `tiles_arrivals.png`, in warm colors: `tile` is a cream and butterscotch checker floor (8px squares), `carpet` rust carpet (along the restaurant fronts), `wood` the honey planks of the seating plaza, `carpet_pattern` red diner carpet with a yellow dot lattice (seating areas). Walls are cream plaster with an orange stripe over terracotta tiles; wall tops are dark brown.
+
+**`restaurant_fronts.png`**: 64x32 restaurant fronts for the wall face, one per frame: CLUCK SHACK (red), PIZZA PLANE (green), NOODLE GATE (charcoal and orange), JAVA JET (brown). Each has a lit name sign, a striped awning, a dark kitchen window with menu boards, and a counter along the bottom. Add new restaurants as frames at the end.
+
+**`food_table.png`**: one 32x24 round orange table with a chair on each side and a tray of fries. A solid floor prop; its base is about 26x6.
+
+**`vending_machine.png`**: two 20x30 frames of a blue snack machine: stocked with colorful bags, then broken open and empty. A solid floor prop; its base is about 18x6.
+
+**`trash_bin.png`**: one 12x16 overflowing trash bin. A solid floor prop.
+
+**`food_litter.png`**: four 16x16 floor decals: spilled fries, a soda puddle with its cup, a dropped tray, a burger wrapper.
+
+**`gates_door.png`**: four 48x32 frames of the door to the gates, laid out like `security_door.png` (closed, closed, opening, open): the boarding gate's glass doors under an ALL GATES sign.
+
+### Gate Areas (Level 4)
+Made by `tools/sprites/gates.py`. The palette key `t` is the gate teal `#193c3e`.
+
+**`tiles_gates.png`**: the same layout and tile names as `tiles_arrivals.png`: `carpet` is dark teal carpet, `carpet_pattern` the lounges' teal grid carpet with orange dots, `tile` and `wood` as in Arrivals. Walls are pale gray with an orange departure-board stripe and a teal baseboard.
+
+**`walkway.png`**: moving-walkway pieces, 16x16. Rows: top-left end, top middle, top-right end, bottom-left end, bottom middle, bottom-right end. Columns: 4 frames of the belt (dark rubber, light slats 8 px apart) creeping 2 px east per frame; the game plays them backward for a westbound walkway and faster at higher speeds. The ends are steel comb plates with a hazard stripe and only use column 0. The top row carries the far handrail along its top edge, the bottom row the near handrail along its bottom edge. The walkway draws itself from this sheet, two tiles tall and any number long.
+
+**`speed_panel.png`**: three 12x14 frames of the walkway control box on the wall: the dial and light at slow (green), normal (yellow) and full (red).
+
+**`gate_desk.png`**: one 32x24 gate agent's podium with a monitor and a boarding-pass printer. A solid floor prop; its base is about 28x6.
+
+**`gate_doors.png`**: six closed 48x32 boarding gates for the wall face, one per frame: GATE A1, A2, B4, B5, C8, C9, drawn like `gate_door.png` with a red "closed" light.
+
+**`final_gate_door.png`**: four 48x32 frames of the door to GATE C13, laid out like `security_door.png` (closed, closed, opening, open).
+
+**`gates_litter.png`**: four 16x16 floor decals: a nest with an egg, scattered boarding passes, a pecked neck pillow, a spilled coffee.
+
+### Opening Cutscene
+Made by `tools/sprites/opening.py`. The scene (`game/scenes/cutscenes/opening.tscn`) also reuses the player and chicken sheets, `seating.png`, `potted_plant.png`, `suitcase.png`, `item_snack.png`, `floor_litter.png`, and `tiles_arrivals.png` for the floor. The departure board and the PA panel are drawn by the game in the menus' departure-board style, not from a sheet.
+
+**`opening_backdrop.png`**: one 320x96 back wall of the gate lounge: wall top and lip, white panels with the blue stripe and baseboard (matching `tiles_arrivals.png`), a big three-pane window, a small "A3" gate sign, and the two hangers for the departure board. The window glass (x 11-172, y 15-71) is transparent; the view outside shows through from behind. Keep the glass and the board's spot (x 184-312, y 12-72) where they are, since the game lines things up with them.
+
+**`opening_tarmac.png`**: one 162x57 view through the window, the size of the glass: sky and clouds, the control tower and a hangar on the horizon, a parked plane, and the tarmac with taxi lines, plus glints on the glass. The game draws the chickens outside between this and the backdrop.
+
+**`opening_boarding_pass.png`**: two 96x48 frames of Amanda's boarding pass, shown as a close-up: as printed (name, destination HOME, gate A3, seat 13C, flight PP404, a barcode stub, and a chicken footprint), then with a red double-ruled EXPIRED stamp across it.
 
 ### Import Settings (Godot)
 - Texture filter: Nearest

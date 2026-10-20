@@ -40,6 +40,8 @@ func _ready() -> void:
 
 func _layout_tests() -> void:
 	var level := await _fresh_level()
+	var stuck: Array[String] = level.things_in_walls()
+	_check(stuck.is_empty(), "nothing stands inside a wall %s" % [stuck])
 	var player: Player = level.get_node("Entities/Player")
 	var hud: Hud = level.get_node("UI/HUD")
 	_check(player.snacks == 0, "the player arrives with no snacks")
@@ -146,6 +148,15 @@ func _critical_path_test() -> void:
 	_check(level._level_over, "going through the door ends the level")
 	var menus: GameMenus = level.get_node("UI/GameMenus")
 	_check(menus.is_open() and menus._mode == "clear", "the level-clear screen comes up")
+	var next := "res://scenes/levels/level_02_security.tscn"
+	_check(SaveSystem.load_game().get("level") == next, "clearing Arrivals autosaves at the start of Security")
+	var requested := [""]
+	var on_change := func(path: String) -> void: requested[0] = path
+	GameManager.scene_change_requested.connect(on_change)
+	_tap("ui_accept")
+	await get_tree().process_frame
+	GameManager.scene_change_requested.disconnect(on_change)
+	_check(requested[0] == next, "ON TO SECURITY goes on to Level 2")
 	level.queue_free()
 
 

@@ -17,11 +17,15 @@ import carousel
 import chicken
 import closet
 import effects
+import foodcourt
 import gate
+import gates
 import items
 import mushrooms
+import opening
 import player
 import roost
+import security
 import security_door
 import set_dressing
 import tiles
@@ -84,6 +88,35 @@ IMAGES = [
     ("seating.png", set_dressing.seating_sheet),
     ("floor_litter.png", set_dressing.litter_sheet),
     ("map_stand.png", set_dressing.map_stand_sheet),
+    ("tiles_security.png", security.tiles_sheet),
+    ("stanchion.png", lambda: to_image(security.stanchion())),
+    ("xray_machine.png", lambda: to_image(security.xray_machine())),
+    ("metal_detector.png", lambda: set_dressing._strip(
+        [security.metal_detector(f) for f in range(2)], 32, 34)),
+    ("bin_table.png", lambda: to_image(security.bin_table())),
+    ("item_boarding_pass.png", security.boarding_pass),
+    ("security_shutter.png", security.shutter_sheet),
+    ("shutter_switch.png", security.shutter_switch_sheet),
+    ("stall_door.png", security.stall_sheet),
+    ("pass_gate.png", security.pass_gate_sheet),
+    ("security_litter.png", security.litter_sheet),
+    ("tiles_food_court.png", foodcourt.tiles_sheet),
+    ("restaurant_fronts.png", foodcourt.fronts_sheet),
+    ("food_table.png", lambda: to_image(foodcourt.food_table())),
+    ("vending_machine.png", foodcourt.vending_sheet),
+    ("trash_bin.png", lambda: to_image(foodcourt.trash_bin())),
+    ("food_litter.png", foodcourt.litter_sheet),
+    ("gates_door.png", foodcourt.gates_door_sheet),
+    ("tiles_gates.png", gates.tiles_sheet),
+    ("walkway.png", gates.walkway_sheet),
+    ("speed_panel.png", gates.speed_panel_sheet),
+    ("gate_desk.png", lambda: to_image(gates.gate_desk())),
+    ("gate_doors.png", gates.gate_doors_sheet),
+    ("final_gate_door.png", gates.final_gate_sheet),
+    ("gates_litter.png", gates.litter_sheet),
+    ("opening_backdrop.png", opening.backdrop_sheet),
+    ("opening_tarmac.png", opening.tarmac_sheet),
+    ("opening_boarding_pass.png", opening.boarding_pass_sheet),
 ]
 
 
@@ -193,6 +226,10 @@ def main():
             img.resize((img.width * 8, img.height * 8), Image.NEAREST).save(
                 args.preview / name.replace(".png", "_8x.png"))
         mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_arrivals_4x.png")
+        gates.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_gates_4x.png")
+        foodcourt.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_food_court_4x.png")
+        security.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_security_4x.png")
+        opening.mock_screen().resize((1280, 720), Image.NEAREST).save(args.preview / "mock_opening_4x.png")
         wall = set_dressing.wall_preview(tiles.by_name())
         wall.resize((wall.width * 4, wall.height * 4), Image.NEAREST).save(
             args.preview / "mock_wall_4x.png")

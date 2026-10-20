@@ -12,6 +12,8 @@ signal scene_change_requested(path: String)
 
 const MAIN_MENU := "res://scenes/ui/main_menu.tscn"
 const FIRST_LEVEL := "res://scenes/levels/level_01_arrivals.tscn"
+## The cutscene New Game plays before the first level.
+const OPENING := "res://scenes/cutscenes/opening.tscn"
 const FADE_TIME := 0.25
 
 ## The snapshot the next level should restore, taken with take_pending().
@@ -39,10 +41,17 @@ func _ready() -> void:
 	layer.add_child(_fade)
 
 
-## Starts over from the first level, replacing any save.
+## Starts over, replacing any save: the opening cutscene plays, then it
+## calls start_first_level().
 func new_game() -> void:
 	SaveSystem.delete_game()
 	last_checkpoint = {}
+	pending = {}
+	change_scene(OPENING)
+
+
+## Starts the first level from the beginning, after the opening.
+func start_first_level() -> void:
 	pending = {}
 	change_scene(FIRST_LEVEL)
 
@@ -55,6 +64,28 @@ func continue_game() -> void:
 	last_checkpoint = save
 	pending = save
 	change_scene(save["level"])
+
+
+## Called by a level when the player leaves through its exit: autosaves at
+## the start of the next level (by scene path), carrying the inventory over.
+func level_cleared(next_level: String, inventory: Dictionary) -> void:
+	checkpoint_reached({
+		"level": next_level,
+		"checkpoint": "start",
+		"reached": [],
+		"inventory": inventory,
+		"collected": [],
+		"unlocked": [],
+	})
+
+
+## Carries on from the latest checkpoint, for example into the next level
+## after one is cleared.
+func continue_run() -> void:
+	if last_checkpoint.is_empty():
+		return
+	pending = last_checkpoint
+	change_scene(last_checkpoint["level"])
 
 
 ## Reloads a level (by scene path) from its latest checkpoint.

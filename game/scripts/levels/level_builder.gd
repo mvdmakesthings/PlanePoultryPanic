@@ -38,12 +38,14 @@ const NAV_OBSTACLES := "nav_obstacles"
 const NAV_AGENT_RADIUS := 6.0
 
 
-static func build_tile_set() -> TileSet:
+## Builds the tile set from a floor-and-wall sheet laid out like
+## tiles_arrivals.png (each area has its own, in the same layout).
+static func build_tile_set(tiles: Texture2D = TILES) -> TileSet:
 	var tile_set := TileSet.new()
 	tile_set.tile_size = Vector2i(TILE, TILE)
 
 	var floor_source := TileSetAtlasSource.new()
-	floor_source.texture = TILES
+	floor_source.texture = tiles
 	floor_source.texture_region_size = Vector2i(TILE, TILE)
 	for coords: Vector2i in ATLAS.values():
 		floor_source.create_tile(coords)

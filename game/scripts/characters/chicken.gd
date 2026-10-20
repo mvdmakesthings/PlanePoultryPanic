@@ -11,7 +11,7 @@ extends CharacterBody2D
 ## Emitted just before a defeated chicken is removed.
 signal defeated
 
-enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL, BESIEGE, SEEK_ROOST, ROOSTING }
+enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL, BESIEGE, SEEK_ROOST, ROOSTING, FLUNG }
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
@@ -85,6 +85,13 @@ const POWER_WARNING_TIME := 3.0
 @export var ice_friction := 160.0
 @export var ice_lethal_speed := 60.0
 @export var ice_shove_reach := 18.0
+
+@export_group("Flung")
+## A chicken flung off a full-speed walkway tumbles, slowing by this much
+## a second; hitting anything solid this fast knocks it out.
+@export var fling_friction := 200.0
+@export var fling_lethal_speed := 90.0
+@export var fling_spin := 18.0
 
 @export_group("Egg Shooter")
 @export var egg_range := 112.0
@@ -188,7 +195,10 @@ func _physics_process(delta: float) -> void:
 				_besiege()
 			State.SEEK_ROOST, State.ROOSTING:
 				_roosting()
-		velocity += Carousel.push_for(get_tree(), global_position)
+			State.FLUNG:
+				_flung()
+		if state != State.FLUNG:
+			velocity += Carousel.push_for(get_tree(), global_position)
 		# Chickens heading into a roost pass through each other: they're
 		# about to stack up anyway, and the nest is too small otherwise.
 		# (A hop that just started this frame manages its own collisions.)
@@ -201,6 +211,10 @@ func _physics_process(delta: float) -> void:
 		return
 	if state == State.FROZEN:
 		_check_ice_hits()
+	elif state == State.FLUNG:
+		_check_fling_hits()
+		if not is_instance_valid(self) or is_queued_for_deletion():
+			return
 	if state == State.WANDER and _retreat_left <= 0.0 and get_slide_collision_count() > 0:
 		_pick_wander()
 	if velocity.length() > 1.0:
@@ -267,6 +281,21 @@ func can_interact(player: Player) -> bool:
 func interact(player: Player) -> void:
 	_slide_velocity = Shove.direction_for(self, player) * ice_shove_speed
 	AudioManager.play("shove", global_position)
+
+
+## Sends the chicken tumbling (off the end of a full-speed walkway).
+func fling(launch: Vector2) -> void:
+	if state == State.FLUNG or _is_hopping():
+		return
+	state = State.FLUNG
+	_slide_velocity = launch
+	_target_snack = null
+	AudioManager.play("whoosh", global_position)
+
+
+## True while tumbling after a fling.
+func is_flung() -> bool:
+	return state == State.FLUNG
 
 
 ## Bursts into feathers and leaves the game.
@@ -396,6 +425,36 @@ func _frozen() -> void:
 		_slide_velocity = Vector2.ZERO
 		state = State.WANDER
 		_pick_wander()
+
+
+func _flung() -> void:
+	var delta := get_physics_process_delta_time()
+	_slide_velocity = _slide_velocity.move_toward(Vector2.ZERO, fling_friction * delta)
+	velocity = _slide_velocity
+	_sprite.rotation += fling_spin * delta * signf(_slide_velocity.x if _slide_velocity.x != 0.0 else 1.0)
+	if _slide_velocity.length() < 20.0:
+		# Landed dazed: a moment to get its bearings.
+		_sprite.rotation = 0.0
+		_slide_velocity = Vector2.ZERO
+		state = State.RECOIL
+		_recoil_velocity = Vector2.ZERO
+		_timer = daze_time * 2.0
+
+
+## While tumbling: anything solid hit at speed knocks it (and any chicken
+## it hits) out; slower, it just stops.
+func _check_fling_hits() -> void:
+	if get_slide_collision_count() == 0:
+		return
+	var lethal := _slide_velocity.length() >= fling_lethal_speed
+	for i in get_slide_collision_count():
+		var other := get_slide_collision(i).get_collider()
+		if lethal and other is Chicken:
+			(other as Chicken).defeat()
+	if lethal:
+		defeat()
+	else:
+		_slide_velocity = Vector2.ZERO
 
 
 ## While sliding as ice: flatten chickens in the way, and stop at walls.
@@ -533,6 +592,11 @@ func _update_power(delta: float) -> void:
 		power = ""
 
 
+## True while a flight chicken is in the air.
+func is_hopping() -> bool:
+	return _is_hopping()
+
+
 func _is_hopping() -> bool:
 	return _hop_time > 0.0
 
@@ -652,7 +716,7 @@ func _start_pursuit(alert_others: bool) -> void:
 
 
 func _check_hit() -> void:
-	if state in [State.EATING, State.FEEDING, State.FROZEN, State.RECOIL] or _is_hopping():
+	if state in [State.EATING, State.FEEDING, State.FROZEN, State.RECOIL, State.FLUNG] or _is_hopping():
 		return
 	for body in _hitbox.get_overlapping_bodies():
 		if body is Player and (body as Player).take_damage(Player.PECK, global_position):

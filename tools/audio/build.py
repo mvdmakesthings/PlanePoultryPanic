@@ -184,6 +184,34 @@ SOUNDS = {
                           tone("square", 90, slide=-0.5, attack=0.001, sustain=0.03,
                                decay=0.06, lowpass=0.3, volume=0.3)),
     "carousel_hum": lambda: carousel_hum(),
+    # Food Court: a vending machine's clunk, then bags dropping.
+    "vend": lambda: mix(tone("noise", 200, attack=0.001, sustain=0.05, decay=0.15,
+                             lowpass=0.25, volume=0.6, seed=41),
+                        tone("square", 80, slide=-1.0, attack=0.001, sustain=0.04, decay=0.1,
+                             lowpass=0.3, volume=0.35),
+                        *[tone("noise", 1400, attack=0.001, sustain=0.01, decay=0.05,
+                               lowpass=0.5, volume=0.35, seed=42 + k) for k in range(3)],
+                        gaps=[0.0, 0.0, 0.22, 0.31, 0.38]),
+    # Gate Areas
+    "walkway_hum": lambda: walkway_hum(),
+    "whoosh": lambda: mix(tone("noise", 800, slide=2.5, attack=0.03, sustain=0.08, decay=0.15,
+                               lowpass=0.5, volume=0.45, seed=51),
+                          tone("square", 300, slide=3.0, duty=0.25, attack=0.01, sustain=0.05,
+                               decay=0.1, lowpass=0.4, volume=0.15)),
+    # Security
+    "beep": lambda: mix(*[tone("square", 1760, duty=0.5, attack=0.001, sustain=0.06, decay=0.02,
+                               lowpass=0.6, volume=0.22) for _ in range(2)], gaps=[0.0, 0.12]),
+    "switch": lambda: mix(tone("noise", 3500, attack=0.001, sustain=0.005, decay=0.02,
+                               lowpass=0.8, volume=0.4, seed=21),
+                          tone("square", 220, slide=-1.0, attack=0.001, sustain=0.02, decay=0.04,
+                               lowpass=0.4, volume=0.3), gaps=[0.0, 0.01]),
+    "shutter": lambda: mix(*[tone("noise", 900 - 40 * k, attack=0.001, sustain=0.01, decay=0.03,
+                                  lowpass=0.35, volume=0.3, seed=22 + k) for k in range(8)],
+                           tone("noise", 300, attack=0.001, sustain=0.04, decay=0.2,
+                                lowpass=0.2, volume=0.6, seed=31),
+                           tone("square", 70, slide=-1.0, attack=0.001, sustain=0.05, decay=0.15,
+                                lowpass=0.3, volume=0.35),
+                           gaps=[0.035 * k for k in range(8)] + [0.29, 0.29]),
     # Moments
     "checkpoint": lambda: mix(*[tone("square", f, duty=0.5, attack=0.003, sustain=0.08,
                                      decay=0.2, volume=0.25) for f in (392, 523, 659)],
@@ -192,6 +220,18 @@ SOUNDS = {
                                       decay=0.1 + 0.4 * (k == 5), volume=0.25)
                                  for k, f in enumerate((523, 523, 659, 784, 659, 1047))],
                                gaps=[0.0, 0.12, 0.24, 0.36, 0.48, 0.6]),
+    # Opening cutscene
+    "pa_chime": lambda: mix(*[tone("triangle", f, attack=0.005, sustain=0.05, decay=0.9,
+                                   volume=0.35) for f in (784, 659, 523)],
+                            gaps=[0.0, 0.35, 0.7]),
+    "flap": lambda: mix(tone("noise", 6000, attack=0.001, sustain=0.003, decay=0.015,
+                             lowpass=0.7, volume=0.3, seed=61),
+                        tone("square", 1400, slide=-3.0, duty=0.25, attack=0.001, sustain=0.004,
+                             decay=0.01, lowpass=0.5, volume=0.12)),
+    "stamp": lambda: mix(tone("noise", 260, attack=0.001, sustain=0.03, decay=0.18,
+                              lowpass=0.25, volume=0.7, seed=62),
+                         tone("square", 110, slide=-2.5, duty=0.5, attack=0.001, sustain=0.03,
+                              decay=0.12, lowpass=0.3, volume=0.4)),
     # Menus
     "ui_move": lambda: tone("square", 880, duty=0.5, attack=0.001, sustain=0.015, decay=0.03,
                             volume=0.2),
@@ -218,6 +258,19 @@ def carousel_hum():
         click = rnd.uniform(-1, 1) * max(0.0, 1.0 - clack_t * 25)
         rattle += (click - rattle) * 0.3
         out.append((drone * wobble * 0.35 + rattle * 0.25))
+    return out
+
+
+def walkway_hum():
+    """A one-second loop of a smooth electric whine with a faint tick of
+    the belt's comb plates, higher and softer than the carousel's motor."""
+    n = RATE
+    out = []
+    for i in range(n):
+        t = i / RATE
+        whine = 0.35 * math.sin(math.tau * 82 * t) + 0.15 * math.sin(math.tau * 246 * t)
+        tick = 0.15 * math.sin(math.tau * 1800 * t) * max(0.0, 1.0 - ((t * 4) % 1.0) * 40)
+        out.append((whine * (1.0 + 0.1 * math.sin(math.tau * 3 * t)) + tick) * 0.3)
     return out
 
 
