@@ -163,7 +163,7 @@ func _sprite_frames() -> SpriteFrames:
 	var frames := SpriteFrames.new()
 	frames.remove_animation("default")
 	SpriteSheets.add_directional(frames, "idle", PLAYER_IDLE, Vector2i(16, 32), 2.0)
-	SpriteSheets.add_directional(frames, "run", PLAYER_RUN, Vector2i(16, 32), 14.0)
+	SpriteSheets.add_directional(frames, "run", PLAYER_RUN, Vector2i(32, 32), 14.0)
 	SpriteSheets.add_directional(frames, "hurt", PLAYER_HURT, Vector2i(16, 32), 1.0)
 	SpriteSheets.add_directional(frames, "throw", PLAYER_THROW, Vector2i(16, 32), 10.0, false)
 	SpriteSheets.add_directional(frames, "walk", CHICKEN_WALK, Vector2i(16, 16), 8.0)

@@ -91,7 +91,7 @@ func _on_chosen(id: String) -> void:
 func _build_chase() -> void:
 	var frames := SpriteFrames.new()
 	frames.remove_animation("default")
-	SpriteSheets.add_directional(frames, "run", PLAYER_RUN, Vector2i(16, 32), 12.0)
+	SpriteSheets.add_directional(frames, "run", PLAYER_RUN, Vector2i(32, 32), 12.0)
 	SpriteSheets.add_directional(frames, "walk", CHICKEN_WALK, Vector2i(16, 16), 12.0)
 	var runner := AnimatedSprite2D.new()
 	runner.sprite_frames = frames
