@@ -86,11 +86,11 @@ When health reaches zero, the player restarts from the last checkpoint with thei
 | Action | Keyboard | Gamepad |
 |---|---|---|
 | Move (8 directions) | WASD or arrow keys | Left stick or D-pad |
-| Run (uses stamina) | Shift | Right shoulder (RB/R1) |
+| Run (uses stamina) | Shift | Hold the left stick in (L3) |
 | Use selected item (throw a snack, spray the extinguisher), or throw a carried suitcase | Space | A / Cross |
 | Interact (shove, take, pick up or put down a suitcase, open, hide) | F | B / Circle |
 | Eat a snack (quick heal, from any slot) | E | X / Square |
-| Previous / next slot | Q / R, or mouse wheel | LB / Y (Triangle) |
+| Previous / next slot | Q / R, or mouse wheel | LB / RB (L1 / R1) |
 | Drop the selected slot | G | Back / Share |
 | Pause | Esc | Start / Options |
 

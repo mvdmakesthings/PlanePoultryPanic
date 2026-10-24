@@ -38,9 +38,9 @@ The one-room prototype is still there as a test bed for chicken behavior and ite
 | Action | Keyboard | Gamepad |
 |---|---|---|
 | Move | WASD or arrow keys | Left stick or D-pad |
-| Run (uses stamina) | Shift | Right shoulder |
+| Run (uses stamina) | Shift | Hold the left stick in (L3) |
 | Use the selected item (throw a snack, spray the extinguisher), or throw a carried suitcase | Space | A |
-| Switch inventory slot | Q / R, or mouse wheel | LB / Y |
+| Switch inventory slot | Q / R, or mouse wheel | LB / RB |
 | Drop the selected slot | G | Back |
 | Eat a snack (heal) | E | X |
 | Interact: push a cart, take an extinguisher, lift or put down a suitcase, unlock a door or vending machine, scan a boarding pass, flip a switch or a walkway's speed panel, hide in a closet or stall | F | B |
