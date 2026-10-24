@@ -212,7 +212,7 @@ script = ExtResource("s1_secret")
 floor_char = "."
 
 [node name="Mural" type="Sprite2D" parent="FreezerRoom"]
-position = Vector2(72, 36)
+position = Vector2(56, 34)
 texture = ExtResource("s2_secret")
 centered = false
 hframes = 5
