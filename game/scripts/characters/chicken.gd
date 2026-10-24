@@ -38,8 +38,9 @@ const POWER_WARNING_TIME := 3.0
 ## "!" once it has spotted the player, "?" while it's suspicious.
 const ALERT_COLOR := Color(0.894, 0.231, 0.267)
 const SUSPICIOUS_COLOR := Color(0.996, 0.906, 0.380)
-## Squabbling and tantrums: a little cartoon swearing.
-const GRAWLIX := "#@!"
+## Squabbling and tantrums: a little cartoon swearing, kept to two
+## characters so it reads at 8 px.
+const GRAWLIX := "#!"
 ## How often a chasing chicken checks whether the player juked past it.
 const JUKE_SAMPLE_TIME := 0.2
 ## A chicken that trips this close to the player makes her laugh.
@@ -1150,16 +1151,17 @@ func _update_visuals() -> void:
 
 
 ## "!" while chasing; "?" while suspicious, blinking once she's out of view
-## and it's cooling off; "#@!" while squabbling or in a tantrum.
+## and it's cooling off; "#!" in a tantrum, or over a squabble (shown by the
+## chicken leading it, so a pile-up doesn't stack labels).
 func _update_alert_label() -> void:
 	_alert_label.position.x = -2.0
 	if state in [State.PURSUE, State.WINDUP]:
 		_alert_label.text = "!"
 		_alert_label.add_theme_color_override("font_color", ALERT_COLOR)
 		_alert_label.visible = true
-	elif state in [State.SQUABBLE, State.TANTRUM]:
+	elif state == State.TANTRUM or (state == State.SQUABBLE and _squabble_leader):
 		_alert_label.text = GRAWLIX
-		_alert_label.position.x = -7.0
+		_alert_label.position.x = -4.0
 		_alert_label.add_theme_color_override("font_color", ALERT_COLOR)
 		_alert_label.visible = true
 	elif state == State.SUSPICIOUS:

@@ -217,7 +217,9 @@ func _personality_tests() -> void:
 	await _wait(0.6)
 	_check(chickens.all(func(c: Chicken) -> bool: return c.state == Chicken.State.SQUABBLE),
 		"two chickens reaching the same snack squabble over it")
-	_check(chickens[0]._alert_label.text == Chicken.GRAWLIX, "squabbling chickens swear")
+	_check(chickens.filter(func(c: Chicken) -> bool:
+		return c._alert_label.visible and c._alert_label.text == Chicken.GRAWLIX).size() == 1,
+		"a squabble swears once, over the chicken leading it")
 	await _wait(1.8)
 	var eating := chickens.filter(func(c: Chicken) -> bool: return c.state == Chicken.State.EATING)
 	_check(eating.size() == 1 and not is_instance_valid(snack), "one chicken wins the squabble and eats")
