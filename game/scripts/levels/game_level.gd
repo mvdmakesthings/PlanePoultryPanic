@@ -26,6 +26,11 @@ const EVENT_HINT_TIME := 5.0
 const PA_FIRST_DELAY := 4.0
 const PA_INTERVAL := 40.0
 const PA_TIME := 6.0
+## A level can hold this many mushroom patches for each one placed in it
+## (spreading stops at the cap).
+const MUSHROOM_CAP_PER_PATCH := 3
+## Shown the first time a patch spreads in a level.
+const SPROUT_HINT := "The mushrooms are spreading!\nStomp sprouts before they ripen."
 ## Retry hints every level can fall back on, by what landed the last hit.
 const COMMON_RETRY_HINTS := {
 	"peck": [
@@ -70,6 +75,10 @@ var next_label := ""
 
 ## The baked navigation, rebaked when something like a shutter moves.
 var navigation: NavigationRegion2D
+## Where the player starts the level (no sprouts grow near it).
+var start_point := Vector2.ZERO
+## The most mushroom patches (sprouts included) the level can hold.
+var mushroom_cap := 0
 
 var _level_over := false
 var _hint_time_left: Array[float] = []
@@ -82,6 +91,7 @@ var _rebake_queued := false
 var _pa_next := PA_FIRST_DELAY
 var _pa_index := 0
 var _pa_left := 0.0
+var _shown_sprout_hint := false
 ## The scene's item pickups, to tell which have been picked up.
 var _pickups: Array[String] = []
 
@@ -127,6 +137,8 @@ func _ready() -> void:
 	for i in hint_zones.size():
 		_hint_time_left.append(HINT_TIME)
 
+	start_point = _player.global_position
+	mushroom_cap = patch_count() * MUSHROOM_CAP_PER_PATCH
 	_pickups = LevelState.pickup_paths(self)
 	for checkpoint in _checkpoints():
 		checkpoint.reached.connect(_on_checkpoint_reached)
@@ -219,6 +231,22 @@ func _update_hints(delta: float) -> void:
 func show_event_hint(text: String) -> void:
 	_event_hint = text
 	_event_hint_left = EVENT_HINT_TIME
+
+
+## A patch just grew a sprout. The first one in the level gets a hint.
+func mushroom_sprouted() -> void:
+	if not _shown_sprout_hint:
+		_shown_sprout_hint = true
+		show_event_hint(SPROUT_HINT)
+
+
+## Mushroom patches in the level right now, sprouts included.
+func patch_count() -> int:
+	var count := 0
+	for node in get_tree().get_nodes_in_group("mushroom_patches"):
+		if is_ancestor_of(node):
+			count += 1
+	return count
 
 
 func _on_player_health_changed(current: int, _maximum: int) -> void:
