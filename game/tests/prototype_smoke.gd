@@ -194,6 +194,17 @@ func _senses_tests() -> void:
 	_check(chicken.global_position.distance_to(noise) < 40.0, "a chicken walks over to look at a noise")
 	setup[0].queue_free()
 
+	# Running past behind it is heard; walking the same way isn't.
+	for run: bool in [false, true]:
+		setup = await _watching_chicken(chicken_at, chicken_at + Vector2(-36, 30))
+		chicken = setup[1]
+		await _hold(["move_up", "run"] if run else ["move_up"], 0.4)
+		if run:
+			_check(chicken.state != Chicken.State.WANDER, "a chicken hears the player running behind it")
+		else:
+			_check(chicken.state == Chicken.State.WANDER, "walking behind a chicken is silent")
+		setup[0].queue_free()
+
 
 ## A fresh room with one chicken standing still looking right, and the
 ## player at player_at. Pecking, it looks right at the floor instead.
