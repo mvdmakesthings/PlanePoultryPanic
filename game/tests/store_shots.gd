@@ -34,6 +34,8 @@ func _ready() -> void:
 			await _gates_chase()
 		"5":
 			await _final_boss()
+		"personality":
+			await _food_court_personality()
 	_hide_hints()
 	await RenderingServer.frame_post_draw
 	var image := get_viewport().get_texture().get_image()
@@ -116,6 +118,41 @@ func _food_court_totem() -> void:
 	_player.global_position = roost.global_position + Vector2(104, 14)
 	_chicken(roost.global_position + Vector2(-30, 26))
 	await _wait(0.85)
+
+
+## Level 3, for the v0.3.0 devlog: two chickens squabble over a snack, one
+## lies where it tripped, a rage chicken throws a tantrum, and Amanda laughs.
+func _food_court_personality() -> void:
+	await _open("res://scenes/levels/level_03_food_court.tscn")
+	var at := _player.global_position + Vector2(0, -40)
+	_player.global_position = at
+	_player.facing = Vector2.LEFT
+	var snack := preload("res://scenes/objects/thrown_snack.tscn").instantiate() as ThrownSnack
+	snack.direction = Vector2.ZERO
+	snack.position = at + Vector2(-64, -4)
+	_level.get_node("Entities").add_child(snack)
+	var leader := _chicken(snack.position + Vector2(-9, 0), "", Chicken.State.WANDER)
+	var rival := _chicken(snack.position + Vector2(9, 2), "", Chicken.State.WANDER)
+	var tripped := _chicken(at + Vector2(-26, 10), "", Chicken.State.WANDER)
+	var tantrum := _chicken(at + Vector2(58, -14), "rage", Chicken.State.WANDER)
+	await get_tree().physics_frame
+	for chicken in [leader, rival]:
+		chicken._target_snack = snack
+	leader._squabble_rivals = [rival]
+	leader._enter_squabble(true, 30.0)
+	rival._enter_squabble(false, 30.0)
+	tripped.state = Chicken.State.RECOIL
+	tripped._tripped = true
+	tripped._timer = 30.0
+	tripped._facing = Vector2.LEFT
+	tantrum.state = Chicken.State.TANTRUM
+	tantrum._timer = 30.0
+	await _wait(0.5)
+	_player.say("Ha!")
+	await _wait(0.2)
+	# A cover image, not a screenshot: no HUD.
+	for hud in _level.find_children("*", "Hud", true, false):
+		hud.visible = false
 
 
 ## Level 4: a chase along the gate area's moving walkway.

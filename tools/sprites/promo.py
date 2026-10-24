@@ -8,7 +8,16 @@ writes, into docs/images/:
     a departure-board title.
   - itch_background.png: 256x256 seamless tile for the page background
     (drawn at 64x64, scaled 4x): dim terminal carpet with chicken tracks.
+
+and, given a staged in-game shot (see game/tests/store_shots.gd),
+
+    python3 tools/sprites/promo.py devlog /tmp/shot.png
+
+writes a devlog cover, devlog_v<version>.png: 1280x720, the middle 256x144
+of the shot (a little above center) scaled 5x under a departure-board
+headline.
 """
+import sys
 from pathlib import Path
 
 from PIL import Image
@@ -165,8 +174,36 @@ def background():
     return img.resize((size * 4, size * 4), Image.NEAREST)
 
 
+def devlog_cover(shot_path, headline, tag):
+    """Crops a 1280x720 shot (the 320x180 game at 4x) to its middle 256x144
+    and puts a departure-board headline across the top."""
+    shot = Image.open(shot_path).convert("RGBA").resize((320, 180), Image.NEAREST)
+    img = shot.crop((32, 6, 288, 150))
+    w = img.width
+    pw = max(text_width(headline, 2), text_width(tag)) + 22
+    px, py, ph = (w - pw) // 2, 3, 27
+    for y in range(py, py + ph):
+        for x in range(px, px + pw):
+            edge = y in (py, py + ph - 1) or x in (px, px + pw - 1)
+            img.putpixel((x, y), rgb("O" if edge else "k"))
+    for x in range(px + 1, px + pw - 1):
+        img.putpixel((x, py + 1), rgb("p"))
+    draw_text(img, (w - text_width(headline, 2)) // 2, py + 5, headline, "F", scale=2, shadow="y", outline="O")
+    draw_text(img, (w - text_width(tag)) // 2, py + 19, tag, "C")
+    # Boarding light on the board's corner.
+    for y in range(py + 4, py + 7):
+        for x in range(px + pw - 7, px + pw - 4):
+            img.putpixel((x, y), rgb("g"))
+    return img.resize((w * 5, img.height * 5), Image.NEAREST)
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
+    if len(sys.argv) == 3 and sys.argv[1] == "devlog":
+        cover = devlog_cover(sys.argv[2], "THE CHICKENS HAVE OPINIONS", "PLANE POULTRY PANIC  +  UPDATE V0.3.0")
+        cover.save(OUT / "devlog_v0.3.0.png")
+        print(f"wrote {OUT / 'devlog_v0.3.0.png'}")
+        sys.exit()
     banner().save(OUT / "itch_banner.png")
     background().save(OUT / "itch_background.png")
     print(f"wrote {OUT / 'itch_banner.png'}")
