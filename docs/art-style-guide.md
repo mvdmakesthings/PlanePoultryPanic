@@ -9,6 +9,7 @@ The rules every piece of in-game art follows. Consistency is what makes pixel ar
 ## Who Makes the Art
 
 - **First pass (now)**: Claude makes all in-game pixel art (characters, chickens, tiles, objects, effects, UI) so the game can be built and playtested with real-looking art.
+- **Amanda's reference art**: her idle, walk and run sheets are converted straight from the creator's reference sheets in `tools/sprites/reference/` by `tools/sprites/reference.py`, which cuts out each frame, shrinks it to size with a majority vote per pixel, snaps it to the palette and outlines it. Her other animations are built on the converted standing poses. To change her look, replace those sheets (same layout: rows down, up, right, left on magenta; 2 idle, 4 walk and 6 run frames) and rebuild.
 - **Final art (after the game is done)**: You redraw every sprite by hand, using Claude's sprites as templates. Keep the same frame sizes, sheet layouts, and file names, so each redrawn sheet drops straight into the game with no code changes.
 - **Art direction**: You approve the style and give feedback throughout.
 - **Store art**: Steam capsule images and key art, made by you or commissioned near launch. These are large illustrations, not in-game sprites, and they drive store-page clicks.
@@ -28,7 +29,7 @@ The rules every piece of in-game art follows. Consistency is what makes pixel ar
 |---|---|
 | Screen | 320x180 (20 x about 11 tiles visible) |
 | Tile | 16x16 |
-| Player | 16x32 frame |
+| Player | 16x32 frame, 32x32 while running (her strides are too wide for 16) |
 | Chicken | 16x16 frame, about 12x12 of visible bird |
 | Chicken totem | 16 px wide, each stacked chicken adds about 10 px of height |
 | Items and pickups | 8x8 or 16x16 |
@@ -88,9 +89,9 @@ One shared palette for the whole game. No colors outside it, ever.
 ## Characters
 
 ### Player
-- Based on the creator's reference photos: shoulder-length pink hair, a heather-gray tee with a mushroom print, a blue backpack, black leggings, black boots, and tattooed forearms.
+- Converted from the creator's reference sheets: shoulder-length mauve-pink hair with side-swept bangs, a heather-gray tee with a small crest print, a blue backpack, black leggings, charcoal boots, and tattooed forearms.
 - The pink hair (`#b55088` family) and blue backpack (`#124e89` family) are the player's signature colors. They make the player stand out against the gray terminal and the white chickens, so no other character or prop should use that pairing.
-- At 16x32, details are hinted, not drawn: tattoos are a few ink pixels on each forearm, and the shirt print is a small mushroom shape.
+- At 16x32, details are hinted, not drawn: each eye is a light and a dark pixel, the tattoos a few ink pixels on each forearm, and the shirt print a couple of gray pixels.
 
 ### Normal Chickens
 - Classic white farm hen: white body shaded with `#ead4aa`, red comb, yellow-orange beak and legs.
@@ -137,7 +138,7 @@ Feedback drawn in code by the `Juice` autoload (`game/scripts/managers/juice.gd`
 
 ### Animation Sets
 
-Left-facing frames are mirrored from right-facing ones, so each character only needs 3 drawn directions (down, up, right).
+Left-facing frames are mirrored from right-facing ones, so each character only needs 3 drawn directions (down, up, right). Amanda's converted idle, walk and run sheets are the exception: the reference draws all four.
 
 **Player**
 
@@ -145,7 +146,7 @@ Left-facing frames are mirrored from right-facing ones, so each character only n
 |---|---|---|---|
 | Idle | 4 | 2 | M2 style test |
 | Walk | 4 | 4 | M2 style test |
-| Run | 4 | 6 (contact, passing, flight on each leg; longer stride, hair and backpack bounce) | M4 vertical slice |
+| Run | 4 | 6, in 32x32 frames (a full sprint from the reference sheets: long strides, arms pumping, hair streaming) | M4 vertical slice |
 | Throw | 4 | 3 (wind-up, release, follow-through) | M4, done |
 | Eat | 1 (facing down) | 3 (bite, chew, yum) | M4, done |
 | Hurt | 4 | 1, plus blinking | M4, done |
@@ -153,7 +154,7 @@ Left-facing frames are mirrored from right-facing ones, so each character only n
 
 Running is a core mechanic tied to stamina, so it has its own cycle: players can see at a glance when they're spending stamina. Every M4 player animation is done: run, throw, eat, hurt and defeat. Action animations (throw, eat, hurt) play for a moment over the walk or idle, then hand back.
 
-The action poses are built by stamping small hand-drawn pieces (raised arms, a fist, the snack bag, faces) onto the base views in `tools/sprites/player.py`, so redrawing a base view by hand means redrawing these sheets too.
+The idle, walk and run sheets are converted from the reference art (see Who Makes the Art). The action poses are built by stamping small hand-drawn pieces (raised arms, a fist, the snack bag, faces) onto her converted standing poses in `tools/sprites/player.py`, so a new reference sheet changes these sheets too. The reference's down- and up-facing run rows are three-quarter views (she sprints across the screen with her face or her back to the camera), so those rows read as a sideways sprint rather than a run toward or away from the camera.
 
 **Messy hair**: the player's hair gets messier as she loses health (see the GDD). Rather than a messy copy of every sheet, one overlay sheet holds flyaway tufts that are drawn over whatever animation is playing.
 
@@ -217,17 +218,17 @@ The same run writes the game icon, `game/icon.png`: the side-view chicken wearin
 - One PNG per animation: `<thing>_<animation>.png`, for example `player_walk.png`, `chicken_walk.png`, `tiles_arrivals.png`
 - **Rows** are directions in this order: down, up, right, left
 - **Columns** are frames, read left to right
-- Frames sit on a regular grid with no padding: 16x32 for the player, 16x16 for chickens
+- Frames sit on a regular grid with no padding: 16x32 for the player (32x32 for her run), 16x16 for chickens
 - Keep this layout when redrawing a sheet so it drops into the game unchanged
 
 ### Current Sheets
 | Sheet | Frame size | Frames | Notes |
 |---|---|---|---|
-| `player_walk.png` | 16x32 | 4 per direction | Contact, passing, contact, passing. In side views each passing frame plants the leg that just landed and kicks the other boot up behind; the near leg is lit and the far leg is in shadow so they read apart. |
-| `player_walk_extinguisher.png`, `player_idle_extinguisher.png` | 16x32 | Same as walk and idle | The same cycles with a small extinguisher in the player's left hand, placed at the hand in every frame so it swings with the arm |
-| `player_idle.png` | 16x32 | 2 per direction | Breathing: the head sinks 1px on the second frame. Play slowly (about 2 FPS). |
-| `player_run.png`, `player_run_extinguisher.png` | 16x32 | 6 per direction | Contact (near foot lands in front), passing (near leg under her, far leg swinging through), flight (far knee up, near leg pushing off behind), then the same with the legs swapped. The body is a pixel lower on contact and passing frames and the backpack bounces a beat behind. Play at 14 FPS. |
-| `player_hair_mess.png` | 24x20 | 3 per direction (one per mess level) | Flyaway hair drawn over the player: a cowlick (below 75% health), puffed-out tufts (below 50%), wild frizz with a lock over the face (below 25%). Each frame covers the player frame's top 16 rows plus a 4 px margin above and to each side. The game lines it up with the top of the head in each animation frame, so redrawn sheets keep working as long as the head is the topmost thing drawn. |
+| `player_walk.png` | 16x32 | 4 per direction | Converted from the reference walk sheet: contact, passing, contact, passing, with her head centered in the frame and her feet on the second-to-last row. Left-facing frames are their own drawings, not mirrors. |
+| `player_walk_extinguisher.png`, `player_idle_extinguisher.png` | 16x32 | Same as walk and idle | The same cycles with a small extinguisher hanging from the lowest hand (her left from the front and back, the near one from the side), found in every frame so it swings with the arm |
+| `player_idle.png` | 16x32 | 2 per direction | Converted from the reference idle sheet: a slight breathing shift between the two frames. Play slowly (about 2 FPS). The first frame of each direction is the base for the action poses. |
+| `player_run.png`, `player_run_extinguisher.png` | 32x32 | 6 per direction | Converted from the reference run sheet, in square frames because the widest stride is 32 px: push-off, flight and landing on each leg, head centered in the frame. Play at 14 FPS. |
+| `player_hair_mess.png` | 24x20 | 3 per direction (one per mess level) | Flyaway hair drawn over the player: a cowlick (below 75% health), puffed-out tufts (below 50%), wild frizz with a lock over the face (below 25%). Each frame covers the player frame's top 16 rows plus a 4 px margin above and to each side. The game lines it up with the top of the head in each animation frame, and centers it on the wider run frames, so new sheets keep working as long as the head is the topmost thing drawn. |
 | `player_throw.png` | 16x32 | 3 per direction | Wind-up (arm raised high beside the head; pulled back in profile), release (fist toward the camera, or arm flung forward in profile, body a pixel lower), follow-through (hand swung low). Throws snacks and suitcases; plays at 10 FPS. |
 | `player_eat.png` | 16x32 | 3, in one row (facing the camera only) | Bite with the bag at her mouth, chew with happy closed eyes, yum with a crumb falling. Plays at 7 FPS. |
 | `player_hurt.png` | 16x32 | 1 per direction | A flinch: arms flung up, eyes squeezed shut, mouth open. Shown for a moment after a hit, blinking. |

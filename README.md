@@ -169,7 +169,7 @@ Runs Level 1 in a window with vsync off for three scenarios (normal play, every 
 
 ## Rebuild the sprites
 
-Sprites are generated from Python sources in `tools/sprites/` (needs Pillow):
+Sprites are generated from Python sources in `tools/sprites/` (needs Pillow and numpy: `pip install -r tools/sprites/requirements.txt`). Amanda's idle, walk and run sheets are converted straight from the reference sheets in `tools/sprites/reference/`, and her other animations are built on the converted standing poses:
 
 ```bash
 python3 tools/sprites/build.py --preview /tmp/sprite-previews

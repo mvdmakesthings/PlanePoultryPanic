@@ -47,8 +47,8 @@ SHEETS = [
     ("player_idle.png", player.idle_cycle(), 16, 32, 2),
     ("player_walk_extinguisher.png", player.walk_cycle_extinguisher(), 16, 32, 8),
     ("player_idle_extinguisher.png", player.idle_cycle_extinguisher(), 16, 32, 2),
-    ("player_run.png", player.run_cycle(), 16, 32, 14),
-    ("player_run_extinguisher.png", player.run_cycle_extinguisher(), 16, 32, 14),
+    ("player_run.png", player.run_cycle(), 32, 32, 14),
+    ("player_run_extinguisher.png", player.run_cycle_extinguisher(), 32, 32, 14),
     ("player_throw.png", player.throw_cycle(), 16, 32, 10),
     ("player_hurt.png", player.hurt_cycle(), 16, 32, 2),
     ("chicken_walk.png", chicken.walk_cycle(), 16, 16, 8),
@@ -178,10 +178,10 @@ def floor_shadow(width):
 def write_previews(out_dir, scale=6):
     """Per sheet: an animated GIF of all four directions and an 8x frame grid."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    cell = 24
     for name, anims, w, h, fps in SHEETS:
         stem = name.removesuffix(".png")
         frames = len(anims["down"])
+        cell = w + 8
         gif_frames = []
         for i in range(frames):
             canvas = Image.new("RGBA", (cell * 4 + 8, h + 12), PREVIEW_BG)

@@ -39,6 +39,9 @@ const HAIR_MARGIN := 4
 ## Below each of these fractions of full health, the hair gets one level messier.
 const HAIR_MESS_BELOW: Array[float] = [0.75, 0.5, 0.25]
 const FRAME_SIZE := Vector2i(16, 32)
+## Running strides are too wide for a 16 px frame, so the run sheets use
+## square frames with her head centered in them.
+const RUN_FRAME_SIZE := Vector2i(32, 32)
 ## The knocked-out pose lies flat, so its frames are wide and short.
 const KO_FRAME_SIZE := Vector2i(32, 20)
 ## Health units in one suitcase on the HUD. A chicken peck costs half a
@@ -149,8 +152,8 @@ func _ready() -> void:
 	SpriteSheets.add_directional(frames, "idle", IDLE_SHEET, FRAME_SIZE, 2.0)
 	SpriteSheets.add_directional(frames, "walk_ext", WALK_EXTINGUISHER_SHEET, FRAME_SIZE, 8.0)
 	SpriteSheets.add_directional(frames, "idle_ext", IDLE_EXTINGUISHER_SHEET, FRAME_SIZE, 2.0)
-	SpriteSheets.add_directional(frames, "run", RUN_SHEET, FRAME_SIZE, 14.0)
-	SpriteSheets.add_directional(frames, "run_ext", RUN_EXTINGUISHER_SHEET, FRAME_SIZE, 14.0)
+	SpriteSheets.add_directional(frames, "run", RUN_SHEET, RUN_FRAME_SIZE, 14.0)
+	SpriteSheets.add_directional(frames, "run_ext", RUN_EXTINGUISHER_SHEET, RUN_FRAME_SIZE, 14.0)
 	SpriteSheets.add_directional(frames, "throw", THROW_SHEET, FRAME_SIZE, 10.0, false)
 	SpriteSheets.add_directional(frames, "hurt", HURT_SHEET, FRAME_SIZE, 1.0, false)
 	# Eating is only drawn facing the camera.
@@ -590,8 +593,12 @@ func _update_hair() -> void:
 	if not _hair.visible:
 		return
 	_hair.frame = row * HAIR_LEVELS + level - 1
-	var top_left := _sprite.offset - Vector2(FRAME_SIZE) / 2.0
-	var head_top := _head_top(_sprite.sprite_frames.get_frame_texture(_sprite.animation, _sprite.frame))
+	var texture := _sprite.sprite_frames.get_frame_texture(_sprite.animation, _sprite.frame)
+	# Wider frames (the run) keep her head in the middle, so the overlay is
+	# centered on them too.
+	var frame_size := texture.get_size()
+	var top_left := _sprite.offset - frame_size / 2.0 + Vector2((frame_size.x - FRAME_SIZE.x) / 2.0, 0.0)
+	var head_top := _head_top(texture)
 	_hair.position = top_left + Vector2(-HAIR_MARGIN, head_top - HAIR_MARGIN)
 
 
