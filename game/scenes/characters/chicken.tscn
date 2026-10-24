@@ -50,6 +50,5 @@ radius = 6.0
 
 [node name="Ice" type="Sprite2D" parent="."]
 visible = false
-modulate = Color(1, 1, 1, 0.85)
 texture = ExtResource("2_ice")
 offset = Vector2(0, -8)

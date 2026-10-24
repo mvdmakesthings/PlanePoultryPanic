@@ -283,7 +283,9 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`extinguisher_cabinet.png`**: two 16x20 frames of the red emergency cabinet that hangs on the wall face: full, then empty.
 
-**`ice_block.png`**: one 16x16 ice-block outline drawn over a frozen chicken, which is also tinted icy blue. The outline is the shape cue, so freezing reads without relying on color.
+**`ice_block.png`**: one 18x20 see-through block of ice drawn over a frozen chicken, a pixel wider than the chicken's frame on each side and two taller so the whole bird sits inside: a pale top face, a cyan front face the chicken shows through (partly transparent pixels), two shine streaks, a hard blue rim and frost crusted along the base. The solid block is the shape cue, so freezing reads without relying on color.
+
+**`chicken_frozen.png`**: a frozen chicken, one 16x16 frame per direction (rows down, up, right, left): the chase cycle's wings-up squawk, stuck. Feathers go pale frosted blue with a deep-blue outline, the comb a cold purple, the beak and feet drained pale, and rime sits on every upward-facing edge. Frozen chickens switch to it instead of being tinted.
 
 **`closet_door.png`**: two 16x30 frames of the supply closet door on the wall face: closed, then open with a mop inside.
 

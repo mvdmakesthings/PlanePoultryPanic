@@ -28,7 +28,7 @@
 [ext_resource type="Script" path="res://scripts/objects/secret_room.gd" id="s1_secret"]
 [ext_resource type="Texture2D" path="res://assets/sprites/mural.png" id="s2_secret"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ice_block.png" id="s3_secret"]
-[ext_resource type="Texture2D" path="res://assets/sprites/chicken_idle.png" id="s99_secret"]
+[ext_resource type="Texture2D" path="res://assets/sprites/chicken_frozen.png" id="s99_secret"]
 [ext_resource type="Texture2D" path="res://assets/sprites/posters.png" id="s4_secret"]
 [ext_resource type="PackedScene" path="res://scenes/objects/secret_door.tscn" id="s5_secret"]
 [ext_resource type="PackedScene" path="res://scenes/objects/secret_stash.tscn" id="s6_secret"]
@@ -273,11 +273,11 @@ position = Vector2(150, 140)
 position = Vector2(140, 76)
 texture = ExtResource("s99_secret")
 centered = false
-hframes = 3
 vframes = 4
+frame = 2
 
 [node name="Ice1" type="Sprite2D" parent="FreezerRoom"]
-position = Vector2(140, 76)
+position = Vector2(139, 74)
 texture = ExtResource("s3_secret")
 centered = false
 
@@ -285,11 +285,11 @@ centered = false
 position = Vector2(156, 80)
 texture = ExtResource("s99_secret")
 centered = false
-hframes = 3
 vframes = 4
+frame = 3
 
 [node name="Ice2" type="Sprite2D" parent="FreezerRoom"]
-position = Vector2(156, 80)
+position = Vector2(155, 78)
 texture = ExtResource("s3_secret")
 centered = false
 
@@ -297,11 +297,11 @@ centered = false
 position = Vector2(22, 104)
 texture = ExtResource("s99_secret")
 centered = false
-hframes = 3
 vframes = 4
+frame = 0
 
 [node name="Ice3" type="Sprite2D" parent="FreezerRoom"]
-position = Vector2(22, 104)
+position = Vector2(21, 102)
 texture = ExtResource("s3_secret")
 centered = false
 

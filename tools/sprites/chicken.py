@@ -361,3 +361,35 @@ def powered_walk(mode):
                           for i, f in enumerate(base[direction])]
     out["left"] = [mirror(f) for f in out["right"]]
     return out
+
+
+# ---------- frozen ----------
+# Frozen solid mid-squawk: the chase cycle's wings-up frame, recolored in
+# icy blues, with rime on every upward-facing edge. One frame per direction.
+
+FROZEN_COLORS = {
+    "O": "B",  # outline and eyes: deep ice blue
+    "C": "W",  # feathers: pale frosted blue
+    "c": "w",
+    "e": "w",
+    "R": "H",  # comb and wattle: blood gone cold
+    "r": "d",
+    "Y": "c",  # beak and feet: drained pale
+    "y": "e",
+}
+
+
+def frozen(grid):
+    g = ["".join(FROZEN_COLORS.get(ch, ch) for ch in row) for row in grid]
+    # Rime: frost settles on whatever faces up.
+    out = list(g)
+    for y in range(1, len(g)):
+        for x, ch in enumerate(g[y]):
+            if ch in "Wwc" and g[y - 1][x] in ".B":
+                put(out, y, x, "C")
+    return out
+
+
+def frozen_cycle():
+    chase = chase_cycle()
+    return {direction: [frozen(frames[0])] for direction, frames in chase.items()}
