@@ -194,10 +194,22 @@ func _gates_chase() -> void:
 ## Level 5: the Supreme Totem stands up in the boarding area.
 func _final_boss() -> void:
 	await _open("res://scenes/levels/level_05_final_gate.tscn")
-	var roost := _level.get_node("BossRoost") as Node2D
-	_player.global_position = roost.global_position + Vector2(76, 18)
-	for i in 900:
-		await get_tree().physics_frame
-		if _level.boss != null:
-			break
+	var roost := _level.get_node("BossRoost") as Roost
+	# Level with the nest, so the camera keeps the crown on top of an
+	# eight-chicken totem in view.
+	_player.global_position = roost.global_position + Vector2(76, -4)
+	# Form the boss straight away: left to themselves the boss chickens
+	# would rather peck Amanda than gather at the nest. Then hold it at the
+	# roost, since it stomps a second after forming.
+	_level._start_fight()
+	var chickens: Array[Chicken] = _level._boss_chickens()
+	roost._form(chickens.slice(0, roost.chickens_needed))
+	# The spare chickens wait by the nest instead of chasing her.
+	for chicken in chickens.slice(roost.chickens_needed):
+		chicken.set_physics_process(false)
+	await get_tree().physics_frame
+	_level.boss.speed = 0.0
+	_level.boss._stomp_ready_in = 30.0
+	_level.boss._barrage_ready_in = 30.0
+	_level.boss._flight_ready_in = 30.0
 	await _wait(1.5)
