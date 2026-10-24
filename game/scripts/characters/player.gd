@@ -49,6 +49,8 @@ const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 ## The extinguisher swings toward the nearest unfrozen chicken this close,
 ## whichever way the player is facing, so it works mid-chase.
 const SPRAY_AIM_RANGE := 64.0
+## How far away chickens hear her running footsteps.
+const RUN_NOISE_RANGE := 48.0
 
 @export var walk_speed := 100.0
 @export var run_speed := 150.0
@@ -523,9 +525,11 @@ func _play_footstep() -> void:
 	var animation := String(_sprite.animation)
 	if (animation.begins_with("walk") or animation.begins_with("run")) and _sprite.frame % 2 == 0:
 		AudioManager.play("step")
-		# Running kicks up a little dust behind her.
+		# Running kicks up a little dust behind her, and chickens nearby hear
+		# it. Walking is silent.
 		if animation.begins_with("run"):
 			ParticleBurst.spawn(get_parent(), "dust", global_position - facing * 3.0, -facing)
+			Chicken.make_noise(get_tree(), global_position, RUN_NOISE_RANGE)
 
 
 func _update_invincibility(delta: float) -> void:

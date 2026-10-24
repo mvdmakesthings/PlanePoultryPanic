@@ -13,6 +13,8 @@ const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const CARRY_HEIGHT := 30.0
 ## How long the burst-open frame stays before the suitcase is gone.
 const BURST_TIME := 0.6
+## How far away chickens hear it land.
+const NOISE_RANGE := 80.0
 
 @export var throw_speed := 200.0
 @export var friction := 900.0
@@ -137,6 +139,7 @@ func _fly(delta: float) -> void:
 
 
 func _land() -> void:
+	Chicken.make_noise(get_tree(), global_position, NOISE_RANGE)
 	if burst_snacks > 0:
 		_burst()
 		return
