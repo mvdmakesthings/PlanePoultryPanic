@@ -635,3 +635,4 @@ game/
 | 2026-10-24 | The PS1-style 3D restyle is dropped; the game stays 2D | You |
 | 2026-10-24 | Chicken personality: squabbles over shared snacks, tripping when juked, looking around (or a rage tantrum) after losing Amanda | You (Proposed details) |
 | 2026-10-24 | Amanda reacts out loud to big moments (a crowd chasing her, escaping, a totem forming, hiding, a chicken tripping), at most one line every 5 seconds | You (Proposed details) |
+| 2026-10-24 | Amanda's idle, walk and run sprites are converted straight from your reference sheets (`tools/sprites/reference/`), not hand-drawn; her run uses 32x32 frames because the strides are too wide for 16 | You |
