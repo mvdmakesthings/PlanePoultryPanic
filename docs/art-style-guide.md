@@ -268,6 +268,8 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`mushroom_patch.png`**: 16x16 frames. Rows are varieties (flight, rage, egg shooter); columns are 3 frames (resting, spores rising, spores drifting higher). Loop slowly, about 3 FPS.
 
+**`mushroom_sprout.png`**: 16x16 frames, the buds a patch spreads (see the GDD's Spreading Mushrooms). Rows are varieties, like `mushroom_patch.png`; columns are 2 frames: a fresh bud, then a bigger one with a second nub, shown for the sprout's second half. No spores, since a sprout isn't ripe. Same baseline as a patch, so a sprout that ripens swaps to the patch sheet without moving. The game wobbles it for its last 2 seconds.
+
 **`item_snack.png`**: one 10x12 bag of chips, used for pickups, thrown snacks, and the HUD.
 
 **`hud_luggage.png`**: two 12x10 health icons side by side: full, then empty.

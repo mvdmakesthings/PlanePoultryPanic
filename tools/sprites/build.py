@@ -65,6 +65,7 @@ SHEETS = [
 IMAGES = [
     ("tiles_arrivals.png", tiles.sheet),
     ("mushroom_patch.png", mushrooms.sheet),
+    ("mushroom_sprout.png", mushrooms.sprout_sheet),
     ("carousel.png", carousel.sheet),
     ("item_snack.png", items.snack),
     ("hud_luggage.png", items.luggage),
