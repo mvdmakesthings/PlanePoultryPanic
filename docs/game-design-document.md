@@ -247,7 +247,7 @@ Behavior priority, highest first:
 ### Spreading Mushrooms
 Mushrooms creep across the terminal the longer Amanda lingers, so dawdling makes a level harder and spraying a patch early saves trouble later.
 
-- **Spreading**: a ripe patch grows a sprout every 25 seconds (40 in Security, where patches are first taught). A patch dimmed from being eaten doesn't spread until it regrows, and its timer starts over when it does. The first sprout in a level brings up a hint: "The mushrooms are spreading! Stomp sprouts before they ripen."
+- **Spreading**: a ripe patch grows a sprout every 13 seconds (21 in Security, where patches are first taught). A patch dimmed from being eaten doesn't spread until it regrows, and its timer starts over when it does. The first sprout in a level brings up a hint: "The mushrooms are spreading! Stomp sprouts before they ripen."
 - **Sprouts**: a sprout is a small, pale bud of its parent's kind that ripens into a full patch after 8 seconds, wobbling for its last 2 seconds as a tell. Chickens can't eat a sprout and don't head for it. Amanda stomps a sprout flat just by walking over it (no item needed); a spray kills it too.
 - **Ripe sprouts spread too**: once ripe, a sprout is a full patch in every way, including spreading. That's the pressure: a patch ignored for a minute becomes a cluster.
 - **Placement**: a sprout lands 2-4 tiles from its parent, on open floor chickens can reach. Never on a walkway, the carousel belt, or in a hiding spot, never within 3 tiles of a checkpoint, a level entrance or exit, and never within 2 tiles of Amanda. If there's no room, the patch skips that sprout.

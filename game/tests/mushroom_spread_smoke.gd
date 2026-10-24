@@ -49,7 +49,7 @@ func _cap_tests() -> void:
 	level = await _fresh_level(SECURITY)
 	_check(level.mushroom_cap == 9, "Security's 3 patches allow 9 in all (got %d)" % level.mushroom_cap)
 	var patch: MushroomPatch = level.get_node("Entities/RagePatch")
-	_check(patch.spread_time == 40.0, "Security's patches spread slower, for teaching")
+	_check(patch.spread_time == 21.0, "Security's patches spread slower, for teaching")
 	level.queue_free()
 
 
@@ -58,7 +58,7 @@ func _sprout_tests() -> void:
 	var hud: Hud = level.get_node("UI/HUD")
 	_park_player(level)
 	var patch: MushroomPatch = level.get_node("Entities/RagePatch")
-	_check(patch.spread_time == 25.0, "patches spread every 25 seconds by default")
+	_check(patch.spread_time == 13.0, "patches spread every 13 seconds by default")
 
 	# An eaten patch doesn't spread until it regrows.
 	patch.eat()
@@ -67,7 +67,7 @@ func _sprout_tests() -> void:
 	_check(_sprouts(level).is_empty(), "an eaten patch doesn't spread")
 	patch._regrow_timer = 0.0
 	await _frames(2)
-	_check(patch.is_ripe and patch._spread_timer > 20.0, "it regrows with its spread timer started over")
+	_check(patch.is_ripe and patch._spread_timer > 12.0, "it regrows with its spread timer started over")
 
 	patch._spread_timer = 0.0
 	await _frames(3)

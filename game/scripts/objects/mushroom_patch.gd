@@ -35,7 +35,7 @@ const STOMP_REACH := 7.0
 @export var regrow_time := 15.0
 @export var spore_fps := 3.0
 ## Seconds a ripe patch takes to grow each sprout (0 never spreads).
-@export var spread_time := 25.0
+@export var spread_time := 13.0
 ## Seconds a sprout takes to ripen into a full patch.
 @export var sprout_time := 8.0
 

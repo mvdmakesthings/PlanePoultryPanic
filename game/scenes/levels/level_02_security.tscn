@@ -237,17 +237,17 @@ position = Vector2(640, 256)
 [node name="RagePatch" parent="Entities" instance=ExtResource("15_r")]
 position = Vector2(840, 472)
 variety = "rage"
-spread_time = 40.0
+spread_time = 21.0
 
 [node name="FlightPatch" parent="Entities" instance=ExtResource("15_r")]
 position = Vector2(72, 330)
 variety = "flight"
-spread_time = 40.0
+spread_time = 21.0
 
 [node name="EggPatch" parent="Entities" instance=ExtResource("15_r")]
 position = Vector2(700, 88)
 variety = "egg"
-spread_time = 40.0
+spread_time = 21.0
 
 [node name="QueueChicken" parent="Entities" instance=ExtResource("16_r")]
 position = Vector2(780, 520)
