@@ -7,6 +7,12 @@
   with a feather (Gates), 4 pecked-open vent (Final Gate).
 - mural.png: 80x28 chicken wall paintings for a secret room's back wall,
   one frame per panel of the story (5), numbered with claw tallies.
+- tiles_freezer.png: the Cluck Shack's walk-in freezer (Food Court secret
+  room), laid out like tiles_arrivals.png: frosted diamond-plate floor,
+  insulated steel walls with icicles.
+- freezer_shelf.png: a 32x32 wire rack of iced-over frozen food, a floor prop.
+- freezer_decor.png: 16x16, one per frame: 0 a wall thermometer reading
+  freezing, 1 and 2 frost patches for the floor.
 - pilot_cap.png: 16x16, the hidden Pilot Cap mushroom patch, 3 frames
   like mushroom_patch.png (resting, spores, spores higher), with a
   propeller frill that turns.
@@ -25,11 +31,14 @@
 - stowaway_captain.png: the ending's stowaway window (laid out like
   stowaway.png) with the chicken wearing the captain's hat.
 """
+import random
+
 from PIL import Image
 
 import chicken
 import ending
 import items
+import tiles
 from mushrooms import PATCH, SPORES
 from palette import put, to_image
 from set_dressing import _blank, _outline, _rect, _strip, _text, _text_width
@@ -466,6 +475,207 @@ def mural(panel):
 
 def mural_sheet():
     return _strip([mural(p) for p in range(5)], MURAL_W, MURAL_H)
+
+
+# --- The walk-in freezer ------------------------------------------------------
+
+TILE = 16
+
+
+def _frost(g, density, seed, keys="CW"):
+    rnd = random.Random(seed)
+    for y in range(len(g)):
+        for x in range(len(g[0])):
+            if g[y][x] != "." and rnd.random() < density:
+                _px(g, x, y, rnd.choice(keys))
+
+
+def _diamond_plate(seed):
+    """Steel diamond-plate floor: raised dashes in a checker of 4px cells,
+    alternating direction by row, lightly frosted."""
+    g = ["w" * TILE for _ in range(TILE)]
+    for cy in range(0, TILE, 4):
+        for cx in range(0, TILE, 4):
+            if (cx // 4 + cy // 4) % 2:
+                continue
+            if cy // 4 % 2:
+                _px(g, cx + 1, cy + 2, "W"); _px(g, cx + 2, cy + 1, "W")
+            else:
+                _px(g, cx + 1, cy + 1, "W"); _px(g, cx + 2, cy + 2, "W")
+    _frost(g, 0.025, seed, "C")
+    return g
+
+
+def _freezer_wall_top():
+    return ["p" * TILE for _ in range(TILE)]
+
+
+def _freezer_wall_lip():
+    g = _freezer_wall_top()
+    g[13] = "W" * TILE
+    g[14] = "T" * TILE
+    g[15] = "O" * TILE
+    return g
+
+
+def _freezer_face_upper():
+    """Insulated white panels, frosted, with icicles hanging off the top."""
+    g = ["W" * 7 + "w" + "W" * 7 + "w" for _ in range(TILE)]
+    _frost(g, 0.18, 21, "C")
+    icicles = {1: 4, 4: 2, 6: 5, 10: 3, 13: 6}
+    for x in range(TILE):
+        _px(g, x, 0, "C")
+        _px(g, x, 1, "C")
+        for y in range(2, 2 + icicles.get(x, 0)):
+            _px(g, x, y, "C" if y < 1 + icicles[x] else "b")
+    return g
+
+
+def _freezer_face_lower():
+    """Riveted steel kick plate, rimed with frost, down to the baseboard."""
+    g = ["W" * 7 + "w" + "W" * 7 + "w" for _ in range(6)]
+    _frost(g, 0.12, 22, "C")
+    g += ["T" * TILE]
+    g += ["w" * TILE for _ in range(6)]
+    for x in (3, 11):
+        _px(g, x, 9, "W")
+        _px(g, x, 10, "T")
+    g += ["C" * TILE, "T" * TILE, "O" * TILE]
+    _px(g, 5, 13, "W"); _px(g, 12, 13, "W")
+    return g
+
+
+def _freezer_wall_edge(side):
+    g = _freezer_wall_top()
+    for i in range(TILE):
+        if side == "right":
+            _px(g, TILE - 2, i, "W"); _px(g, TILE - 1, i, "O")
+        elif side == "left":
+            _px(g, 1, i, "W"); _px(g, 0, i, "O")
+        elif side == "bottom":
+            _px(g, i, 1, "W"); _px(g, i, 0, "O")
+    return g
+
+
+def freezer_tiles():
+    """The Cluck Shack's walk-in freezer: laid out like tiles_arrivals.png,
+    with every floor the same frosted diamond plate (the room only uses one)
+    and steel-and-frost walls."""
+    plate_a, plate_b = _diamond_plate(31), _diamond_plate(32)
+    floors = [
+        ("carpet_a", plate_a), ("carpet_b", plate_b),
+        ("tile_a", plate_a), ("tile_b", plate_b),
+        ("wood_a", plate_a), ("wood_b", plate_b),
+        ("carpet_shadow", tiles.shadowed(plate_a)), ("tile_shadow", tiles.shadowed(plate_a)),
+        ("wood_shadow", tiles.shadowed(plate_a)),
+    ]
+    walls = [
+        ("wall_top", _freezer_wall_top()), ("wall_lip", _freezer_wall_lip()),
+        ("wall_face_upper", _freezer_face_upper()), ("wall_face_lower", _freezer_face_lower()),
+        ("wall_edge_right", _freezer_wall_edge("right")), ("wall_edge_left", _freezer_wall_edge("left")),
+        ("wall_edge_bottom", _freezer_wall_edge("bottom")),
+    ]
+    patterns = [
+        ("carpet_pattern_a", plate_a), ("carpet_pattern_b", plate_b),
+        ("carpet_pattern_shadow", tiles.shadowed(plate_a)),
+    ]
+    return floors + walls + patterns
+
+
+def freezer_tiles_sheet():
+    items = freezer_tiles()
+    cols = tiles.COLUMNS
+    rows = (len(items) + cols - 1) // cols
+    out = Image.new("RGBA", (cols * TILE, rows * TILE), (0, 0, 0, 0))
+    for i, (_, grid) in enumerate(items):
+        out.alpha_composite(to_image(grid), ((i % cols) * TILE, (i // cols) * TILE))
+    return out
+
+
+SHELF_W, SHELF_H = 32, 32
+
+
+def freezer_shelf():
+    """A wire rack of frozen food, iced over: boxes of nuggets, a bag of
+    peas, a tub of ice cream, icicles hanging off the shelves."""
+    g = _blank(SHELF_W, SHELF_H)
+    # Uprights and three wire shelves.
+    for x in (1, SHELF_W - 2):
+        _rect(g, x, 1, x, SHELF_H - 1, "w")
+    for y in (10, 20, 29):
+        _rect(g, 1, y, SHELF_W - 2, y, "W")
+        for x in range(2, SHELF_W - 2, 3):
+            _px(g, x, y + 1, "T")
+    # Top shelf: boxes of frozen nuggets (yellow with a red band).
+    for x in (3, 11, 19):
+        _rect(g, x, 3, x + 6, 9, "Y")
+        _rect(g, x, 5, x + 6, 6, "R")
+        _rect(g, x, 3, x + 6, 3, "F")
+    # Middle shelf: a green bag of peas and a stack of pink tubs.
+    _rect(g, 3, 13, 12, 19, "g")
+    _rect(g, 4, 12, 11, 12, "g")
+    _rect(g, 5, 15, 10, 16, "l")
+    for x in (15, 22):
+        _rect(g, x, 14, x + 5, 19, "h")
+        _rect(g, x, 14, x + 5, 14, "C")
+        _rect(g, x + 1, 16, x + 4, 17, "H")
+    # Bottom shelf: white boxes with a blue snowflake.
+    for x in (3, 13, 22):
+        _rect(g, x, 23, x + 7, 28, "C")
+        _px(g, x + 3, 25, "b"); _px(g, x + 4, 25, "b")
+        _px(g, x + 3, 26, "b"); _px(g, x + 4, 26, "b")
+        _px(g, x + 2, 24, "b"); _px(g, x + 5, 27, "b")
+    # Frost on everything, and icicles under each shelf.
+    _frost(g, 0.08, 41, "C")
+    for y in (10, 20):
+        for x in (4, 9, 17, 26):
+            _px(g, x, y + 1, "C")
+            _px(g, x, y + 2, "C")
+    return _outline(g)
+
+
+def freezer_shelf_sheet():
+    return to_image(freezer_shelf())
+
+
+DECOR = 16
+
+
+def freezer_decor(frame):
+    """Small freezer pieces, one per frame: 0 a wall thermometer with its
+    needle deep in the blue, 1 and 2 frost patches for the floor."""
+    g = _blank(DECOR, DECOR)
+    if frame == 0:
+        for y in range(DECOR):
+            for x in range(DECOR):
+                d = ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5
+                if d < 6.5:
+                    _px(g, x, y, "C")
+                elif d < 7.5:
+                    _px(g, x, y, "w")
+        # The cold half of the dial is blue; the needle points into it.
+        for y in range(3, 13):
+            for x in range(2, 8):
+                if g[y][x] == "C" and ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5 > 3.5:
+                    _px(g, x, y, "b")
+        for x, y in [(7, 7), (6, 6), (5, 6), (4, 5)]:
+            _px(g, x, y, "R")
+        _px(g, 8, 8, "O")
+        # Frost on the dial's rim.
+        for x, y in [(4, 1), (5, 1), (11, 2), (12, 3), (2, 11)]:
+            _px(g, x, y, "C")
+        return _outline(g)
+    rnd = random.Random(50 + frame)
+    for y in range(DECOR):
+        for x in range(DECOR):
+            d = ((x - 8) / 7.0) ** 2 + ((y - 9) / 4.5) ** 2
+            if d < 1.0 and rnd.random() < 1.2 - d:
+                _px(g, x, y, "C" if d < 0.5 or rnd.random() < 0.5 else "W")
+    return g
+
+
+def freezer_decor_sheet():
+    return _strip([freezer_decor(f) for f in range(3)], DECOR, DECOR)
 
 
 # --- The Pilot Cap -------------------------------------------------------------

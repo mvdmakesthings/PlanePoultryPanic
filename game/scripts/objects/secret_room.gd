@@ -23,6 +23,10 @@ const DARK := Color("181425")
 ## The floor's map character (see LevelBuilder): "." tile, "," carpet,
 ## "~" patterned carpet, "=" wood.
 @export var floor_char := "."
+## The room's own floor-and-wall sheet (laid out like tiles_arrivals.png),
+## for a room that shouldn't look like the level around it, such as the
+## Food Court's walk-in freezer. Empty uses the level's.
+@export var tiles_texture: Texture2D
 
 ## The door that leads here (set by the door).
 var door: SecretDoor
@@ -38,7 +42,10 @@ func _ready() -> void:
 	if level and not level.is_node_ready():
 		await level.ready
 	var layer := TileMapLayer.new()
-	layer.tile_set = LevelBuilder.build_tile_set(level.tiles_texture if level else LevelBuilder.TILES)
+	var texture := tiles_texture
+	if texture == null:
+		texture = level.tiles_texture if level else LevelBuilder.TILES
+	layer.tile_set = LevelBuilder.build_tile_set(texture)
 	LevelBuilder.paint_map(layer, rows)
 	add_child(layer)
 	move_child(layer, 0)

@@ -444,6 +444,12 @@ Made by `tools/sprites/easter_eggs.py` (see the Secrets section of the GDD). The
 
 **`mural.png`**: five 80x28 frames, the chickens' paintings on each secret room's back wall. Each panel is numbered with claw tallies (I to IIIII) so the story reads in order, and the figures are drawn like the game's own sprites (outlined white chickens with red combs, blue-tailed planes) so they read at a glance: two chickens behind a farm fence beside a barn, one dreaming of a plane in a thought bubble while a plane flies off; fuel drums leaking a glowing puddle by a country runway, teal mushrooms sprouting from it; one chicken pecking a teal mushroom, its eye glowing, waves of glow rolling out to a flock with glowing eyes; the control tower with a chicken in every window and the chickens' flag on top, chickens planting mushrooms in the airport carpet; a chicken in a captain's hat walking up the stairs to a parked plane's open door.
 
+**`tiles_freezer.png`**: the Cluck Shack's walk-in freezer (the Food Court's secret room), laid out exactly like `tiles_arrivals.png` so the room's text map works unchanged: every floor is frosted steel diamond plate, the walls are insulated white panels with frost and icicles over a riveted kick plate. The room uses it through its `tiles_texture` instead of the level's.
+
+**`freezer_shelf.png`**: one 32x32 wire rack of iced-over frozen food (nugget boxes, a bag of peas, ice-cream tubs, snowflake boxes), icicles under the shelves. A solid floor prop.
+
+**`freezer_decor.png`**: three 16x16 frames: 0 a wall thermometer with its needle deep in the blue, 1 and 2 frost patches for the floor.
+
 **`pilot_cap.png`**: three 16x16 frames of the hidden Pilot Cap patch, laid out like one row of `mushroom_patch.png` (resting, spores, spores higher): pale-yellow caps with white spots and a little white propeller frill on top that turns between frames.
 
 **`secret_stashes.png`**: 16x16, 2 columns (full, searched) and one row per kind: 0 a gray security bin with a red CONFISCATED band (searched: a rubber chicken, a tiny hat and an egg), 1 a straw nest heaped with stolen snack bags (searched: crumbs), 2 Amanda's own pink suitcase with a big white tag (searched: burst open).
