@@ -78,6 +78,10 @@ In Level 1, find the maintenance key and use it on the locked door to **SECURITY
 ```
 
 ```bash
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/mushroom_spread_smoke.tscn
+```
+
+```bash
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path game res://tests/level_05_smoke.tscn
 ```
 

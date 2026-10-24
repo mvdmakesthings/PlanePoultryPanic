@@ -124,6 +124,7 @@ Build each level fully before starting the next, so the game is always playable 
 - [x] Screen shake (with a Settings toggle), particles, hit flashes, squash and stretch, hit-stop, and HUD feedback
 - [x] Music transitions (crossfades, ducking under big cues) and a balanced sound mix
 - [x] Secrets and easter eggs (11 secrets, gags, the mushroom lore in the opening, and the captain ending; see the GDD's Secrets section)
+- [ ] Spreading mushrooms (sprouts Amanda can stomp, a cap per level; see the GDD's Spreading Mushrooms section). An approved exception to the M3 feature lock (2026-10-24): it adds pressure against dawdling using the existing patches, with no new item or enemy
 
 ## M7: Beta
 
