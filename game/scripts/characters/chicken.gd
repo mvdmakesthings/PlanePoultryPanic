@@ -3,7 +3,9 @@ extends CharacterBody2D
 ## A chicken: wanders and pecks until it spots the player, then chases and
 ## alerts nearby chickens. It sees in a cone the way it faces, and glimpsing
 ## the player makes it suspicious ("?") before it spots her ("!"); noises
-## make it turn and go look. Thrown snacks beat everything else: a chicken
+## make it turn and go look. Chickens that reach a snack together squabble
+## over it, a chasing chicken can trip when the player jukes past it, and one
+## that loses her looks around (or, in a rage, throws a tantrum). Thrown snacks beat everything else: a chicken
 ## drops what it's doing to go eat one. Chickens also seek out mushroom
 ## patches, and eating one powers them up for a while:
 ##   flight: hops over furniture and walls of chickens while chasing
@@ -13,7 +15,7 @@ extends CharacterBody2D
 ## Emitted just before a defeated chicken is removed.
 signal defeated
 
-enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL, BESIEGE, SEEK_ROOST, ROOSTING, FLUNG, SUSPICIOUS }
+enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL, BESIEGE, SEEK_ROOST, ROOSTING, FLUNG, SUSPICIOUS, SQUABBLE, TANTRUM }
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
@@ -36,6 +38,12 @@ const POWER_WARNING_TIME := 3.0
 ## "!" once it has spotted the player, "?" while it's suspicious.
 const ALERT_COLOR := Color(0.894, 0.231, 0.267)
 const SUSPICIOUS_COLOR := Color(0.996, 0.906, 0.380)
+## Squabbling and tantrums: a little cartoon swearing.
+const GRAWLIX := "#@!"
+## How often a chasing chicken checks whether the player juked past it.
+const JUKE_SAMPLE_TIME := 0.2
+## A chicken that trips this close to the player makes her laugh.
+const TRIP_LAUGH_RANGE := 48.0
 const CARDINALS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
 
 @export_group("Normal")
@@ -84,6 +92,21 @@ const CARDINALS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vecto
 @export var look_turn_time := 0.5
 ## Longest it spends walking over to a noise it heard.
 @export var noise_walk_time := 4.0
+
+@export_group("Personality")
+## Chickens reaching the same snack within this distance squabble over it
+## for squabble_time, then one wins and eats it.
+@export var squabble_reach := 16.0
+@export var squabble_time := 1.5
+## A chasing chicken whose way to the player swings this far (degrees)
+## within JUKE_SAMPLE_TIME may trip and lie on its side for trip_time.
+@export var trip_turn_angle := 120.0
+@export var trip_chance := 0.33
+@export var rage_trip_chance := 0.5
+@export var trip_time := 0.7
+@export var trip_cooldown := 2.0
+## A rage chicken that loses the player stomps in place this long.
+@export var tantrum_time := 1.2
 
 @export_group("Mushrooms")
 @export var mushroom_notice_range := 112.0
@@ -163,6 +186,12 @@ var _noise_spot := Vector2.ZERO
 var _heading_to_noise := false
 var _look_left := 0.0
 var _turn_in := 0.0
+var _squabble_leader := false
+var _squabble_rivals: Array[Chicken] = []
+var _juke_dir := Vector2.ZERO
+var _juke_sample_in := 0.0
+var _trip_ready_in := 0.0
+var _tripped := false
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
@@ -204,6 +233,7 @@ func _physics_process(delta: float) -> void:
 	_uninterested_left -= delta
 	_egg_ready_in -= delta
 	_hop_ready_in -= delta
+	_trip_ready_in -= delta
 	_update_power(delta)
 
 	if _is_hopping():
@@ -234,6 +264,10 @@ func _physics_process(delta: float) -> void:
 				_flung()
 			State.SUSPICIOUS:
 				_suspicious(delta)
+			State.SQUABBLE:
+				_squabble()
+			State.TANTRUM:
+				_tantrum()
 		if state != State.FLUNG:
 			velocity += Carousel.push_for(get_tree(), global_position)
 		# Chickens heading into a roost pass through each other: they're
@@ -294,6 +328,11 @@ func hear(at: Vector2) -> void:
 ## True while it's suspicious: it glimpsed the player or heard something.
 func is_suspicious() -> bool:
 	return state == State.SUSPICIOUS
+
+
+## True while lying on its side after tripping.
+func is_tripped() -> bool:
+	return state == State.RECOIL and _tripped
 
 
 ## Knocked silly (for example, tumbling off a toppled totem): no moving or
@@ -416,10 +455,15 @@ func _pursue(delta: float) -> void:
 	else:
 		_lost_sight_time += delta
 		var patience := rage_give_up_time if power == "rage" else give_up_time
-		if _lost_sight_time >= patience or _player.is_dead:
+		if _player.is_dead:
 			state = State.WANDER
 			_pick_wander()
 			return
+		if _lost_sight_time >= patience:
+			_lose_player()
+			return
+	if _check_juke(delta):
+		return
 
 	var distance := global_position.distance_to(_player.global_position)
 	match power:
@@ -449,6 +493,8 @@ func _investigate() -> void:
 		return
 	if global_position.distance_to(_target_snack.global_position) < 4.0:
 		velocity = Vector2.ZERO
+		if _try_squabble():
+			return
 		if _target_snack.consume():
 			state = State.EATING
 			_timer = eat_time
@@ -524,6 +570,142 @@ func _suspicious(delta: float) -> void:
 	if _suspicion <= 0.0 and _look_left <= 0.0:
 		state = State.WANDER
 		_pick_wander()
+
+
+## Reached a snack another chicken is about to reach too (or is already
+## squabbling over): squabble instead of eating. The first one there leads
+## the squabble and settles it.
+func _try_squabble() -> bool:
+	var rivals: Array[Chicken] = []
+	for node in get_tree().get_nodes_in_group("chickens"):
+		var other := node as Chicken
+		if other == self or other._target_snack != _target_snack:
+			continue
+		if other.state == State.SQUABBLE and other._squabble_leader:
+			# Join a squabble already going on.
+			other._squabble_rivals.append(self)
+			_enter_squabble(false, other._timer + 0.5)
+			return true
+		if other.state == State.INVESTIGATE \
+				and other.global_position.distance_to(_target_snack.global_position) < squabble_reach:
+			rivals.append(other)
+	if rivals.is_empty():
+		return false
+	_squabble_rivals = rivals
+	_enter_squabble(true, squabble_time)
+	for rival in rivals:
+		# Rivals wait a little longer, so the leader always settles it first.
+		rival._enter_squabble(false, squabble_time + 0.5)
+	AudioManager.play("cluck", global_position)
+	return true
+
+
+func _enter_squabble(leader: bool, seconds: float) -> void:
+	state = State.SQUABBLE
+	_squabble_leader = leader
+	_timer = seconds
+	velocity = Vector2.ZERO
+	if not leader:
+		_squabble_rivals.clear()
+
+
+## Flapping, shaking and feathers until the leader picks a winner. If the
+## snack goes (the player grabbed it back), everyone gives up.
+func _squabble() -> void:
+	velocity = Vector2.ZERO
+	if not is_instance_valid(_target_snack):
+		_squabble_leader = false
+		state = State.WANDER
+		_pick_wander()
+		return
+	if randf() < get_physics_process_delta_time() * 3.0:
+		ParticleBurst.spawn(get_parent(), "feather", global_position, Vector2.ZERO, 1)
+	_facing = Vector2.LEFT if int(_timer * 7.0) % 2 == 0 else Vector2.RIGHT
+	if _timer > 0.0:
+		return
+	if not _squabble_leader:
+		# The leader is gone: nobody won.
+		state = State.WANDER
+		_pick_wander()
+		return
+	var contenders: Array[Chicken] = [self]
+	for rival in _squabble_rivals:
+		if is_instance_valid(rival) and rival.state == State.SQUABBLE and rival._target_snack == _target_snack:
+			contenders.append(rival)
+	_squabble_leader = false
+	_squabble_rivals.clear()
+	var winner: Chicken = contenders.pick_random()
+	var snack := _target_snack
+	for chicken in contenders:
+		if chicken == winner and snack.consume():
+			chicken.state = State.EATING
+			chicken._timer = eat_time
+		else:
+			chicken.state = State.WANDER
+			chicken._pick_wander()
+
+
+## Lost sight of the player for long enough: look around for her, or in a
+## rage, throw a tantrum.
+func _lose_player() -> void:
+	if power == "rage":
+		state = State.TANTRUM
+		_timer = tantrum_time
+		return
+	state = State.SUSPICIOUS
+	_suspicion = 0.0
+	_heading_to_noise = false
+	_look_left = look_around_time
+	# A double take: turn the head right away.
+	_turn_in = 0.0
+
+
+## Stomping in place, kicking up dust, seeing nothing.
+func _tantrum() -> void:
+	velocity = Vector2.ZERO
+	var step := get_physics_process_delta_time()
+	if int(_timer * 5.0) != int((_timer + step) * 5.0):
+		Juice.squash(_sprite, Vector2(1.25, 0.8), 0.1)
+		ParticleBurst.spawn(get_parent(), "dust", global_position + Vector2(0, 3), Vector2.ZERO, 2)
+	if _timer <= 0.0:
+		state = State.WANDER
+		_pick_wander()
+
+
+## While chasing, every JUKE_SAMPLE_TIME: if the way to the player swung
+## around (she dodged past), maybe trip. Egg shooters back off on purpose,
+## so they never trip.
+func _check_juke(delta: float) -> bool:
+	_juke_sample_in -= delta
+	if _juke_sample_in > 0.0:
+		return false
+	_juke_sample_in = JUKE_SAMPLE_TIME
+	var dir := global_position.direction_to(_player.global_position)
+	var previous := _juke_dir
+	_juke_dir = dir
+	if previous == Vector2.ZERO or power == "egg" or _trip_ready_in > 0.0:
+		return false
+	if absf(rad_to_deg(previous.angle_to(dir))) < trip_turn_angle:
+		return false
+	_trip_ready_in = trip_cooldown
+	if randf() >= (rage_trip_chance if power == "rage" else trip_chance):
+		return false
+	_trip()
+	return true
+
+
+## Over its own feet: flat on its side for a moment, sliding a little.
+func _trip() -> void:
+	state = State.RECOIL
+	_timer = trip_time
+	_tripped = true
+	_recoil_velocity = velocity * 0.5
+	_juke_dir = Vector2.ZERO
+	Juice.squash(_sprite, Vector2(1.3, 0.7), 0.15)
+	ParticleBurst.spawn(get_parent(), "dust", global_position, Vector2.ZERO, 4)
+	AudioManager.play("flap", global_position)
+	if global_position.distance_to(_player.global_position) <= TRIP_LAUGH_RANGE:
+		_player.say("Ha!")
 
 
 func _frozen() -> void:
@@ -877,6 +1059,7 @@ func _start_pursuit(alert_others: bool) -> void:
 	state = State.PURSUE
 	_lost_sight_time = 0.0
 	_suspicion = 0.0
+	_juke_dir = Vector2.ZERO
 	if not alert_others:
 		return
 	# Spotted her: a startled hop and a cluck.
@@ -889,7 +1072,8 @@ func _start_pursuit(alert_others: bool) -> void:
 
 
 func _check_hit() -> void:
-	if state in [State.EATING, State.FEEDING, State.FROZEN, State.RECOIL, State.FLUNG] or _is_hopping():
+	if state in [State.EATING, State.FEEDING, State.FROZEN, State.RECOIL, State.FLUNG, State.SQUABBLE,
+			State.TANTRUM] or _is_hopping():
 		return
 	for body in _hitbox.get_overlapping_bodies():
 		if body is Player and (body as Player).take_damage(Player.PECK, global_position):
@@ -917,14 +1101,14 @@ func _update_visuals() -> void:
 		animation = power + "_walk_" + direction
 	elif state in [State.EATING, State.FEEDING]:
 		animation = "eat_down"
-	elif state == State.PURSUE and moving:
-		# Flapping and squawking after the player.
+	elif (state == State.PURSUE and moving) or state == State.SQUABBLE:
+		# Flapping and squawking after the player, or at a rival.
 		animation = "chase_" + direction
 	else:
 		animation = ("walk_" if moving else "idle_") + direction
 	if _sprite.animation != animation:
 		_sprite.play(animation)
-	if show_power and not moving and state != State.FROZEN:
+	if show_power and not moving and state not in [State.FROZEN, State.TANTRUM]:
 		# Powered sheets only have walk cycles; stand on the passing frame.
 		_sprite.pause()
 		_sprite.frame = 1
@@ -942,6 +1126,15 @@ func _update_visuals() -> void:
 		var t := clampf(_hop_elapsed / hop_duration, 0.0, 1.0)
 		_sprite.position.y = -roundf(sin(t * PI) * hop_height) if t < 1.0 else -hop_height
 	_update_alert_label()
+	if state != State.RECOIL:
+		_tripped = false
+	if _tripped:
+		# Lying on its side.
+		_sprite.rotation = PI / 2.0 if _facing.x < 0.0 else -PI / 2.0
+	elif state != State.FLUNG:
+		_sprite.rotation = 0.0
+	# Squabbling chickens shake.
+	_sprite.position.x = float(randi() % 3 - 1) if state == State.SQUABBLE else 0.0
 	if state == State.ROOSTING and is_instance_valid(_roost) and _roost.is_forming():
 		# Hop in place while the stack goes up.
 		_sprite.position.y = -roundf(absf(sin(Time.get_ticks_msec() / 90.0)) * 3.0)
@@ -957,10 +1150,16 @@ func _update_visuals() -> void:
 
 
 ## "!" while chasing; "?" while suspicious, blinking once she's out of view
-## and it's cooling off.
+## and it's cooling off; "#@!" while squabbling or in a tantrum.
 func _update_alert_label() -> void:
+	_alert_label.position.x = -2.0
 	if state in [State.PURSUE, State.WINDUP]:
 		_alert_label.text = "!"
+		_alert_label.add_theme_color_override("font_color", ALERT_COLOR)
+		_alert_label.visible = true
+	elif state in [State.SQUABBLE, State.TANTRUM]:
+		_alert_label.text = GRAWLIX
+		_alert_label.position.x = -7.0
 		_alert_label.add_theme_color_override("font_color", ALERT_COLOR)
 		_alert_label.visible = true
 	elif state == State.SUSPICIOUS:

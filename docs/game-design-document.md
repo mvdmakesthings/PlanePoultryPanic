@@ -196,6 +196,13 @@ Sneaking is a skill: chickens can be crept up on, and a careful player can slip 
 - **Powers**: Rage chickens go from "?" to "!" more than twice as fast. Egg shooters see as far as they shoot, inside the same cone.
 - Settled roost chickens, besieging chickens, and chickens eating or chasing ignore noise.
 
+### Personality
+Chickens act like chickens. Every quirk is a joke and also a small opening for a player who's paying attention:
+
+- **Snack squabbles**: When two or more chickens reach the same snack within about a tile of each other, they squabble over it for 1.5 seconds: they shake, feathers fly, and a "#@!" pops up over them. Then one of them wins and eats it, and the rest stomp off. A squabble buys extra time, and Amanda can even grab the snack back while they argue. A chicken that arrives during a squabble joins in.
+- **Tripping on a juke**: A chasing chicken that has to turn around fast (the way to Amanda swings by 120 degrees or more at once, because she dodged past it) has a 1-in-3 chance to trip over its own feet, a 1-in-2 chance if it's in a rage. It lands on its side in a puff of dust for 0.7 seconds. Flight chickens in the air don't trip, and a chicken can't trip again for 2 seconds.
+- **Losing her**: When a chase ends because the chicken lost sight of Amanda, it doesn't just go back to wandering: it stops and looks around with a blinking "?", and can spot her again if she's in front of it. A rage chicken throws a tantrum instead: it stomps in place for 1.2 seconds with a "#@!", kicking up dust and seeing nothing, then wanders off.
+
 ### Powered-Up Chickens
 Chickens that eat from a mushroom patch power up for 30-60 seconds, then return to normal. Each patch grows one kind of mushroom, and the kind decides the mode. A powered chicken wears a cap of the mushroom it ate, so the player can read its mode at a glance and can see which power a patch gives before going near it:
 
@@ -215,7 +222,7 @@ Chickens head for mushroom patches when they can. Watching a patch and timing a 
 - **Toppling**: Freeze its base with the extinguisher, ram it with a luggage cart, or lure it onto the carousel belt. It falls away from the hit, flattening any chicken where its members land; its own chickens land dazed along the fall line. Three snacks lying beside it break it apart instead, with no defeats. The roost then rests for 20 seconds.
 
 ### AI States
-Wander → Patrol → Suspicious (glimpsed the player, or heard a noise) → Investigate (snack) → Pursue → Powered → Forming (totem)
+Wander → Patrol → Suspicious (glimpsed the player, heard a noise, or lost her) → Investigate (snack) → Squabble (over a shared snack) → Pursue → Tripped or Tantrum → Powered → Forming (totem)
 
 Behavior priority, highest first:
 1. Already eating or forming a totem: keep doing it
@@ -626,4 +633,5 @@ game/
 | 2026-10-24 | Noise turns chickens' heads: running footsteps, metal-detector beeps, shutter slams and landing suitcases; walking is silent | You (Proposed details) |
 | 2026-10-24 | Chickens notice the player more aggressively: 5-tile sight in a 150-degree cone, three quarters as far while pecking, instant notice within about 1.75 tiles, "?" to "!" in about a third of a second, slower cool-off, and neighbors alerted within 4 tiles | You (Proposed details) |
 | 2026-10-24 | The PS1-style 3D restyle is dropped; the game stays 2D | You |
+| 2026-10-24 | Chicken personality: squabbles over shared snacks, tripping when juked, looking around (or a rage tantrum) after losing Amanda | You (Proposed details) |
 | 2026-10-24 | Amanda reacts out loud to big moments (a crowd chasing her, escaping, a totem forming, hiding, a chicken tripping), at most one line every 5 seconds | You (Proposed details) |

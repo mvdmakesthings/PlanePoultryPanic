@@ -105,6 +105,7 @@ func _ready() -> void:
 
 	room.queue_free()
 	await _senses_tests()
+	await _personality_tests()
 	await _reaction_tests()
 	await _power_tests()
 	await _carousel_tests()
@@ -207,6 +208,81 @@ func _senses_tests() -> void:
 		setup[0].queue_free()
 
 
+## Squabbles, tripping on a juke, losing the player, and tantrums.
+func _personality_tests() -> void:
+	# Two chickens reaching the same snack squabble, then one eats it.
+	var setup := await _squabble_room()
+	var chickens: Array = setup[1]
+	var snack: ThrownSnack = setup[2]
+	await _wait(0.6)
+	_check(chickens.all(func(c: Chicken) -> bool: return c.state == Chicken.State.SQUABBLE),
+		"two chickens reaching the same snack squabble over it")
+	_check(chickens[0]._alert_label.text == Chicken.GRAWLIX, "squabbling chickens swear")
+	await _wait(1.8)
+	var eating := chickens.filter(func(c: Chicken) -> bool: return c.state == Chicken.State.EATING)
+	_check(eating.size() == 1 and not is_instance_valid(snack), "one chicken wins the squabble and eats")
+	setup[0].queue_free()
+
+	# Grabbing the snack back mid-squabble ends it.
+	setup = await _squabble_room()
+	chickens = setup[1]
+	snack = setup[2]
+	var player: Player = setup[3]
+	await _wait(0.6)
+	var snacks_before := player.snacks
+	player.global_position = snack.global_position
+	await _wait(0.2)
+	_check(player.snacks == snacks_before + 1, "the player can grab the snack back mid-squabble")
+	_check(chickens.all(func(c: Chicken) -> bool: return c.state != Chicken.State.SQUABBLE),
+		"the squabble ends when the snack is gone")
+	setup[0].queue_free()
+
+	# Dodging past a chasing chicken can trip it.
+	setup = await _fresh_room(Vector2(200, 260), Vector2(240, 260))
+	var chicken: Chicken = setup[1]
+	player = setup[2]
+	chicken.trip_chance = 1.0
+	await _wait(0.3)
+	player.global_position = chicken.global_position + Vector2(-30, 0)
+	await _wait(0.25)
+	_check(chicken.is_tripped() and chicken._sprite.rotation != 0.0, "a juked chicken trips onto its side")
+	_check(_said(player, "Ha!"), "Amanda laughs at a chicken tripping nearby")
+	await _wait(0.8)
+	_check(not chicken.is_tripped() and chicken._sprite.rotation == 0.0, "a tripped chicken gets back up")
+	setup[0].queue_free()
+
+	# A chicken that loses her looks around; a rage chicken throws a tantrum.
+	setup = await _fresh_room(Vector2(200, 260), Vector2(240, 260))
+	chicken = setup[1]
+	player = setup[2]
+	# Held in place, so it can't close in and spot her again first, and
+	# sure-footed: her moving away counts as a juke.
+	chicken.pursue_speed = 0.0
+	chicken.trip_chance = 0.0
+	await get_tree().physics_frame
+	player.global_position = Vector2(40, 296)
+	await _wait(chicken.give_up_time + 0.3)
+	_check(chicken.is_suspicious(), "a chicken that loses the player looks around for her")
+	setup[0].queue_free()
+
+	setup = await _fresh_room(Vector2(200, 260), Vector2(240, 260))
+	chicken = setup[1]
+	player = setup[2]
+	chicken.power_up("rage")
+	# Held in place and sure-footed, as above.
+	chicken.rage_speed = 0.0
+	chicken.rage_trip_chance = 0.0
+	await get_tree().physics_frame
+	player.global_position = Vector2(40, 296)
+	await _wait(chicken.rage_give_up_time + 0.3)
+	_check(chicken.state == Chicken.State.TANTRUM and chicken._alert_label.text == Chicken.GRAWLIX,
+		"a rage chicken that loses the player throws a tantrum")
+	await _wait(chicken.tantrum_time)
+	_check(chicken.state != Chicken.State.TANTRUM, "a tantrum blows over")
+	setup[0].queue_free()
+
+
+
 ## Amanda's reactions are rate-limited, and react to a crowd chasing her.
 func _reaction_tests() -> void:
 	var setup := await _fresh_room(Vector2(200, 260), Vector2(40, 296))
@@ -234,6 +310,25 @@ func _reaction_tests() -> void:
 	await _wait(0.3)
 	_check(_said(player, "Phew!"), "shaking off a crowd makes her say Phew!")
 	setup[0].queue_free()
+
+
+## A fresh room with two chickens either side of a snack, and the player far
+## out of sight. Returns [room, chickens, snack, player].
+func _squabble_room() -> Array:
+	var setup := await _fresh_room(Vector2(180, 260), Vector2(40, 296))
+	var room: Node = setup[0]
+	var first: Chicken = setup[1]
+	var second: Chicken = preload("res://scenes/characters/chicken.tscn").instantiate()
+	second.position = Vector2(220, 260)
+	room.get_node("Entities").add_child(second)
+	var snack: ThrownSnack = preload("res://scenes/objects/thrown_snack.tscn").instantiate()
+	snack.direction = Vector2.ZERO
+	snack.position = Vector2(200, 260)
+	room.get_node("Entities").add_child(snack)
+	await get_tree().physics_frame
+	for chicken: Chicken in [first, second]:
+		chicken.state = Chicken.State.WANDER
+	return [room, [first, second], snack, setup[2]]
 
 
 ## True if a reaction with this text is floating over the player.
