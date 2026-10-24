@@ -1,7 +1,7 @@
 """Item pickups and HUD icons."""
 from PIL import Image
 
-from palette import to_image
+from palette import PALETTE, to_image
 
 # A bag of chips: 10x12. Wide silver crimped seals pinch in to a puffy red
 # bag with a yellow brand stripe, a shine on the left, and a chip on the front.
@@ -189,28 +189,45 @@ def cabinet():
 
 # Ice block drawn over a frozen chicken: 16x16, outline and highlights only,
 # so the chicken shows through the middle.
-ICE = [
-    "................",
-    "................",
-    "..qqqqqqqqqqqq..",
-    "..qCC.......Cq..",
-    "..qC.........q..",
-    "..q..........q..",
-    "..q..........q..",
-    "..q.........Cq..",
-    "..q..........q..",
-    "..q..........q..",
-    "..qC.........q..",
-    "..q..........q..",
-    "..q.........Cq..",
-    "..q........CCq..",
-    "..qqqqqqqqqqqq..",
-    "................",
-]
+ICE_SIZE = (18, 20)
 
 
 def ice():
-    return to_image(ICE)
+    """A see-through block of ice drawn over a frozen chicken, a pixel wider
+    than the chicken's frame on each side and two taller, so the whole bird
+    sits inside: a pale top face, a cyan front face the chicken shows
+    through, shine streaks, a hard blue rim and frost along the base. Its
+    solid shape is the cue, so freezing reads without relying on color."""
+    def rgba(key, alpha):
+        hexcode = PALETTE[key]
+        return tuple(int(hexcode[i:i + 2], 16) for i in (0, 2, 4)) + (alpha,)
+
+    w, h = ICE_SIZE
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    face = 3  # the ledge between the top face and the front face
+    for y in range(h):
+        for x in range(w):
+            if x in (0, w - 1) and y in (0, h - 1):
+                continue
+            if x in (0, w - 1) or y in (0, h - 1):
+                img.putpixel((x, y), rgba("b", 235))
+            elif y < face:
+                img.putpixel((x, y), rgba("C", 110))
+            elif y == face:
+                img.putpixel((x, y), rgba("C", 150))
+            else:
+                img.putpixel((x, y), rgba("q", 45))
+    # Shine: two diagonal streaks across the front face, and glints.
+    for x, y in [(2, 14), (3, 13), (4, 12), (5, 11), (2, 10), (3, 9), (4, 8)]:
+        img.putpixel((x, y), rgba("C", 170))
+    for x, y in [(15, 5), (15, 6), (2, 1), (3, 1)]:
+        img.putpixel((x, y), rgba("C", 230))
+    # Frost crusted along the base.
+    for x in range(1, w - 1):
+        img.putpixel((x, h - 2), rgba("C", 220 if x % 3 else 150))
+    for x in (4, 9, 13):
+        img.putpixel((x, h - 3), rgba("C", 170))
+    return img
 
 
 # Rolling suitcase: two 14x16 frames, closed then burst open. A green hard

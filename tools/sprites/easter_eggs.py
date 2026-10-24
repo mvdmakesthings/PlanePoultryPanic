@@ -5,8 +5,14 @@
   poking out (Arrivals), 1 staff door with a crooked sign (Security),
   2 frosted freezer panel (Food Court), 3 emergency exit propped open
   with a feather (Gates), 4 pecked-open vent (Final Gate).
-- mural.png: 48x24 chicken cave paintings for a secret room's back wall,
-  one frame per panel of the story (5).
+- mural.png: 80x28 chicken wall paintings for a secret room's back wall,
+  one frame per panel of the story (5), numbered with claw tallies.
+- tiles_freezer.png: the Cluck Shack's walk-in freezer (Food Court secret
+  room), laid out like tiles_arrivals.png: frosted diamond-plate floor,
+  insulated steel walls with icicles.
+- freezer_shelf.png: a 32x32 wire rack of iced-over frozen food, a floor prop.
+- freezer_decor.png: 16x16, one per frame: 0 a wall thermometer reading
+  freezing, 1 and 2 frost patches for the floor.
 - pilot_cap.png: 16x16, the hidden Pilot Cap mushroom patch, 3 frames
   like mushroom_patch.png (resting, spores, spores higher), with a
   propeller frill that turns.
@@ -25,11 +31,14 @@
 - stowaway_captain.png: the ending's stowaway window (laid out like
   stowaway.png) with the chicken wearing the captain's hat.
 """
+import random
+
 from PIL import Image
 
 import chicken
 import ending
 import items
+import tiles
 from mushrooms import PATCH, SPORES
 from palette import put, to_image
 from set_dressing import _blank, _outline, _rect, _strip, _text, _text_width
@@ -160,107 +169,513 @@ def doors_sheet():
 
 # --- The mural ---------------------------------------------------------------
 
-MURAL_W, MURAL_H = 48, 24
-# Crude stamps for the chickens' cave paintings ("#" is the paint color).
-GLYPHS = {
-    "chicken": [".#..", "###.", ".###", ".##.", ".#.#"],
-    "plane": ["#.......", "##..#...", "########", "....#...", "...#...."],
-    "mushroom": [".###.", "#####", "..#..", "..#.."],
-    "drum": ["###", "#.#", "###", "#.#", "###"],
-    "tower": [".###.", "#####", "..#..", "..#..", "..#..", ".###."],
-    "fence": ["#.#.#.#", "#######", "#.#.#.#"],
-    "hat": [".###.", "#####"],
-    "eye": ["#"],
-    "door": ["###", "#.#", "#.#", "#.#"],
+MURAL_W, MURAL_H = 80, 28
+# Figures for the chickens' wall paintings, in palette keys ("." is bare
+# wall). They're drawn like the game's own sprites, chunky and outlined,
+# so each panel reads at a glance. All face right; flip for left.
+FIGURES = {
+    "chicken": [
+        ".....R....",
+        "....RRR...",
+        "....CCCC..",
+        "....CvCCY.",
+        "C...CCCCYY",
+        "CC..CCCR..",
+        "CCCCCCCC..",
+        "CCCCCCCc..",
+        ".cCCCCcc..",
+        "..cccc....",
+        "...Y.Y....",
+        "..YY.YY...",
+    ],
+    # A chicken pecking at the ground, head down.
+    "pecking": [
+        "C.........",
+        "CC........",
+        "CCCCCC....",
+        "CCCCCCCC..",
+        ".cCCCCCCC.",
+        "..ccCCCvCR",
+        "...Y.CCCCR",
+        "..YY..RYY.",
+    ],
+    "chick": [
+        "...R..",
+        "..CvY.",
+        "C.CCY.",
+        "CCCC..",
+        ".cCc..",
+        "..Y...",
+    ],
+    "plane": [
+        "BB......................",
+        "BBB.....................",
+        "BBBB....................",
+        ".BBWWWWWWWWWWWWWWWWWW...",
+        ".WWWbWbWbWbWbWbWbWbWWWW.",
+        "..WWWWWWWWWWWWWWWWWWWbbW",
+        "...wwwwwwwwwwwwwwwwwwww.",
+        "........TTTTT...........",
+        "......TTTTT.............",
+    ],
+    "mini_plane": [
+        "B......",
+        "BTTTTT.",
+        ".TTTTTB",
+        "..BB...",
+    ],
+    "barn": [
+        "...RRRR...",
+        "..RRRRRR..",
+        ".RRRCCRRR.",
+        "RRRRRRRRRR",
+        ".CCCCCCCC.",
+        ".CRrRRrRC.",
+        ".CrRRRRrC.",
+        ".CRrRRrRC.",
+        ".CrRRRRrC.",
+    ],
+    "fence": [
+        "n.n.n.n.n",
+        "nnnnnnnnn",
+        "n.n.n.n.n",
+        "nnnnnnnnn",
+        "n.n.n.n.n",
+    ],
+    "drum": [
+        "rRRRr",
+        "RRYRR",
+        "rrrrr",
+        "RRRRR",
+        "rrrrr",
+        "RRRRR",
+        "rRRRr",
+    ],
+    "drum_tipped": [
+        "rRrRrRr",
+        "RRrRrYR",
+        "RRrRrRR",
+        "rRrRrRr",
+    ],
+    "mushroom": [
+        ".qqqq.",
+        "qqCqqq",
+        "qqqqCq",
+        "..CC..",
+        "..CC..",
+    ],
+    "red_mushroom": [
+        ".RRRR.",
+        "RCRRCR",
+        "..CC..",
+        "..CC..",
+    ],
+    "purple_mushroom": [
+        ".HHHH.",
+        "HHhHHH",
+        "..CC..",
+        "..CC..",
+    ],
+    "tower": [
+        "..TTTTTT..",
+        ".kkkkkkkk.",
+        "kbbkbbkbbk",
+        "kbbkbbkbbk",
+        "TTTTTTTTTT",
+        "..wWWWWw..",
+        "...wWWw...",
+        "...wWWw...",
+        "...wWWw...",
+        "...wWWw...",
+        "...wWWw...",
+        "...wWWw...",
+        "...wWWw...",
+        "..wwWWww..",
+    ],
+    "flag": [
+        "Rrrr",
+        "RCCr",
+        "Rrrr",
+        "n...",
+        "n...",
+        "n...",
+    ],
+    "captain_hat": [
+        "..kkkk..",
+        ".kkYYkk.",
+        "kkkkkkkk",
+        "...NNNNN",
+    ],
+    # A parked plane facing left, its cabin door open behind the nose.
+    "plane_door": [
+        "........................BBB.",
+        ".......................BBBB.",
+        "......................BBBBB.",
+        "...WWWWWWWWWWWWWWWWWWWWWWBB.",
+        ".WWWWWOOOOWbWbWbWbWbWbWbWWW.",
+        "WbbWWWOkkOWWWWWWWWWWWWWWWWW.",
+        "WWWWWWOkkOWWWWWWWWWWWWWWWW..",
+        ".wwwwwOkkOwwwwwwwwwwwwwwww..",
+        "..wwwwOOOOwwwwwwwwwwwww.....",
+        ".............TTTTTT.........",
+        "...............TTTTTT.......",
+    ],
+    "stairs": [
+        "......ww",
+        ".....wW.",
+        "....wW..",
+        "...wW...",
+        "..wW....",
+        ".wW.....",
+        "wW......",
+    ],
 }
 
 
-def _stamp(g, name, x, y, key, flip=False):
-    for dy, row in enumerate(GLYPHS[name]):
+def _figure(g, name, x, y, flip=False, swap=None):
+    """Paint a figure onto g (no outline; see _figures)."""
+    for dy, row in enumerate(FIGURES[name]):
         if flip:
             row = row[::-1]
-        for dx, bit in enumerate(row):
-            if bit == "#":
-                put(g, y + dy, x + dx, key)
+        for dx, key in enumerate(row):
+            if key != "." and 0 <= y + dy < len(g) and 0 <= x + dx < len(g[0]):
+                put(g, y + dy, x + dx, (swap or {}).get(key, key))
+
+
+def _layer(g, figures):
+    """Paint figures on their own layer, outline them, and lay it over g.
+    Each figure is (name, x, y), optionally followed by flip and a dict of
+    key swaps."""
+    top = _blank(MURAL_W, MURAL_H)
+    for name, x, y, *rest in figures:
+        flip = rest[0] if rest else False
+        swap = rest[1] if len(rest) > 1 else None
+        _figure(top, name, x, y, flip, swap)
+    top = _outline(top)
+    for y, row in enumerate(top):
+        for x, key in enumerate(row):
+            if key != ".":
+                put(g, y, x, key)
 
 
 def mural(panel):
     g = _blank(MURAL_W, MURAL_H)
-    # A rough patch of paint on the wall, edges uneven.
+    # A rough patch of whitewash on the wall, edges uneven, with a dark
+    # border of smeared paint so it stands out from the wall behind.
+    _rect(g, 0, 0, MURAL_W - 1, MURAL_H - 1, "v")
     _rect(g, 1, 1, MURAL_W - 2, MURAL_H - 2, "c")
-    for x in range(1, MURAL_W - 3, 5):
-        _px(g, x, 1, ".")
-        _px(g, x + 2, MURAL_H - 2, ".")
-    for y in (4, 11, 17):
-        _px(g, 1, y, ".")
-        _px(g, MURAL_W - 2, y + 2, ".")
-    for x, y in [(6, 4), (30, 18), (41, 6), (17, 15)]:
-        _px(g, x, y, "a")
+    for x in range(2, MURAL_W - 2, 6):
+        _px(g, x, 0, ".")
+        _px(g, x + 3, MURAL_H - 1, ".")
+    for y in (5, 13, 20):
+        _px(g, 0, y, ".")
+        _px(g, MURAL_W - 1, y + 2, ".")
+    # Each panel is numbered in the corner, scratched in with a claw,
+    # so the story can be read in order.
+    for i in range(panel + 1):
+        _rect(g, 3 + i * 2, 2, 3 + i * 2, 4, "e")
     if panel == 0:
-        # Chickens behind a farm fence, staring up at a plane.
-        _stamp(g, "plane", 26, 3, "k")
-        for x in (5, 11, 17):
-            _stamp(g, "chicken", x, 13, "v")
-            _px(g, x + 1, 13, "R")
-        _stamp(g, "fence", 3, 18, "m")
-        _stamp(g, "fence", 10, 18, "m")
-        _stamp(g, "fence", 17, 18, "m")
-        # Little "!!" of jealousy.
-        _px(g, 13, 9, "R")
-        _px(g, 13, 11, "R")
-        _px(g, 15, 9, "R")
-        _px(g, 15, 11, "R")
+        # Chickens on a farm stare up at a plane, wishing they could fly.
+        _rect(g, 1, 22, MURAL_W - 2, MURAL_H - 2, "l")
+        for x in range(2, MURAL_W - 2, 4):
+            _px(g, x, 22, "g")
+        _layer(g, [
+            ("barn", 3, 13),
+            ("fence", 14, 18), ("fence", 22, 18), ("fence", 30, 18),
+            ("chicken", 16, 12), ("chicken", 29, 12),
+            ("plane", 52, 3),
+        ])
+        # Both chickens look up: beaks tilted toward the plane.
+        for x in (24, 37):
+            _px(g, x, 15, ".")
+        # A thought bubble: a little plane, the thing they want.
+        _rect(g, 36, 3, 48, 9, "O")
+        _rect(g, 37, 4, 47, 8, "C")
+        _figure(g, "mini_plane", 39, 4)
+        _px(g, 34, 10, "C"); _px(g, 33, 11, "C")
+        _px(g, 34, 9, "O"); _px(g, 35, 10, "O"); _px(g, 32, 11, "O"); _px(g, 33, 12, "O")
+        # The plane's contrail.
+        for x in range(44, 52, 2):
+            _px(g, x, 6, "W")
     elif panel == 1:
-        # Fuel drums leaking by a runway; glowing mushrooms sprout.
-        _stamp(g, "drum", 5, 13, "r")
-        _stamp(g, "drum", 9, 13, "r")
-        for x in range(4, 44, 3):
-            _px(g, x, 20, "k")
-        _stamp(g, "mushroom", 16, 15, "q")
-        _stamp(g, "mushroom", 23, 14, "q")
-        _stamp(g, "mushroom", 30, 16, "q")
-        for x, y in [(14, 19), (13, 18), (18, 12), (25, 11), (32, 13)]:
+        # Fuel drums leak by a country runway; glowing mushrooms sprout.
+        _rect(g, 1, 23, MURAL_W - 2, MURAL_H - 2, "p")
+        for x in range(4, MURAL_W - 4, 6):
+            _rect(g, x, 24, x + 2, 24, "C")
+        _layer(g, [
+            ("drum", 4, 15), ("drum", 10, 15), ("drum_tipped", 15, 18),
+            ("plane", 54, 13),
+        ])
+        # The leak: a glowing puddle spreading from the tipped drum.
+        _rect(g, 22, 21, 42, 22, "q")
+        _rect(g, 24, 20, 38, 20, "q")
+        _layer(g, [
+            ("mushroom", 25, 15), ("mushroom", 32, 13), ("mushroom", 39, 16),
+        ])
+        for x, y in [(24, 11), (30, 9), (36, 8), (42, 12), (28, 6), (38, 4)]:
             _px(g, x, y, "q")
-        _stamp(g, "plane", 34, 4, "k")
+        # Warning drops dripping from the drum.
+        _px(g, 21, 21, "q"); _px(g, 22, 19, "q")
     elif panel == 2:
-        # One chicken eats; its eyes glow, and a whole flock lights up.
-        _stamp(g, "mushroom", 5, 15, "q")
-        _stamp(g, "chicken", 10, 14, "v", flip=True)
-        _px(g, 10, 14, "q")
-        for i, x in enumerate(range(18, 44, 5)):
-            y = 5 if i % 2 else 11
-            _stamp(g, "chicken", x, y, "v")
-            _px(g, x + 1, y, "q")
-        for x, y in [(15, 12), (16, 10), (17, 8)]:
+        # One chicken eats a glowing mushroom; its eyes glow, and the whole
+        # flock lights up with it, linked.
+        glow = {"v": "q"}
+        _layer(g, [
+            ("pecking", 3, 17, False, glow),
+            ("mushroom", 13, 20),
+        ])
+        # Its eye glows.
+        for x, y in [(10, 20), (11, 21), (9, 21)]:
             _px(g, x, y, "q")
+        # Waves of glow rolling out from the first chicken to the flock.
+        for r in (5, 8, 11):
+            for dy in range(-r, r + 1):
+                if 2 <= 17 + dy <= MURAL_H - 3:
+                    _px(g, 22 + int((r * r - dy * dy) ** 0.5), 17 + dy, "q")
+        flock = []
+        for i, x in enumerate(range(38, 76, 8)):
+            flock.append(("chick", x, 4 if i % 2 else 12, False, glow))
+            flock.append(("chick", x + 3, 20, False, glow))
+        _layer(g, flock)
     elif panel == 3:
-        # The control tower taken, mushrooms in the carpet.
-        _stamp(g, "tower", 6, 5, "k")
-        _stamp(g, "chicken", 7, 2, "v")
-        _px(g, 8, 2, "R")
-        for x in range(4, 44):
-            _px(g, x, 16, "t")
-        for x in (16, 23, 30, 37):
-            _stamp(g, "mushroom", x, 12, "R" if x % 2 else "H")
-            _stamp(g, "chicken", x + 1, 17, "v")
+        # The chickens hold the control tower (their flag on top), and plant
+        # mushrooms in the airport carpet.
+        _rect(g, 1, 22, MURAL_W - 2, MURAL_H - 2, "t")
+        for x in range(3, MURAL_W - 2, 4):
+            _px(g, x, 24, "y")
+            _px(g, x + 2, 26, "b")
+        _layer(g, [
+            ("tower", 4, 8),
+            ("flag", 12, 2),
+        ])
+        # A chicken's head in each window of the cab.
+        for x in (5, 8, 11):
+            _px(g, x + 1, 10, "R")
+            _rect(g, x, 11, x + 1, 11, "C")
+        _layer(g, [
+            ("red_mushroom", 18, 18), ("chicken", 24, 10), ("mushroom", 36, 17),
+            ("pecking", 42, 14), ("purple_mushroom", 53, 18),
+            ("chicken", 60, 10), ("red_mushroom", 71, 18),
+        ])
     else:
-        # A chicken in a captain's hat walks up to a plane's door.
-        _stamp(g, "plane", 26, 8, "k")
-        for x in range(25, 44):
-            _px(g, x, 10, "k")
-        _stamp(g, "door", 34, 7, "a")
-        _stamp(g, "chicken", 22, 13, "v")
-        _stamp(g, "hat", 22, 11, "B")
-        _px(g, 24, 12, "Y")
-        # Footprints leading up to it.
-        for x in (6, 10, 14, 18):
-            _px(g, x, 18, "v")
-            _px(g, x + 1, 19, "v")
+        # A chicken in a captain's hat climbs the stairs to a plane's door.
+        _rect(g, 1, 24, MURAL_W - 2, MURAL_H - 2, "p")
+        _layer(g, [
+            ("plane_door", 48, 9),
+            ("stairs", 46, 18),
+            ("chicken", 33, 12),
+            ("captain_hat", 36, 9),
+        ])
+        # Footprints leading up to the stairs.
+        for x in (4, 10, 16, 22):
+            _px(g, x, 25, "v"); _px(g, x + 1, 26, "v")
+            _px(g, x + 2, 25, "v")
     return g
 
 
 def mural_sheet():
     return _strip([mural(p) for p in range(5)], MURAL_W, MURAL_H)
+
+
+# --- The walk-in freezer ------------------------------------------------------
+
+TILE = 16
+
+
+def _frost(g, density, seed, keys="CW"):
+    rnd = random.Random(seed)
+    for y in range(len(g)):
+        for x in range(len(g[0])):
+            if g[y][x] != "." and rnd.random() < density:
+                _px(g, x, y, rnd.choice(keys))
+
+
+def _diamond_plate(seed):
+    """Steel diamond-plate floor: raised dashes in a checker of 4px cells,
+    alternating direction by row, lightly frosted."""
+    g = ["w" * TILE for _ in range(TILE)]
+    for cy in range(0, TILE, 4):
+        for cx in range(0, TILE, 4):
+            if (cx // 4 + cy // 4) % 2:
+                continue
+            if cy // 4 % 2:
+                _px(g, cx + 1, cy + 2, "W"); _px(g, cx + 2, cy + 1, "W")
+            else:
+                _px(g, cx + 1, cy + 1, "W"); _px(g, cx + 2, cy + 2, "W")
+    _frost(g, 0.025, seed, "C")
+    return g
+
+
+def _freezer_wall_top():
+    return ["p" * TILE for _ in range(TILE)]
+
+
+def _freezer_wall_lip():
+    g = _freezer_wall_top()
+    g[13] = "W" * TILE
+    g[14] = "T" * TILE
+    g[15] = "O" * TILE
+    return g
+
+
+def _freezer_face_upper():
+    """Insulated white panels, frosted, with icicles hanging off the top."""
+    g = ["W" * 7 + "w" + "W" * 7 + "w" for _ in range(TILE)]
+    _frost(g, 0.18, 21, "C")
+    icicles = {1: 4, 4: 2, 6: 5, 10: 3, 13: 6}
+    for x in range(TILE):
+        _px(g, x, 0, "C")
+        _px(g, x, 1, "C")
+        for y in range(2, 2 + icicles.get(x, 0)):
+            _px(g, x, y, "C" if y < 1 + icicles[x] else "b")
+    return g
+
+
+def _freezer_face_lower():
+    """Riveted steel kick plate, rimed with frost, down to the baseboard."""
+    g = ["W" * 7 + "w" + "W" * 7 + "w" for _ in range(6)]
+    _frost(g, 0.12, 22, "C")
+    g += ["T" * TILE]
+    g += ["w" * TILE for _ in range(6)]
+    for x in (3, 11):
+        _px(g, x, 9, "W")
+        _px(g, x, 10, "T")
+    g += ["C" * TILE, "T" * TILE, "O" * TILE]
+    _px(g, 5, 13, "W"); _px(g, 12, 13, "W")
+    return g
+
+
+def _freezer_wall_edge(side):
+    g = _freezer_wall_top()
+    for i in range(TILE):
+        if side == "right":
+            _px(g, TILE - 2, i, "W"); _px(g, TILE - 1, i, "O")
+        elif side == "left":
+            _px(g, 1, i, "W"); _px(g, 0, i, "O")
+        elif side == "bottom":
+            _px(g, i, 1, "W"); _px(g, i, 0, "O")
+    return g
+
+
+def freezer_tiles():
+    """The Cluck Shack's walk-in freezer: laid out like tiles_arrivals.png,
+    with every floor the same frosted diamond plate (the room only uses one)
+    and steel-and-frost walls."""
+    plate_a, plate_b = _diamond_plate(31), _diamond_plate(32)
+    floors = [
+        ("carpet_a", plate_a), ("carpet_b", plate_b),
+        ("tile_a", plate_a), ("tile_b", plate_b),
+        ("wood_a", plate_a), ("wood_b", plate_b),
+        ("carpet_shadow", tiles.shadowed(plate_a)), ("tile_shadow", tiles.shadowed(plate_a)),
+        ("wood_shadow", tiles.shadowed(plate_a)),
+    ]
+    walls = [
+        ("wall_top", _freezer_wall_top()), ("wall_lip", _freezer_wall_lip()),
+        ("wall_face_upper", _freezer_face_upper()), ("wall_face_lower", _freezer_face_lower()),
+        ("wall_edge_right", _freezer_wall_edge("right")), ("wall_edge_left", _freezer_wall_edge("left")),
+        ("wall_edge_bottom", _freezer_wall_edge("bottom")),
+    ]
+    patterns = [
+        ("carpet_pattern_a", plate_a), ("carpet_pattern_b", plate_b),
+        ("carpet_pattern_shadow", tiles.shadowed(plate_a)),
+    ]
+    return floors + walls + patterns
+
+
+def freezer_tiles_sheet():
+    items = freezer_tiles()
+    cols = tiles.COLUMNS
+    rows = (len(items) + cols - 1) // cols
+    out = Image.new("RGBA", (cols * TILE, rows * TILE), (0, 0, 0, 0))
+    for i, (_, grid) in enumerate(items):
+        out.alpha_composite(to_image(grid), ((i % cols) * TILE, (i // cols) * TILE))
+    return out
+
+
+SHELF_W, SHELF_H = 32, 32
+
+
+def freezer_shelf():
+    """A wire rack of frozen food, iced over: boxes of nuggets, a bag of
+    peas, a tub of ice cream, icicles hanging off the shelves."""
+    g = _blank(SHELF_W, SHELF_H)
+    # Uprights and three wire shelves.
+    for x in (1, SHELF_W - 2):
+        _rect(g, x, 1, x, SHELF_H - 1, "w")
+    for y in (10, 20, 29):
+        _rect(g, 1, y, SHELF_W - 2, y, "W")
+        for x in range(2, SHELF_W - 2, 3):
+            _px(g, x, y + 1, "T")
+    # Top shelf: boxes of frozen nuggets (yellow with a red band).
+    for x in (3, 11, 19):
+        _rect(g, x, 3, x + 6, 9, "Y")
+        _rect(g, x, 5, x + 6, 6, "R")
+        _rect(g, x, 3, x + 6, 3, "F")
+    # Middle shelf: a green bag of peas and a stack of pink tubs.
+    _rect(g, 3, 13, 12, 19, "g")
+    _rect(g, 4, 12, 11, 12, "g")
+    _rect(g, 5, 15, 10, 16, "l")
+    for x in (15, 22):
+        _rect(g, x, 14, x + 5, 19, "h")
+        _rect(g, x, 14, x + 5, 14, "C")
+        _rect(g, x + 1, 16, x + 4, 17, "H")
+    # Bottom shelf: white boxes with a blue snowflake.
+    for x in (3, 13, 22):
+        _rect(g, x, 23, x + 7, 28, "C")
+        _px(g, x + 3, 25, "b"); _px(g, x + 4, 25, "b")
+        _px(g, x + 3, 26, "b"); _px(g, x + 4, 26, "b")
+        _px(g, x + 2, 24, "b"); _px(g, x + 5, 27, "b")
+    # Frost on everything, and icicles under each shelf.
+    _frost(g, 0.08, 41, "C")
+    for y in (10, 20):
+        for x in (4, 9, 17, 26):
+            _px(g, x, y + 1, "C")
+            _px(g, x, y + 2, "C")
+    return _outline(g)
+
+
+def freezer_shelf_sheet():
+    return to_image(freezer_shelf())
+
+
+DECOR = 16
+
+
+def freezer_decor(frame):
+    """Small freezer pieces, one per frame: 0 a wall thermometer with its
+    needle deep in the blue, 1 and 2 frost patches for the floor."""
+    g = _blank(DECOR, DECOR)
+    if frame == 0:
+        for y in range(DECOR):
+            for x in range(DECOR):
+                d = ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5
+                if d < 6.5:
+                    _px(g, x, y, "C")
+                elif d < 7.5:
+                    _px(g, x, y, "w")
+        # The cold half of the dial is blue; the needle points into it.
+        for y in range(3, 13):
+            for x in range(2, 8):
+                if g[y][x] == "C" and ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5 > 3.5:
+                    _px(g, x, y, "b")
+        for x, y in [(7, 7), (6, 6), (5, 6), (4, 5)]:
+            _px(g, x, y, "R")
+        _px(g, 8, 8, "O")
+        # Frost on the dial's rim.
+        for x, y in [(4, 1), (5, 1), (11, 2), (12, 3), (2, 11)]:
+            _px(g, x, y, "C")
+        return _outline(g)
+    rnd = random.Random(50 + frame)
+    for y in range(DECOR):
+        for x in range(DECOR):
+            d = ((x - 8) / 7.0) ** 2 + ((y - 9) / 4.5) ** 2
+            if d < 1.0 and rnd.random() < 1.2 - d:
+                _px(g, x, y, "C" if d < 0.5 or rnd.random() < 0.5 else "W")
+    return g
+
+
+def freezer_decor_sheet():
+    return _strip([freezer_decor(f) for f in range(3)], DECOR, DECOR)
 
 
 # --- The Pilot Cap -------------------------------------------------------------

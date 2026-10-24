@@ -283,7 +283,9 @@ A north wall stacks four tiles from top to bottom: `wall_top`, `wall_lip`, `wall
 
 **`extinguisher_cabinet.png`**: two 16x20 frames of the red emergency cabinet that hangs on the wall face: full, then empty.
 
-**`ice_block.png`**: one 16x16 ice-block outline drawn over a frozen chicken, which is also tinted icy blue. The outline is the shape cue, so freezing reads without relying on color.
+**`ice_block.png`**: one 18x20 see-through block of ice drawn over a frozen chicken, a pixel wider than the chicken's frame on each side and two taller so the whole bird sits inside: a pale top face, a cyan front face the chicken shows through (partly transparent pixels), two shine streaks, a hard blue rim and frost crusted along the base. The solid block is the shape cue, so freezing reads without relying on color.
+
+**`chicken_frozen.png`**: a frozen chicken, one 16x16 frame per direction (rows down, up, right, left): the chase cycle's wings-up squawk, stuck. Feathers go pale frosted blue with a deep-blue outline, the comb a cold purple, the beak and feet drained pale, and rime sits on every upward-facing edge. Frozen chickens switch to it instead of being tinted.
 
 **`closet_door.png`**: two 16x30 frames of the supply closet door on the wall face: closed, then open with a mop inside.
 
@@ -442,7 +444,13 @@ Made by `tools/sprites/easter_eggs.py` (see the Secrets section of the GDD). The
 
 **`secret_doors.png`**: 16x32 hidden entrances for the wall face (placed like a closet door), 2 columns (closed, open) and one row per kind: 0 a cracked wall panel with feathers poking out (Arrivals), 1 a slate staff door with its red STAFF ONLY sign hanging crooked (Security), 2 a steel freezer panel with frost creeping out (Food Court), 3 a green emergency exit under a lit EXIT sign, a feather wedged in it (Gates), 4 a vent low on the wall with its grille pecked through (Final Gate). The tell is always visible when closed.
 
-**`mural.png`**: five 48x24 frames, the chickens' cave paintings on each secret room's back wall, crude on purpose: chickens behind a farm fence staring at a plane; fuel drums leaking by a runway with glowing teal mushrooms sprouting; one chicken eating and a flock lighting up teal-eyed; the control tower taken and mushrooms in the carpet; a chicken in a captain's hat walking up to a plane's door.
+**`mural.png`**: five 80x28 frames, the chickens' paintings on each secret room's back wall. Each panel is numbered with claw tallies (I to IIIII) so the story reads in order, and the figures are drawn like the game's own sprites (outlined white chickens with red combs, blue-tailed planes) so they read at a glance: two chickens behind a farm fence beside a barn, one dreaming of a plane in a thought bubble while a plane flies off; fuel drums leaking a glowing puddle by a country runway, teal mushrooms sprouting from it; one chicken pecking a teal mushroom, its eye glowing, waves of glow rolling out to a flock with glowing eyes; the control tower with a chicken in every window and the chickens' flag on top, chickens planting mushrooms in the airport carpet; a chicken in a captain's hat walking up the stairs to a parked plane's open door.
+
+**`tiles_freezer.png`**: the Cluck Shack's walk-in freezer (the Food Court's secret room), laid out exactly like `tiles_arrivals.png` so the room's text map works unchanged: every floor is frosted steel diamond plate, the walls are insulated white panels with frost and icicles over a riveted kick plate. The room uses it through its `tiles_texture` instead of the level's.
+
+**`freezer_shelf.png`**: one 32x32 wire rack of iced-over frozen food (nugget boxes, a bag of peas, ice-cream tubs, snowflake boxes), icicles under the shelves. A solid floor prop.
+
+**`freezer_decor.png`**: three 16x16 frames: 0 a wall thermometer with its needle deep in the blue, 1 and 2 frost patches for the floor.
 
 **`pilot_cap.png`**: three 16x16 frames of the hidden Pilot Cap patch, laid out like one row of `mushroom_patch.png` (resting, spores, spores higher): pale-yellow caps with white spots and a little white propeller frill on top that turns between frames.
 

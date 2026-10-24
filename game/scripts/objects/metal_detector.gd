@@ -6,6 +6,8 @@ extends StaticBody2D
 
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const BEEP_TIME := 0.6
+## How far away chickens hear it beep.
+const NOISE_RANGE := 96.0
 ## Passes this close together count toward the tune.
 const TUNE_WINDOW := 12.0
 
@@ -31,6 +33,7 @@ func _physics_process(delta: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is Player:
+		Chicken.make_noise(get_tree(), global_position, NOISE_RANGE)
 		if _tune_due():
 			_beep_left = BEEP_TIME * 3.0
 			AudioManager.play("cluck_tune", global_position)

@@ -15,6 +15,8 @@ const FRAMES := 4
 const DEPTH := 6.0
 ## Chickens this close to the floor line (above or below) get flattened.
 const CRUSH_REACH := 8.0
+## How far away chickens hear it slam shut.
+const NOISE_RANGE := 96.0
 
 @export var start_closed := false
 @export var frames_per_second := 12.0
@@ -59,6 +61,7 @@ func close() -> void:
 		return
 	is_closed = true
 	AudioManager.play("shutter", global_position + Vector2(WIDTH / 2.0, 0))
+	Chicken.make_noise(get_tree(), global_position + Vector2(WIDTH / 2.0, 0), NOISE_RANGE)
 
 
 func open() -> void:
