@@ -330,6 +330,7 @@ A fourth, hidden mushroom: gold and white with a little propeller-shaped frill, 
 | 4 Gates | Flip a speed panel five times quickly and its display reads WHEEE |
 | 4 Gates | A chicken in a pilot's cap sits at Gate C's desk and ignores Amanda completely |
 | Any | Meta PA lines mixed into each level's rotation, such as the "walls are not usually doors" line |
+| Any | Eat three snacks within four seconds and Amanda farts ("Excuse me!"): a green puff, and any chicken within about 2.5 tiles is dazed for 2.5 seconds |
 
 ### Ending Payoff
 Finding every secret changes the ending: the stowaway chicken winking from the cabin window is wearing the captain's hat from the crew room, and after THE END the PA chimes once more: "This is your captain speaking. BAWK."

@@ -14,6 +14,7 @@ const LEVELS := {
 	5: "res://scenes/levels/level_05_final_gate.tscn",
 }
 const ENDING := preload("res://scenes/ui/ending.tscn")
+const CHICKEN := preload("res://scenes/characters/chicken.tscn")
 
 var _failures: Array[String] = []
 var _signalled: Array[String] = []
@@ -179,6 +180,24 @@ func _food_court_test() -> void:
 	_tap("interact")
 	await _frames(3)
 	_check(GameManager.has_secret("food_court_hoard"), "searching it finds the secret")
+	# Three snacks eaten quickly: Amanda farts, dazing the chicken beside her
+	# but not the one across the room.
+	var near: Chicken = CHICKEN.instantiate()
+	var far: Chicken = CHICKEN.instantiate()
+	near.position = player.position + Vector2(20, 0)
+	far.position = player.position + Vector2(Player.FART_RADIUS * 3.0, 0)
+	level.get_node("Entities").add_child(near)
+	level.get_node("Entities").add_child(far)
+	await _frames(2)
+	player.health = 1
+	player.pick_up("snack", Player.FART_AFTER)
+	for i in Player.FART_AFTER - 1:
+		player.eat_snack()
+	_check(near.state != Chicken.State.RECOIL, "two snacks in a row are just snacks")
+	player.eat_snack()
+	_check(near.state == Chicken.State.RECOIL, "the third makes Amanda fart and dazes a chicken beside her")
+	_check(far.state != Chicken.State.RECOIL, "a chicken across the room doesn't notice")
+	_check(ResourceLoader.exists(AudioManager.SFX_DIR + "fart.wav"), "the fart sound exists")
 	level.queue_free()
 
 
