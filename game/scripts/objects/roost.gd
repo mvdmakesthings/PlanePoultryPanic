@@ -10,6 +10,8 @@ signal totem_formed(totem: Totem)
 const TOTEM_SCENE := preload("res://scenes/characters/totem.tscn")
 const POOF_SCENE := preload("res://scenes/objects/feather_poof.tscn")
 const WARNING_COLOR := Color("e43b44")
+## A totem forming this close makes Amanda say "Nope." (about 10 tiles).
+const NOPE_RANGE := 160.0
 
 ## Chickens this close wander over to the roost.
 @export var call_radius := 120.0
@@ -109,6 +111,9 @@ func _form(members: Array[Chicken]) -> void:
 	entities.add_child(poof)
 	entities.add_child(totem)
 	totem_formed.emit(totem)
+	var player := get_tree().get_first_node_in_group("player") as Player
+	if player and player.global_position.distance_to(global_position) <= NOPE_RANGE:
+		player.say("Nope.")
 
 
 func _draw() -> void:

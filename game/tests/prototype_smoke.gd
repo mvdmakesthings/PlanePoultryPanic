@@ -105,6 +105,7 @@ func _ready() -> void:
 
 	room.queue_free()
 	await _senses_tests()
+	await _reaction_tests()
 	await _power_tests()
 	await _carousel_tests()
 	await _cart_tests()
@@ -204,6 +205,41 @@ func _senses_tests() -> void:
 		else:
 			_check(chicken.state == Chicken.State.WANDER, "walking behind a chicken is silent")
 		setup[0].queue_free()
+
+
+## Amanda's reactions are rate-limited, and react to a crowd chasing her.
+func _reaction_tests() -> void:
+	var setup := await _fresh_room(Vector2(200, 260), Vector2(40, 296))
+	setup[1].queue_free()
+	var player: Player = setup[2]
+	_check(player.say("Test.") and not player.say("Other."), "Amanda says at most one line at a time")
+	player._last_said = -INF
+	_check(not player.say("Test."), "Amanda doesn't repeat a line straight away")
+	var crowd: Array[Chicken] = []
+	for i in 3:
+		var hen: Chicken = preload("res://scenes/characters/chicken.tscn").instantiate()
+		hen.position = Vector2(300 + i * 20, 300)
+		setup[0].get_node("Entities").add_child(hen)
+		crowd.append(hen)
+	await get_tree().physics_frame
+	player._last_said = -INF
+	for hen in crowd:
+		hen.set_physics_process(false)
+		hen.state = Chicken.State.PURSUE
+	await _wait(0.3)
+	_check(_said(player, "Uh oh."), "three chickens chasing Amanda make her say Uh oh.")
+	player._last_said = -INF
+	for hen in crowd:
+		hen.state = Chicken.State.WANDER
+	await _wait(0.3)
+	_check(_said(player, "Phew!"), "shaking off a crowd makes her say Phew!")
+	setup[0].queue_free()
+
+
+## True if a reaction with this text is floating over the player.
+func _said(player: Player, line: String) -> bool:
+	return player.get_parent().get_children().any(
+		func(n: Node) -> bool: return n is FloatText and (n as FloatText).text == line)
 
 
 ## A fresh room with one chicken standing still looking right, and the

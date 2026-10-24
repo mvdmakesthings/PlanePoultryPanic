@@ -121,6 +121,19 @@ When health reaches zero, the player restarts from the last checkpoint with thei
 - Her hair gets messier as she loses health: a cowlick below 75%, puffed-out tufts below 50%, and wild frizz with a lock over her face below 25%. Healing tidies it again. It shows how hurt she is at a glance, without looking at the HUD.
 - A chicken that lands a peck bounces back about two tiles and is dazed for a moment before chasing again, so the player has a chance to run.
 
+### Reactions
+Amanda reacts to what's happening with a word floating over her head, in the same style as "Full!" and "Got it!":
+
+| Moment | She says |
+|---|---|
+| Three or more chickens start chasing her | "Uh oh." |
+| A chase by two or more chickens ends with nobody chasing her | "Phew!" |
+| A totem forms within about 10 tiles | "Nope." |
+| She hides while chickens are chasing her | "Shh..." |
+| A chicken trips within about 3 tiles of her | "Ha!" |
+
+She says at most one line every 5 seconds and never repeats the same line within 20 seconds, so it stays a garnish. Other messages ("Full!", "Excuse me!") aren't limited by this.
+
 ### Healing
 Eating a snack restores one whole suitcase. E eats from any slot, whichever item is selected; at full health or with no snacks, a short "Full!" or "No snacks" pops up instead. Snacks are the only way to heal, so every snack is a choice between healing now and distracting chickens later.
 
@@ -613,3 +626,4 @@ game/
 | 2026-10-24 | Noise turns chickens' heads: running footsteps, metal-detector beeps, shutter slams and landing suitcases; walking is silent | You (Proposed details) |
 | 2026-10-24 | Chickens notice the player more aggressively: 5-tile sight in a 150-degree cone, three quarters as far while pecking, instant notice within about 1.75 tiles, "?" to "!" in about a third of a second, slower cool-off, and neighbors alerted within 4 tiles | You (Proposed details) |
 | 2026-10-24 | The PS1-style 3D restyle is dropped; the game stays 2D | You |
+| 2026-10-24 | Amanda reacts out loud to big moments (a crowd chasing her, escaping, a totem forming, hiding, a chicken tripping), at most one line every 5 seconds | You (Proposed details) |

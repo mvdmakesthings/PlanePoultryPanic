@@ -58,6 +58,14 @@ const FART_WINDOW := 4.0
 const FART_RADIUS := 40.0
 const FART_DAZE := 2.5
 const GAS_TINT := Color("#63c74d")
+## Amanda's reactions (say()): at most one every SAY_GAP seconds, and never
+## the same line twice within SAY_REPEAT seconds.
+const SAY_GAP := 5.0
+const SAY_REPEAT := 20.0
+## Chickens in these states are after her, for "Uh oh." and "Phew!".
+const CHASING_STATES: Array[Chicken.State] = [Chicken.State.PURSUE, Chicken.State.WINDUP, Chicken.State.BESIEGE]
+## How often she counts the chickens after her.
+const CHASER_CHECK_TIME := 0.25
 
 @export var walk_speed := 100.0
 @export var run_speed := 150.0
@@ -119,6 +127,12 @@ var _head_tops := {}
 var _sheet_images := {}
 ## When recent snacks were eaten, for the fart gag.
 var _snacks_eaten: Array[float] = []
+## When each reaction line was last said, and when any was.
+var _said_at := {}
+var _last_said := -INF
+var _chasers := 0
+var _chased_by_crowd := false
+var _chaser_check_in := 0.0
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -160,6 +174,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_update_chasers(delta)
 	if is_hidden:
 		# Inside a closet: no moving, but Interact still lets the player out.
 		interact_target = _nearest_interactable()
@@ -351,6 +366,47 @@ func fart() -> void:
 			chicken.stun(FART_DAZE)
 
 
+## A reaction floating over her head, like "Phew!". Rate-limited so it stays
+## a garnish; returns false if it was skipped.
+func say(line: String) -> bool:
+	if is_dead:
+		return false
+	var now := Time.get_ticks_msec() / 1000.0
+	if now - _last_said < SAY_GAP or now - float(_said_at.get(line, -INF)) < SAY_REPEAT:
+		return false
+	_last_said = now
+	_said_at[line] = now
+	FloatText.spawn(self, line)
+	return true
+
+
+## "Uh oh." when a crowd starts chasing her, "Phew!" when a chase by two or
+## more ends with nobody after her.
+func _update_chasers(delta: float) -> void:
+	_chaser_check_in -= delta
+	if _chaser_check_in > 0.0:
+		return
+	_chaser_check_in = CHASER_CHECK_TIME
+	var count := _count_chasers()
+	if count >= 3 and _chasers < 3:
+		say("Uh oh.")
+	if count >= 2:
+		_chased_by_crowd = true
+	elif count == 0:
+		if _chased_by_crowd and _chasers > 0:
+			say("Phew!")
+		_chased_by_crowd = false
+	_chasers = count
+
+
+func _count_chasers() -> int:
+	var count := 0
+	for node in get_tree().get_nodes_in_group("chickens"):
+		if (node as Chicken).state in CHASING_STATES:
+			count += 1
+	return count
+
+
 ## Returns false if every slot is full.
 func give_extinguisher(charges: int) -> bool:
 	return pick_up("extinguisher", charges) == 0
@@ -451,6 +507,8 @@ func _nearest_interactable() -> Node2D:
 
 ## Steps into a closet: hidden, untouchable, and out of the way.
 func hide_in(spot: HidingSpot) -> void:
+	if _count_chasers() > 0:
+		say("Shh...")
 	hidden_in = spot
 	global_position = spot.base_point()
 	velocity = Vector2.ZERO
