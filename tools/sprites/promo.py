@@ -79,9 +79,14 @@ def floor_shadow(img, cx, y, w):
 
 
 def place(img, grid, x, y):
-    """Draws a sprite grid with its top-left at x, y, plus a floor shadow."""
+    """Draws a sprite grid with its top-left at x, y, plus a floor shadow
+    under its feet: the span of the sprite's bottom four drawn rows, so a
+    wide frame around a narrow figure doesn't get a shadow the frame's width."""
     sprite = to_image(grid)
-    floor_shadow(img, x + sprite.width // 2, y + sprite.height - 1, sprite.width - 4)
+    bottom = max(i for i, row in enumerate(grid) if row.strip("."))
+    feet = [gx for row in grid[max(bottom - 3, 0):bottom + 1] for gx, ch in enumerate(row) if ch != "."]
+    cx = x + (min(feet) + max(feet) + 1) // 2
+    floor_shadow(img, cx, min(y + bottom + 1, img.height - 2), max(max(feet) - min(feet) - 1, 6))
     img.alpha_composite(sprite, (x, y))
 
 
@@ -126,9 +131,10 @@ def banner():
     place(img, egg[2], 46, 66)
     place(img, chase[2], 70, 76)
     place(img, rage[1], 96, 70)
-    place(img, run[2], 136, 58)
+    # Amanda's run frames are 32 wide with her head in the middle.
+    place(img, run[1], 128, 58)
     snack = items.snack()
-    img.alpha_composite(snack, (118, 56))
+    img.alpha_composite(snack, (112, 50))
     place(img, flight[0], 190, 52)
     img.alpha_composite(to_image(mushrooms.patch("flight", 1)), (226, 74))
 
