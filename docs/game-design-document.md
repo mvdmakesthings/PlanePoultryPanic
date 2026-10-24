@@ -242,7 +242,19 @@ Behavior priority, highest first:
 | Baggage carousel | The belt around the solid center island is walkable and carries anything on it clockwise (chickens, snacks, the player). Chickens carried into the chute are defeated; the player can't fit through it. Chickens never walk into the chute on purpose, so the trick is getting one distracted on the belt, for example eating a snack thrown there. |
 | Moving walkway | A two-tile belt between handrails, entered and left only at its ends, that carries the player, chickens and snacks east or west at 20 (slow), 45 (normal) or 110 (full) px/s, so walking with it is faster and against it slower. A speed panel on the wall steps it through the three speeds. At full speed a chicken riding off the far end is flung at 200 px/s and tumbles; hitting anything solid while still going 90 px/s or faster knocks it out (and any chicken it hits). Slower, it lands dazed. The player is never flung. |
 | Security scanner and gates | Barriers to route around: X-ray machines and metal-detector arches (which beep as the player walks through) line the scanner lanes. A roll-down shutter closes a lane when its wall switch is flipped; a chicken under it as it slams down is defeated, and chickens path around it while it's shut. |
-| Mushroom patch | Powers up chickens that eat there, then regrows after 15 seconds. Spraying it with the fire extinguisher (one charge) kills the patch for good. |
+| Mushroom patch | Powers up chickens that eat there, then regrows after 15 seconds. Spraying it with the fire extinguisher (one charge) kills the patch for good. Left alone, it spreads (see below). |
+
+### Spreading Mushrooms
+Mushrooms creep across the terminal the longer Amanda lingers, so dawdling makes a level harder and spraying a patch early saves trouble later.
+
+- **Spreading**: a ripe patch grows a sprout every 25 seconds (40 in Security, where patches are first taught). A patch dimmed from being eaten doesn't spread until it regrows, and its timer starts over.
+- **Sprouts**: a sprout is a small, pale bud of its parent's kind that ripens into a full patch after 8 seconds, wobbling for its last 2 seconds as a tell. Chickens can't eat a sprout and don't head for it. Amanda stomps a sprout flat just by walking over it (no item needed); a spray kills it too.
+- **Ripe sprouts spread too**: once ripe, a sprout is a full patch in every way, including spreading. That's the pressure: a patch ignored for a minute becomes a cluster.
+- **Placement**: a sprout lands 2-4 tiles from its parent, on open floor chickens can reach. Never on a walkway, the carousel belt, or in a hiding spot, never within 3 tiles of a checkpoint, a level entrance or exit, and never within 2 tiles of Amanda. If there's no room, the patch skips that sprout.
+- **Cap**: each level allows at most three times its placed patches (so a level with 3 patches tops out at 9). A full level stops spreading until a patch is sprayed or a sprout stomped.
+- **Retries**: a knockout clears every sprout and spread patch; the level goes back to its placed patches, minus any sprayed before the checkpoint.
+- **Not in**: Level 1 (no patches) or the Supreme Totem's arena, where the fight shouldn't get muddier. The Level 5 escape is fair game.
+- **The decision**: spraying a patch costs one of three charges but stops a whole future cluster; stomping sprouts is free but means detouring to reach them. Players racing through barely see a sprout; players who hide and wait come out to a garden.
 
 ### Interactive Objects
 | Element | Effect |
@@ -406,10 +418,10 @@ Kept minimal so the game stays readable at 320x180.
 ### Difficulty Modes
 | Mode | Changes |
 |---|---|
-| Easy | Calmer chickens, more snacks, longer extinguisher freeze |
+| Easy | Calmer chickens, more snacks, longer extinguisher freeze, mushrooms spread half as fast |
 | Standard | As designed |
 | Hard | More chickens, powered modes trigger more often, fewer snacks |
-| Expert | Maximum chickens, instant power-ups at mushroom patches, checkpoints only at the start of each level |
+| Expert | Maximum chickens, instant power-ups at mushroom patches, mushrooms spread twice as fast, checkpoints only at the start of each level |
 
 ### Scoring
 After THE END, a departure board shows how the run went: a row per category, flipping in one at a time like split-flap letters, then the total counting up, the rank, and the best score and fastest finish (with NEW BEST! or NEW FASTEST! blinking when one is beaten). The main menu shows the best score once a run has been finished.
