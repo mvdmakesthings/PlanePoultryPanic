@@ -56,7 +56,7 @@ const SOUNDS := {
 	"level_clear": {"duck": [-10.0, 1.5]},
 	"death": {"duck": [-10.0, 1.2]},
 	"pa_chime": {"duck": [-6.0, 1.6]},
-	"fart": {"db": 0.0, "pitch": 0.08},
+	"fart": {"db": 1.0, "pitch": 0.08, "duck": [-8.0, 0.6]},
 }
 ## Per-track trims (dB) so every loop plays at about the same loudness.
 const MUSIC := {"arrivals": -1.7, "boss": -1.4, "gates": -0.3, "security": -0.2, "victory": 0.0}
