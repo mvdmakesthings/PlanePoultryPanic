@@ -222,3 +222,4 @@ Older chiptune sketches are note lists in `tools/audio/music.py`, built only wit
 - [Art style guide](docs/art-style-guide.md): palette, sprite rules, sheet layouts
 - [Storyline](docs/storyline.md): world and tone
 - [Store page](docs/store-page.md): itch.io tagline, description, tags, and metadata
+- [Devlogs](docs/devlogs/): the itch.io devlog post for each release, with its cover image in `docs/images/`
