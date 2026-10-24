@@ -11,11 +11,11 @@ writes, into docs/images/:
 
 and, given a staged in-game shot (see game/tests/store_shots.gd),
 
-    python3 tools/sprites/promo.py devlog /tmp/shot.png
+    python3 tools/sprites/promo.py devlog /tmp/shot.png "THE HEADLINE" 0.4.0
 
 writes a devlog cover, devlog_v<version>.png: 1280x720, the middle 256x144
 of the shot (a little above center) scaled 5x under a departure-board
-headline.
+headline (at most about 26 characters).
 """
 import sys
 from pathlib import Path
@@ -199,10 +199,11 @@ def devlog_cover(shot_path, headline, tag):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    if len(sys.argv) == 3 and sys.argv[1] == "devlog":
-        cover = devlog_cover(sys.argv[2], "THE CHICKENS HAVE OPINIONS", "PLANE POULTRY PANIC  +  UPDATE V0.3.0")
-        cover.save(OUT / "devlog_v0.3.0.png")
-        print(f"wrote {OUT / 'devlog_v0.3.0.png'}")
+    if len(sys.argv) == 5 and sys.argv[1] == "devlog":
+        shot, headline, version = sys.argv[2:]
+        cover = devlog_cover(shot, headline, f"PLANE POULTRY PANIC  +  UPDATE V{version}")
+        cover.save(OUT / f"devlog_v{version}.png")
+        print(f"wrote {OUT / f'devlog_v{version}.png'}")
         sys.exit()
     banner().save(OUT / "itch_banner.png")
     background().save(OUT / "itch_background.png")

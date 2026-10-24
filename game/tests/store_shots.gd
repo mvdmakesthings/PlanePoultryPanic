@@ -36,6 +36,8 @@ func _ready() -> void:
 			await _final_boss()
 		"personality":
 			await _food_court_personality()
+		"sprint":
+			await _arrivals_sprint()
 	_hide_hints()
 	await RenderingServer.frame_post_draw
 	var image := get_viewport().get_texture().get_image()
@@ -150,6 +152,28 @@ func _food_court_personality() -> void:
 	await _wait(0.5)
 	_player.say("Ha!")
 	await _wait(0.2)
+	# A cover image, not a screenshot: no HUD.
+	for hud in _level.find_children("*", "Hud", true, false):
+		hud.visible = false
+
+
+## Level 1, for the v0.4.0 devlog: Amanda sprints across the Arrivals floor
+## with chickens on her heels, showing off her new sprites.
+func _arrivals_sprint() -> void:
+	await _open("res://scenes/levels/level_01_arrivals.tscn")
+	var belt := get_tree().get_first_node_in_group("conveyors") as Carousel
+	var at := Vector2(belt.outer.get_center().x + 40, belt.outer.end.y + 30)
+	_player.global_position = at
+	_player.facing = Vector2.RIGHT
+	# Hold her mid-stride: the physics step would switch her back to idle.
+	_player.set_physics_process(false)
+	_player._sprite.animation = "run_right"
+	_player._sprite.frame = 1
+	_player._sprite.stop()
+	_chicken(at + Vector2(-84, 8))
+	_chicken(at + Vector2(-112, -14), "rage")
+	_chicken(at + Vector2(-100, 26))
+	await _wait(0.6)
 	# A cover image, not a screenshot: no HUD.
 	for hud in _level.find_children("*", "Hud", true, false):
 		hud.visible = false
