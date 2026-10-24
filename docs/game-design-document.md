@@ -612,3 +612,4 @@ game/
 | 2026-10-24 | Sneaking becomes a skill: chickens see in a cone the way they face, get suspicious ("?") before spotting the player ("!"), and notice her instantly only within about a tile and a quarter | You (Proposed details) |
 | 2026-10-24 | Noise turns chickens' heads: running footsteps, metal-detector beeps, shutter slams and landing suitcases; walking is silent | You (Proposed details) |
 | 2026-10-24 | Chickens notice the player more aggressively: 5-tile sight in a 150-degree cone, three quarters as far while pecking, instant notice within about 1.75 tiles, "?" to "!" in about a third of a second, slower cool-off, and neighbors alerted within 4 tiles | You (Proposed details) |
+| 2026-10-24 | The PS1-style 3D restyle is dropped; the game stays 2D | You |
