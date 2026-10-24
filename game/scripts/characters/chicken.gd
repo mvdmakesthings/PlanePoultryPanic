@@ -43,10 +43,10 @@ const CARDINALS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vecto
 ## Slower than the player's walk, so one normal chicken can always be escaped.
 @export var pursue_speed := 60.0
 @export var investigate_speed := 70.0
-@export var sight_range := 64.0
+@export var sight_range := 80.0
 ## Seconds without seeing the player before giving up the chase.
 @export var give_up_time := 2.0
-@export var alert_radius := 48.0
+@export var alert_radius := 64.0
 @export var snack_notice_range := 100.0
 @export var eat_time := 2.5
 ## After a peck lands, the chicken bounces back about two tiles and stays
@@ -68,16 +68,16 @@ const CARDINALS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vecto
 @export_group("Senses")
 ## Half the width of the cone a chicken sees in, either side of the way its
 ## sprite faces.
-@export var vision_half_angle := 60.0
+@export var vision_half_angle := 75.0
 ## Pecking at the floor, a chicken only sees this share of its sight range.
-@export var pecking_sight_scale := 0.5
+@export var pecking_sight_scale := 0.75
 ## Closer than this, a chicken notices the player from any side, at once.
-@export var instant_notice_range := 20.0
+@export var instant_notice_range := 28.0
 ## Seconds the player has to stay in view at the edge of its sight before a
 ## suspicious chicken spots her; right up close it takes half as long.
-@export var notice_time := 0.6
+@export var notice_time := 0.35
 ## Suspicion lost per second while the player is out of view.
-@export var suspicion_cooldown := 0.6
+@export var suspicion_cooldown := 0.35
 ## How long a suspicious chicken looks around before going back to normal,
 ## and how often it turns its head meanwhile.
 @export var look_around_time := 1.5

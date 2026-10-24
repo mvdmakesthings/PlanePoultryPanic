@@ -173,12 +173,12 @@ func _senses_tests() -> void:
 	_check(chicken.state in CHASING, "a chicken notices the player right behind it at once")
 	setup[0].queue_free()
 
-	setup = await _watching_chicken(chicken_at, chicken_at + Vector2(48, 0), true)
+	setup = await _watching_chicken(chicken_at, chicken_at + Vector2(70, 0), true)
 	chicken = setup[1]
 	player = setup[2]
 	await _wait(0.5)
 	_check(chicken.state == Chicken.State.WANDER, "a pecking chicken doesn't see as far")
-	player.global_position = chicken_at + Vector2(28, 0)
+	player.global_position = chicken_at + Vector2(40, 0)
 	await _wait(0.1)
 	_check(chicken.is_suspicious(), "a pecking chicken still sees the player close in front")
 	setup[0].queue_free()

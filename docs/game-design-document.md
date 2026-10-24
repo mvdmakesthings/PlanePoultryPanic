@@ -175,9 +175,9 @@ Fire extinguisher spray and distractions don't defeat chickens. They control the
 ### Sight and Sound
 Sneaking is a skill: chickens can be crept up on, and a careful player can slip past one that's looking the other way.
 
-- **Facing**: A chicken sees 4 tiles ahead, in a cone 120 degrees wide pointing the way its sprite faces (up, down, left or right), so what the player sees is what the chicken sees. Pecking at the floor, it only sees about half as far. Standing still, it looks around now and then.
-- **Too close**: Anywhere within about a tile and a quarter, even behind it, a chicken notices the player at once and chases.
-- **"?" then "!"**: A chicken that catches sight of the player stops, turns to face her, and shows a yellow "?". If she stays in view for about 0.6 seconds (half that up close), it spots her: a red "!", a hop, a cluck, and the chase begins, alerting its neighbors. If she gets out of view first, the "?" blinks while it cools off, and it goes back to what it was doing. Coming back into view picks up where the suspicion left off.
+- **Facing**: A chicken sees 5 tiles ahead, in a cone 150 degrees wide pointing the way its sprite faces (up, down, left or right), so what the player sees is what the chicken sees. Pecking at the floor, it sees about three quarters as far. Standing still, it looks around now and then.
+- **Too close**: Anywhere within about a tile and three quarters, even behind it, a chicken notices the player at once and chases.
+- **"?" then "!"**: A chicken that catches sight of the player stops, turns to face her, and shows a yellow "?". If she stays in view for about a third of a second (half that up close), it spots her: a red "!", a hop, a cluck, and the chase begins, alerting its neighbors within 4 tiles. If she gets out of view first, the "?" blinks while it cools off (slowly: it stays wary for a few seconds), and it goes back to what it was doing. Coming back into view picks up where the suspicion left off.
 - **Chasing**: Once a chicken is chasing, it tracks the player all around, not just in front, until it loses sight of her for a couple of seconds as before.
 - **Noise**: Noises make chickens nearby turn toward them and walk over to look around, suspicious, for a moment. Running makes footstep noise heard about 3 tiles away (walking is silent); a metal-detector beep and a security shutter slamming carry 6 tiles; a thrown suitcase landing carries 5. Noise is a lure as well as a risk: a suitcase thrown one way turns heads away from the player's route.
 - **Powers**: Rage chickens go from "?" to "!" more than twice as fast. Egg shooters see as far as they shoot, inside the same cone.
@@ -611,3 +611,4 @@ game/
 | 2026-10-19 | Finding every secret puts the captain's hat on the ending's stowaway and adds a last PA line | Proposed |
 | 2026-10-24 | Sneaking becomes a skill: chickens see in a cone the way they face, get suspicious ("?") before spotting the player ("!"), and notice her instantly only within about a tile and a quarter | You (Proposed details) |
 | 2026-10-24 | Noise turns chickens' heads: running footsteps, metal-detector beeps, shutter slams and landing suitcases; walking is silent | You (Proposed details) |
+| 2026-10-24 | Chickens notice the player more aggressively: 5-tile sight in a 150-degree cone, three quarters as far while pecking, instant notice within about 1.75 tiles, "?" to "!" in about a third of a second, slower cool-off, and neighbors alerted within 4 tiles | You (Proposed details) |
