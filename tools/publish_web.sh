@@ -38,7 +38,7 @@ git clone --quiet "$PLAY_REPO" "$work/play"
 # Mirror the export into the play repo, keeping its README and Vercel files.
 rsync -a --delete --exclude .git --exclude README.md --exclude vercel.json --exclude .gitignore \
 	"$ROOT/build/web/" "$work/play/"
-sed -i '' "s/^Current version: v[^,]*,/Current version: v$version,/" "$work/play/README.md"
+sed -i '' "s/Current version: v[^,]*,/Current version: v$version,/" "$work/play/README.md"
 
 (
 	cd "$work/play"
