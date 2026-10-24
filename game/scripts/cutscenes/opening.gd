@@ -44,10 +44,10 @@ const SHADOW := Color(0.094, 0.078, 0.145, 0.4)
 const AMANDA_AT := Vector2(100, 102)
 const RUN_SPEED := 120.0
 
-## Departure board columns, in characters, and each character's cell.
-const DEST_CHARS := 9
+## Departure board columns: letters in a status, and where the status
+## column starts, in pixels from the destinations.
 const STATUS_CHARS := 9
-const CELL := 6.0
+const STATUS_X := 60.0
 const BOARD_ROW_HEIGHT := 9.0
 ## A flipping board row settles one letter at a time, this far apart.
 const FLAP_STEP := 0.07
@@ -476,21 +476,16 @@ func _draw_board() -> void:
 	for i in board_rows.size():
 		var y := inner.position.y + 20.0 + i * BOARD_ROW_HEIGHT
 		var x := inner.position.x + 3.0
-		_draw_cells(canvas, font, Vector2(x, y), board_rows[i]["dest"], BoardMenu.LABEL)
+		canvas.draw_string(font, Vector2(x, y), board_rows[i]["dest"], HORIZONTAL_ALIGNMENT_LEFT, -1,
+			BoardMenu.FONT_SIZE, BoardMenu.LABEL)
 		var status := row_status(i)
 		var color: Color = board_rows[i]["color"]
 		if status != board_rows[i]["status"] and status != "BOARDING":
 			color = BoardMenu.STATUS
-		_draw_cells(canvas, font, Vector2(x + (DEST_CHARS + 1) * CELL, y), status, color)
-
-
-## Draws text one letter per fixed-width cell, like split-flap modules.
-func _draw_cells(canvas: CanvasItem, font: Font, pos: Vector2, text: String, color: Color) -> void:
-	for i in text.length():
-		# Centered by hand: a width limit would drop letters wider than a cell.
-		var width := font.get_string_size(text[i], HORIZONTAL_ALIGNMENT_LEFT, -1, BoardMenu.FONT_SIZE).x
-		canvas.draw_string(font, Vector2(pos.x + i * CELL + roundf((CELL - width) / 2.0), pos.y), text[i],
-			HORIZONTAL_ALIGNMENT_LEFT, -1, BoardMenu.FONT_SIZE, color)
+		# Whole words, not a letter per fixed cell: the font's letters vary
+		# in width, so cells left gaps beside narrow ones and crowded wide ones.
+		canvas.draw_string(font, Vector2(x + STATUS_X, y), status, HORIZONTAL_ALIGNMENT_LEFT, -1,
+			BoardMenu.FONT_SIZE, color)
 
 
 ## The news ticker: the mushroom story, crawling past on a loop.
