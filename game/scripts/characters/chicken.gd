@@ -1,7 +1,9 @@
 class_name Chicken
 extends CharacterBody2D
 ## A chicken: wanders and pecks until it spots the player, then chases and
-## alerts nearby chickens. Thrown snacks beat everything else: a chicken
+## alerts nearby chickens. It sees in a cone the way it faces, and glimpsing
+## the player makes it suspicious ("?") before it spots her ("!"); noises
+## make it turn and go look. Thrown snacks beat everything else: a chicken
 ## drops what it's doing to go eat one. Chickens also seek out mushroom
 ## patches, and eating one powers them up for a while:
 ##   flight: hops over furniture and walls of chickens while chasing
@@ -11,7 +13,7 @@ extends CharacterBody2D
 ## Emitted just before a defeated chicken is removed.
 signal defeated
 
-enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL, BESIEGE, SEEK_ROOST, ROOSTING, FLUNG }
+enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP, FROZEN, RECOIL, BESIEGE, SEEK_ROOST, ROOSTING, FLUNG, SUSPICIOUS }
 
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
@@ -32,6 +34,10 @@ const WORLD_LAYER := 1
 const CHICKEN_LAYER := 4
 ## Seconds before a power wears off when the chicken starts flickering.
 const POWER_WARNING_TIME := 3.0
+## "!" once it has spotted the player, "?" while it's suspicious.
+const ALERT_COLOR := Color(0.894, 0.231, 0.267)
+const SUSPICIOUS_COLOR := Color(0.996, 0.906, 0.380)
+const CARDINALS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
 
 @export_group("Normal")
 @export var wander_speed := 30.0
@@ -60,6 +66,26 @@ const POWER_WARNING_TIME := 3.0
 ## player stepping out of hiding has time to slip away.
 @export var lost_interest_time := 3.0
 
+@export_group("Senses")
+## Half the width of the cone a chicken sees in, either side of the way its
+## sprite faces.
+@export var vision_half_angle := 60.0
+## Pecking at the floor, a chicken only sees this share of its sight range.
+@export var pecking_sight_scale := 0.5
+## Closer than this, a chicken notices the player from any side, at once.
+@export var instant_notice_range := 20.0
+## Seconds the player has to stay in view at the edge of its sight before a
+## suspicious chicken spots her; right up close it takes half as long.
+@export var notice_time := 0.6
+## Suspicion lost per second while the player is out of view.
+@export var suspicion_cooldown := 0.6
+## How long a suspicious chicken looks around before going back to normal,
+## and how often it turns its head meanwhile.
+@export var look_around_time := 1.5
+@export var look_turn_time := 0.5
+## Longest it spends walking over to a noise it heard.
+@export var noise_walk_time := 4.0
+
 @export_group("Mushrooms")
 @export var mushroom_notice_range := 112.0
 @export var feed_time := 1.5
@@ -71,6 +97,8 @@ const POWER_WARNING_TIME := 3.0
 @export var rage_speed := 105.0
 @export var rage_sight_bonus := 32.0
 @export var rage_give_up_time := 4.0
+## Rage chickens go from "?" to "!" this much faster.
+@export var rage_notice_scale := 0.4
 
 @export_group("Flight")
 @export var hop_speed := 95.0
@@ -129,6 +157,13 @@ var _uninterested_left := 0.0
 var _roost: Roost = null
 var _roost_index := 0
 var _show_prompt := false
+## 0 to 1: how close a suspicious chicken is to spotting the player.
+var _suspicion := 0.0
+var _sees_player_now := false
+var _noise_spot := Vector2.ZERO
+var _heading_to_noise := false
+var _look_left := 0.0
+var _turn_in := 0.0
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
@@ -197,6 +232,8 @@ func _physics_process(delta: float) -> void:
 				_roosting()
 			State.FLUNG:
 				_flung()
+			State.SUSPICIOUS:
+				_suspicious(delta)
 		if state != State.FLUNG:
 			velocity += Carousel.push_for(get_tree(), global_position)
 		# Chickens heading into a roost pass through each other: they're
@@ -225,8 +262,38 @@ func _physics_process(delta: float) -> void:
 
 ## Called by a nearby chicken that spotted the player.
 func alert() -> void:
-	if state in [State.WANDER, State.SEEK_MUSHROOM]:
+	if state in [State.WANDER, State.SEEK_MUSHROOM, State.SUSPICIOUS]:
 		_start_pursuit(false)
+
+
+## Makes a noise at a point: chickens within radius turn toward it and go
+## and look around there, suspicious.
+static func make_noise(tree: SceneTree, at: Vector2, radius: float) -> void:
+	for node in tree.get_nodes_in_group("chickens"):
+		var chicken := node as Chicken
+		if chicken.global_position.distance_to(at) <= radius:
+			chicken.hear(at)
+
+
+## Heard a noise: turn toward it and walk over to look. Chickens that are
+## busy (eating, chasing, settled in a roost, at a closet door) ignore it.
+func hear(at: Vector2) -> void:
+	if state not in [State.WANDER, State.SEEK_MUSHROOM, State.SEEK_ROOST, State.SUSPICIOUS] \
+			or _is_hopping() or _uninterested_left > 0.0:
+		return
+	state = State.SUSPICIOUS
+	_noise_spot = at
+	_heading_to_noise = true
+	_timer = noise_walk_time
+	_look_left = look_around_time
+	_turn_in = look_turn_time
+	if at != global_position:
+		_facing = global_position.direction_to(at)
+
+
+## True while it's suspicious: it glimpsed the player or heard something.
+func is_suspicious() -> bool:
+	return state == State.SUSPICIOUS
 
 
 ## Knocked silly (for example, tumbling off a toppled totem): no moving or
@@ -334,8 +401,7 @@ func _wander() -> void:
 	velocity = _wander_dir * wander_speed * (1.5 if power == "rage" else 1.0)
 	if _try_investigate():
 		return
-	if _can_see_player():
-		_start_pursuit(true)
+	if _try_notice():
 		return
 	_try_seek_mushroom()
 	if state == State.WANDER:
@@ -409,8 +475,7 @@ func _seek_mushroom() -> void:
 		return
 	if _try_investigate():
 		return
-	if _can_see_player():
-		_start_pursuit(true)
+	if _try_notice():
 		return
 	if global_position.distance_to(_target_patch.global_position) < 6.0:
 		velocity = Vector2.ZERO
@@ -421,6 +486,44 @@ func _seek_mushroom() -> void:
 			state = State.WANDER
 		return
 	velocity = _direction_toward(_target_patch.global_position) * investigate_speed
+
+
+## Glimpsed the player or heard a noise. While she's in view it stares at
+## her and suspicion builds until it spots her; out of view it cools off,
+## walks over to any noise, and looks around before going back to normal.
+func _suspicious(delta: float) -> void:
+	if _try_investigate():
+		return
+	velocity = Vector2.ZERO
+	_sees_player_now = _can_notice_player()
+	if _sees_player_now:
+		var distance := global_position.distance_to(_player.global_position)
+		if distance <= instant_notice_range:
+			_start_pursuit(true)
+			return
+		_facing = global_position.direction_to(_player.global_position)
+		_heading_to_noise = false
+		_look_left = look_around_time
+		var closeness := 1.0 - clampf(distance / _sight_reach(), 0.0, 1.0)
+		var time := notice_time * (rage_notice_scale if power == "rage" else 1.0)
+		_suspicion += delta * (1.0 + closeness) / time
+		if _suspicion >= 1.0:
+			_start_pursuit(true)
+		return
+	_suspicion = maxf(_suspicion - suspicion_cooldown * delta, 0.0)
+	if _heading_to_noise:
+		if global_position.distance_to(_noise_spot) > 8.0 and _timer > 0.0:
+			velocity = _direction_toward(_noise_spot) * investigate_speed * 0.6
+			return
+		_heading_to_noise = false
+	_look_left -= delta
+	_turn_in -= delta
+	if _turn_in <= 0.0:
+		_turn_in = look_turn_time
+		_facing = CARDINALS.pick_random()
+	if _suspicion <= 0.0 and _look_left <= 0.0:
+		state = State.WANDER
+		_pick_wander()
 
 
 func _frozen() -> void:
@@ -496,8 +599,7 @@ func _roosting() -> void:
 		return
 	if _try_investigate():
 		return
-	if state == State.SEEK_ROOST and _can_see_player():
-		_start_pursuit(true)
+	if state == State.SEEK_ROOST and _try_notice():
 		return
 	var spot := _roost.spot_for(_roost_index)
 	if global_position.distance_to(spot) < 3.0:
@@ -661,6 +763,9 @@ func _pick_wander() -> void:
 	# Half the time stand and peck; otherwise stroll somewhere.
 	if randf() < 0.5:
 		_wander_dir = Vector2.ZERO
+		# Standing still, it looks around now and then.
+		if randf() < 0.5:
+			_facing = CARDINALS.pick_random()
 	else:
 		_wander_dir = Vector2.from_angle(randf() * TAU)
 	_timer = randf_range(1.0, 2.5)
@@ -695,15 +800,72 @@ func _try_seek_mushroom() -> void:
 			state = State.SEEK_MUSHROOM
 
 
+## While chasing, a chicken keeps track of the player all around it.
 func _can_see_player() -> bool:
+	return _sees_player_within(_sight_reach())
+
+
+## Noticing her in the first place takes being in front of it (the way its
+## sprite faces), unless she's right beside it. Pecking, it sees less far.
+func _can_notice_player() -> bool:
+	if _player == null:
+		return false
+	var offset := _player.global_position - global_position
+	if offset.length() <= instant_notice_range:
+		return _sees_player_within(instant_notice_range)
+	if absf(rad_to_deg(_view_direction().angle_to(offset))) > vision_half_angle:
+		return false
+	var reach := _sight_reach()
+	if _is_pecking():
+		reach *= pecking_sight_scale
+	return _sees_player_within(reach)
+
+
+## Glimpsed the player: get suspicious, or chase at once if she's right there.
+func _try_notice() -> bool:
+	if not _can_notice_player():
+		return false
+	if global_position.distance_to(_player.global_position) <= instant_notice_range:
+		_start_pursuit(true)
+	else:
+		state = State.SUSPICIOUS
+		_heading_to_noise = false
+		_look_left = look_around_time
+		_turn_in = look_turn_time
+	return true
+
+
+## The way the sprite is drawn facing (up, down, left or right), so what the
+## player sees is what the chicken sees.
+func _view_direction() -> Vector2:
+	match SpriteSheets.direction_name(_facing):
+		"left":
+			return Vector2.LEFT
+		"right":
+			return Vector2.RIGHT
+		"up":
+			return Vector2.UP
+	return Vector2.DOWN
+
+
+## Standing still pecking at the floor while wandering.
+func _is_pecking() -> bool:
+	return state == State.WANDER and _wander_dir == Vector2.ZERO and _retreat_left <= 0.0 \
+		and power == ""
+
+
+func _sight_reach() -> float:
+	if power == "rage":
+		return sight_range + rage_sight_bonus
+	if power == "egg":
+		# Egg shooters need to see as far as they can shoot.
+		return maxf(sight_range, egg_range)
+	return sight_range
+
+
+func _sees_player_within(reach: float) -> bool:
 	if _player == null or _player.is_dead or _player.is_hidden or _uninterested_left > 0.0:
 		return false
-	var reach := sight_range
-	if power == "rage":
-		reach += rage_sight_bonus
-	elif power == "egg":
-		# Egg shooters need to see as far as they can shoot.
-		reach = maxf(sight_range, egg_range)
 	if global_position.distance_to(_player.global_position) > reach:
 		return false
 	var query := PhysicsRayQueryParameters2D.create(global_position, _player.global_position, WORLD_LAYER)
@@ -713,8 +875,11 @@ func _can_see_player() -> bool:
 func _start_pursuit(alert_others: bool) -> void:
 	state = State.PURSUE
 	_lost_sight_time = 0.0
+	_suspicion = 0.0
 	if not alert_others:
 		return
+	# Spotted her: a startled hop and a cluck.
+	Juice.squash(_sprite, Vector2(0.8, 1.3), 0.15)
 	AudioManager.play("cluck", global_position)
 	for node in get_tree().get_nodes_in_group("chickens"):
 		var other := node as Chicken
@@ -773,7 +938,7 @@ func _update_visuals() -> void:
 	if _is_hopping():
 		var t := clampf(_hop_elapsed / hop_duration, 0.0, 1.0)
 		_sprite.position.y = -roundf(sin(t * PI) * hop_height) if t < 1.0 else -hop_height
-	_alert_label.visible = state in [State.PURSUE, State.WINDUP]
+	_update_alert_label()
 	if state == State.ROOSTING and is_instance_valid(_roost) and _roost.is_forming():
 		# Hop in place while the stack goes up.
 		_sprite.position.y = -roundf(absf(sin(Time.get_ticks_msec() / 90.0)) * 3.0)
@@ -789,6 +954,21 @@ func _update_visuals() -> void:
 	if frozen:
 		_sprite.pause()
 	_alert_label.position.y = _sprite.position.y - 26.0
+
+
+## "!" while chasing; "?" while suspicious, blinking once she's out of view
+## and it's cooling off.
+func _update_alert_label() -> void:
+	if state in [State.PURSUE, State.WINDUP]:
+		_alert_label.text = "!"
+		_alert_label.add_theme_color_override("font_color", ALERT_COLOR)
+		_alert_label.visible = true
+	elif state == State.SUSPICIOUS:
+		_alert_label.text = "?"
+		_alert_label.add_theme_color_override("font_color", SUSPICIOUS_COLOR)
+		_alert_label.visible = _sees_player_now or int(Time.get_ticks_msec() / 200.0) % 2 == 0
+	else:
+		_alert_label.visible = false
 
 
 func _draw() -> void:

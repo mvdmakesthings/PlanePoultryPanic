@@ -165,11 +165,23 @@ Fire extinguisher spray and distractions don't defeat chickens. They control the
 
 ### Normal Chickens
 - Wander and peck at the floor, or follow set patrol routes
-- Spot the player within sight range when no wall is in the way
+- Notice the player in front of them, get suspicious ("?"), and spot her ("!") if she stays in view (see [Sight and Sound](#sight-and-sound))
+- Turn toward noises and go to look
 - Call nearby chickens when they spot the player
 - Give up the chase when they lose sight of the player for a couple of seconds
 - Drop everything to go after a thrown snack, then stop to eat it
 - Chase slower than the player walks, so a careful player can always escape a single normal chicken
+
+### Sight and Sound
+Sneaking is a skill: chickens can be crept up on, and a careful player can slip past one that's looking the other way.
+
+- **Facing**: A chicken sees 4 tiles ahead, in a cone 120 degrees wide pointing the way its sprite faces (up, down, left or right), so what the player sees is what the chicken sees. Pecking at the floor, it only sees about half as far. Standing still, it looks around now and then.
+- **Too close**: Anywhere within about a tile and a quarter, even behind it, a chicken notices the player at once and chases.
+- **"?" then "!"**: A chicken that catches sight of the player stops, turns to face her, and shows a yellow "?". If she stays in view for about 0.6 seconds (half that up close), it spots her: a red "!", a hop, a cluck, and the chase begins, alerting its neighbors. If she gets out of view first, the "?" blinks while it cools off, and it goes back to what it was doing. Coming back into view picks up where the suspicion left off.
+- **Chasing**: Once a chicken is chasing, it tracks the player all around, not just in front, until it loses sight of her for a couple of seconds as before.
+- **Noise**: Noises make chickens nearby turn toward them and walk over to look around, suspicious, for a moment.
+- **Powers**: Rage chickens go from "?" to "!" more than twice as fast. Egg shooters see as far as they shoot, inside the same cone.
+- Settled roost chickens, besieging chickens, and chickens eating or chasing ignore noise.
 
 ### Powered-Up Chickens
 Chickens that eat from a mushroom patch power up for 30-60 seconds, then return to normal. Each patch grows one kind of mushroom, and the kind decides the mode. A powered chicken wears a cap of the mushroom it ate, so the player can read its mode at a glance and can see which power a patch gives before going near it:
@@ -190,14 +202,15 @@ Chickens head for mushroom patches when they can. Watching a patch and timing a 
 - **Toppling**: Freeze its base with the extinguisher, ram it with a luggage cart, or lure it onto the carousel belt. It falls away from the hit, flattening any chicken where its members land; its own chickens land dazed along the fall line. Three snacks lying beside it break it apart instead, with no defeats. The roost then rests for 20 seconds.
 
 ### AI States
-Wander → Patrol → Investigate (snack or noise) → Pursue → Powered → Forming (totem)
+Wander → Patrol → Suspicious (glimpsed the player, or heard a noise) → Investigate (snack) → Pursue → Powered → Forming (totem)
 
 Behavior priority, highest first:
 1. Already eating or forming a totem: keep doing it
 2. Snack nearby: investigate it
-3. Player in sight: pursue
-4. Mushroom patch reachable: go eat
-5. Otherwise: wander or patrol
+3. Player in sight: get suspicious, then pursue once she's spotted
+4. Noise heard: go and look
+5. Mushroom patch reachable: go eat
+6. Otherwise: wander or patrol
 
 ---
 
@@ -595,3 +608,4 @@ game/
 | 2026-10-19 | A hidden fourth mushroom, the Pilot Cap: unripe, ignored by chickens, and spraying a patch counts as a secret | You (Proposed details) |
 | 2026-10-19 | The opening adds mushroom lore: a news ticker on the departure board and tarmac chickens pecking a glowing patch beside a fuel drum | You |
 | 2026-10-19 | Finding every secret puts the captain's hat on the ending's stowaway and adds a last PA line | Proposed |
+| 2026-10-24 | Sneaking becomes a skill: chickens see in a cone the way they face, get suspicious ("?") before spotting the player ("!"), and notice her instantly only within about a tile and a quarter | You (Proposed details) |

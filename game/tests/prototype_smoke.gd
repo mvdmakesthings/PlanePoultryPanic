@@ -104,6 +104,7 @@ func _ready() -> void:
 		"chicken paths around the carousel island and eats the snack")
 
 	room.queue_free()
+	await _senses_tests()
 	await _power_tests()
 	await _carousel_tests()
 	await _cart_tests()
@@ -126,6 +127,85 @@ func _ready() -> void:
 		for failure in _failures:
 			printerr("FAILED: " + failure)
 		get_tree().quit(1)
+
+
+## A chicken that spotted the player is chasing her, or bouncing back from
+## the peck it just landed.
+const CHASING: Array[Chicken.State] = [Chicken.State.PURSUE, Chicken.State.RECOIL]
+
+
+## Sight cones, the "?" before the "!", and hearing noises, each with one
+## chicken standing at (200, 260) looking right.
+func _senses_tests() -> void:
+	var chicken_at := Vector2(200, 260)
+
+	var setup := await _watching_chicken(chicken_at, chicken_at + Vector2(-40, 0))
+	var chicken: Chicken = setup[1]
+	var player: Player = setup[2]
+	await _wait(1.0)
+	_check(chicken.state == Chicken.State.WANDER, "a chicken doesn't see the player behind it")
+	setup[0].queue_free()
+
+	setup = await _watching_chicken(chicken_at, chicken_at + Vector2(40, 0))
+	chicken = setup[1]
+	await _wait(0.1)
+	_check(chicken.is_suspicious(), "a chicken that glimpses the player gets suspicious first")
+	_check(chicken._alert_label.visible and chicken._alert_label.text == "?", "a suspicious chicken shows a ?")
+	await _wait(0.9)
+	_check(chicken.state in CHASING, "staying in view gets the player spotted")
+	_check(chicken._alert_label.text == "!", "a chicken that spots the player shows a !")
+	setup[0].queue_free()
+
+	setup = await _watching_chicken(chicken_at, chicken_at + Vector2(40, 0))
+	chicken = setup[1]
+	player = setup[2]
+	await _wait(0.15)
+	player.global_position = chicken_at + Vector2(0, 200)
+	await _wait(0.8)
+	_check(chicken.state != Chicken.State.PURSUE, "getting out of view during the ? avoids the chase")
+	await _wait(2.0)
+	_check(chicken.state == Chicken.State.WANDER, "a suspicious chicken calms down again")
+	setup[0].queue_free()
+
+	setup = await _watching_chicken(chicken_at, chicken_at + Vector2(-15, 0))
+	chicken = setup[1]
+	await _wait(0.1)
+	_check(chicken.state in CHASING, "a chicken notices the player right behind it at once")
+	setup[0].queue_free()
+
+	setup = await _watching_chicken(chicken_at, chicken_at + Vector2(48, 0), true)
+	chicken = setup[1]
+	player = setup[2]
+	await _wait(0.5)
+	_check(chicken.state == Chicken.State.WANDER, "a pecking chicken doesn't see as far")
+	player.global_position = chicken_at + Vector2(28, 0)
+	await _wait(0.1)
+	_check(chicken.is_suspicious(), "a pecking chicken still sees the player close in front")
+	setup[0].queue_free()
+
+	setup = await _watching_chicken(chicken_at, chicken_at + Vector2(0, -200))
+	chicken = setup[1]
+	var noise := chicken_at + Vector2(-50, 0)
+	Chicken.make_noise(get_tree(), noise, 96.0)
+	await get_tree().physics_frame
+	_check(chicken.is_suspicious() and chicken._view_direction() == Vector2.LEFT,
+		"a chicken turns toward a noise")
+	await _wait(0.8)
+	_check(chicken.global_position.distance_to(noise) < 40.0, "a chicken walks over to look at a noise")
+	setup[0].queue_free()
+
+
+## A fresh room with one chicken standing still looking right, and the
+## player at player_at. Pecking, it looks right at the floor instead.
+func _watching_chicken(chicken_at: Vector2, player_at: Vector2, pecking := false) -> Array:
+	var setup := await _fresh_room(chicken_at, player_at)
+	var chicken: Chicken = setup[1]
+	chicken.state = Chicken.State.WANDER
+	chicken.wander_speed = 0.0
+	chicken._wander_dir = Vector2.ZERO if pecking else Vector2.RIGHT
+	chicken._facing = Vector2.RIGHT
+	chicken._timer = 100.0
+	return setup
 
 
 ## Mushroom power-ups, each in a fresh room with a single chicken.
