@@ -57,6 +57,11 @@ var state := State.IDLE
 @export var speed := 45.0
 @export var sight_range := 110.0
 @export var command_radius := 96.0
+## Once chasing, it keeps after the player out to this range while it can
+## still see her, so going the long way around a walkway doesn't lose her.
+@export var chase_range := 220.0
+## Seconds it keeps after her once she's out of view.
+@export var give_up_time := 3.0
 @export_group("Stomp")
 @export var stomp_trigger := 34.0
 @export var stomp_radius := 44.0
@@ -99,6 +104,7 @@ var _topple_dir := Vector2.RIGHT
 var _time := 0.0
 var _flight_ready_in := 4.0
 var _flight_elapsed := 0.0
+var _lost_sight_time := 0.0
 var _hits_taken := 0
 ## After a hit, a moment when it can't be hit again.
 var _reeling := 0.0
@@ -159,7 +165,7 @@ func _physics_process(delta: float) -> void:
 		State.FLYING:
 			_fly(delta)
 		State.IDLE, State.STALK:
-			_stalk()
+			_stalk(delta)
 		State.STOMP_WINDUP:
 			velocity = Vector2.ZERO
 			if _timer <= 0.0:
@@ -233,15 +239,24 @@ func hit_by_foam(from: Vector2) -> void:
 	topple(from.direction_to(global_position))
 
 
-func _stalk() -> void:
+func _stalk(delta: float) -> void:
 	velocity = Vector2.ZERO
 	if not _can_see_player():
 		# A player in range but behind furniture: fly over it.
 		if _flight_ready_in <= 0.0 and _player_in_range():
 			_take_off()
 			return
+		# Out of range or view mid-chase: keep after her, around whatever's
+		# in the way, while she's still in view or only just out of it.
+		var in_view := _player_trackable() and _has_line_of_sight() \
+			and global_position.distance_to(_player.global_position) <= chase_range
+		_lost_sight_time = 0.0 if in_view else _lost_sight_time + delta
+		if state == State.STALK and _lost_sight_time < give_up_time and _player_trackable():
+			_walk_toward_player()
+			return
 		state = State.IDLE
 		return
+	_lost_sight_time = 0.0
 	if state == State.IDLE:
 		_command_chickens()
 	state = State.STALK
@@ -255,6 +270,10 @@ func _stalk() -> void:
 		return
 	if distance >= barrage_min_range and distance <= barrage_max_range and _barrage_ready_in <= 0.0:
 		_barrage()
+	_walk_toward_player()
+
+
+func _walk_toward_player() -> void:
 	_agent.target_position = _player.global_position
 	var next := _agent.get_next_path_position()
 	var target := next if next.distance_to(global_position) > 0.5 else _player.global_position
@@ -282,7 +301,9 @@ func _fly(delta: float) -> void:
 	if _timer > 0.0:
 		return
 	if _overlaps_world():
-		# Can't land inside furniture: keep flying a moment longer.
+		# Can't land inside furniture (or a walkway rail, landing where she
+		# stood beside it): drift out of it and try again.
+		global_position += _out_of_world()
 		_timer = 0.05
 		return
 	collision_mask = WORLD_LAYER
@@ -299,6 +320,19 @@ func _overlaps_world() -> bool:
 	params.transform = ($CollisionShape2D as CollisionShape2D).global_transform
 	params.collision_mask = WORLD_LAYER
 	return not get_world_2d().direct_space_state.intersect_shape(params, 1).is_empty()
+
+
+## A one-pixel step out of whatever it overlaps, away from the contact.
+func _out_of_world() -> Vector2:
+	var params := PhysicsShapeQueryParameters2D.new()
+	params.shape = ($CollisionShape2D as CollisionShape2D).shape
+	params.transform = ($CollisionShape2D as CollisionShape2D).global_transform
+	params.collision_mask = WORLD_LAYER
+	var info := get_world_2d().direct_space_state.get_rest_info(params)
+	if info.is_empty():
+		return Vector2.ZERO
+	var away: Vector2 = info["point"].direction_to(params.transform.origin)
+	return away if away != Vector2.ZERO else Vector2.DOWN
 
 
 ## Height above the floor: rising after take-off, sinking before landing.
@@ -397,14 +431,21 @@ func _break_apart(fell: bool) -> void:
 
 
 func _player_in_range() -> bool:
-	return _player != null and not _player.is_dead and not _player.is_hidden \
-		and global_position.distance_to(_player.global_position) <= sight_range
+	return _player_trackable() and global_position.distance_to(_player.global_position) <= sight_range
+
+
+## Not dead or hiding: someone it can keep chasing, seen or not.
+func _player_trackable() -> bool:
+	return _player != null and not _player.is_dead and not _player.is_hidden
 
 
 func _can_see_player() -> bool:
-	if not _player_in_range():
-		return false
+	return _player_in_range() and _has_line_of_sight()
+
+
+func _has_line_of_sight() -> bool:
 	var query := PhysicsRayQueryParameters2D.create(global_position, _player.global_position, WORLD_LAYER)
+	query.exclude = Walkway.rails(get_tree())
 	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
 

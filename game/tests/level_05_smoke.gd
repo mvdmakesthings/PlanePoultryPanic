@@ -21,6 +21,7 @@ func _ready() -> void:
 	GameManager.dry_run = true
 	await _arrival_test()
 	await _layout_tests()
+	await _totem_walkway_test()
 	await _boss_and_escape_test()
 	await _time_out_test()
 	await _ending_test()
@@ -65,6 +66,35 @@ func _layout_tests() -> void:
 	for chicken in level._boss_chickens():
 		still = still and not chicken.is_physics_processing()
 	_check(still, "the boss's chickens wait until she steps into the boarding area")
+	level.queue_free()
+
+
+## A totem across a walkway from her sees over the rails, walks around
+## the end (out of its sight range on the way) and reaches her; a flight
+## that lands where she stands right under a rail settles beside it.
+func _totem_walkway_test() -> void:
+	var level := await _fresh_level()
+	var player: Player = level.get_node("Entities/Player")
+	player._invincible_timer = 1.0e9
+	player.set_physics_process(false)
+	for chicken in level._boss_chickens():
+		chicken.queue_free()
+	player.global_position = Vector2(640, 170)
+	var totem: Totem = preload("res://scenes/characters/totem.tscn").instantiate()
+	totem.position = Vector2(640, 92)
+	totem.flight_interval = 1.0e9
+	totem.barrage_cooldown = 1.0e9
+	totem.stomp_trigger = -1.0
+	level.get_node("Entities").add_child(totem)
+	totem._flight_ready_in = 1.0e9
+	# Around the end and back is about 460 px at 45 px/s.
+	await _wait(13.0)
+	_check(totem.global_position.distance_to(player.global_position) < 20.0,
+		"a totem goes around a walkway to reach her (at %s)" % totem.global_position)
+	player.global_position = Vector2(640, 148)
+	totem._take_off()
+	await _wait(4.0)
+	_check(totem.state != Totem.State.FLYING, "a totem landing by a walkway rail touches down")
 	level.queue_free()
 
 

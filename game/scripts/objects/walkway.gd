@@ -36,6 +36,7 @@ const FLING_ZONE := 8.0
 @export var fling_speed := 200.0
 
 var _phase := 0.0
+var _rails: Array[RID] = []
 
 
 func _ready() -> void:
@@ -47,6 +48,7 @@ func _ready() -> void:
 			Rect2(Vector2(r.position.x, r.end.y - RAIL), Vector2(r.size.x, RAIL))]:
 		var body := LevelBuilder.add_wall(self, rail)
 		body.position = -global_position
+		_rails.append(body.get_rid())
 	AudioManager.play_loop("walkway_hum", self, r.get_center())
 
 
@@ -61,6 +63,15 @@ func direction() -> Vector2:
 
 func belt_speed() -> float:
 	return SPEEDS[speed]
+
+
+## The handrails of every walkway. They're waist high: they block walking
+## but not seeing, so sight checks leave them out.
+static func rails(tree: SceneTree) -> Array[RID]:
+	var out: Array[RID] = []
+	for node in tree.get_nodes_in_group("walkways"):
+		out.append_array((node as Walkway)._rails)
+	return out
 
 
 ## Belt velocity at a world position, or zero off the belt.

@@ -869,6 +869,7 @@ func _sees_player_within(reach: float) -> bool:
 	if global_position.distance_to(_player.global_position) > reach:
 		return false
 	var query := PhysicsRayQueryParameters2D.create(global_position, _player.global_position, WORLD_LAYER)
+	query.exclude = Walkway.rails(get_tree())
 	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
 
