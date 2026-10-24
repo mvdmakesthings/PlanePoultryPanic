@@ -16,6 +16,7 @@ enum State { WANDER, PURSUE, INVESTIGATE, EATING, SEEK_MUSHROOM, FEEDING, WINDUP
 const WALK_SHEET := preload("res://assets/sprites/chicken_walk.png")
 const IDLE_SHEET := preload("res://assets/sprites/chicken_idle.png")
 const CHASE_SHEET := preload("res://assets/sprites/chicken_chase.png")
+const FROZEN_SHEET := preload("res://assets/sprites/chicken_frozen.png")
 const EAT_SHEET := preload("res://assets/sprites/chicken_eat.png")
 const POWER_SHEETS := {
 	"flight": preload("res://assets/sprites/chicken_flight_walk.png"),
@@ -24,8 +25,6 @@ const POWER_SHEETS := {
 }
 const EGG_SCENE := preload("res://scenes/objects/egg_projectile.tscn")
 const POOF_SCENE := preload("res://scenes/objects/feather_poof.tscn")
-## Frozen chickens are tinted icy and boxed in an ice block.
-const FROZEN_TINT := Color(0.7, 0.95, 1.0)
 const FRAME_SIZE := Vector2i(16, 16)
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const WORLD_LAYER := 1
@@ -146,6 +145,7 @@ func _ready() -> void:
 	SpriteSheets.add_directional(frames, "walk", WALK_SHEET, FRAME_SIZE, 8.0)
 	SpriteSheets.add_directional(frames, "idle", IDLE_SHEET, FRAME_SIZE, 3.0)
 	SpriteSheets.add_directional(frames, "chase", CHASE_SHEET, FRAME_SIZE, 12.0)
+	SpriteSheets.add_directional(frames, "frozen", FROZEN_SHEET, FRAME_SIZE, 1.0)
 	# Eating is only drawn facing the camera: peck, chip in beak, chomp.
 	frames.add_animation("eat_down")
 	frames.set_animation_speed("eat_down", 6.0)
@@ -745,7 +745,9 @@ func _update_visuals() -> void:
 	var show_power := power != "" and (
 		_power_timer > POWER_WARNING_TIME or int(_power_timer * 4.0) % 2 == 0)
 	var animation: String
-	if show_power:
+	if state == State.FROZEN:
+		animation = "frozen_" + direction
+	elif show_power:
 		animation = power + "_walk_" + direction
 	elif state in [State.EATING, State.FEEDING]:
 		animation = "eat_down"
@@ -756,7 +758,7 @@ func _update_visuals() -> void:
 		animation = ("walk_" if moving else "idle_") + direction
 	if _sprite.animation != animation:
 		_sprite.play(animation)
-	if show_power and not moving:
+	if show_power and not moving and state != State.FROZEN:
 		# Powered sheets only have walk cycles; stand on the passing frame.
 		_sprite.pause()
 		_sprite.frame = 1
@@ -785,9 +787,6 @@ func _update_visuals() -> void:
 		_show_prompt = prompt
 		queue_redraw()
 	_ice.visible = frozen
-	_sprite.modulate = FROZEN_TINT if frozen else Color.WHITE
-	if frozen:
-		_sprite.pause()
 	_alert_label.position.y = _sprite.position.y - 26.0
 
 
