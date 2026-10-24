@@ -51,6 +51,13 @@ const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const SPRAY_AIM_RANGE := 64.0
 ## How far away chickens hear her running footsteps.
 const RUN_NOISE_RANGE := 48.0
+## A gag: eating FART_AFTER snacks within FART_WINDOW seconds makes Amanda
+## fart, dazing every chicken within FART_RADIUS for FART_DAZE seconds.
+const FART_AFTER := 3
+const FART_WINDOW := 4.0
+const FART_RADIUS := 40.0
+const FART_DAZE := 2.5
+const GAS_TINT := Color("#63c74d")
 
 @export var walk_speed := 100.0
 @export var run_speed := 150.0
@@ -110,6 +117,8 @@ var _hair: Sprite2D
 ## Top opaque row of each animation frame, so the hair follows the head.
 var _head_tops := {}
 var _sheet_images := {}
+## When recent snacks were eaten, for the fart gag.
+var _snacks_eaten: Array[float] = []
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -309,6 +318,37 @@ func eat_snack() -> void:
 	_start_action("eat")
 	health = mini(health + SUITCASE, max_health)
 	health_changed.emit(health, max_health)
+	if _fart_due():
+		fart()
+
+
+## Counts this snack; true (and starts counting over) on the FART_AFTER-th
+## snack eaten within FART_WINDOW seconds.
+func _fart_due() -> bool:
+	var now := Time.get_ticks_msec() / 1000.0
+	_snacks_eaten.append(now)
+	_snacks_eaten.assign(_snacks_eaten.filter(func(t: float) -> bool: return now - t <= FART_WINDOW))
+	if _snacks_eaten.size() < FART_AFTER:
+		return false
+	_snacks_eaten.clear()
+	return true
+
+
+## A green puff billowing out from behind her, and chickens close by reel
+## from it. Frozen, airborne or hopping chickens are left alone.
+func fart() -> void:
+	AudioManager.play("fart", global_position)
+	# A pixel up the screen, so the cloud sorts behind her, not over her.
+	var cloud := ParticleBurst.spawn(get_parent(), "gas", global_position + Vector2(0, -1))
+	if cloud:
+		cloud.modulate = GAS_TINT
+	FloatText.spawn(self, "Excuse me!")
+	for node in get_tree().get_nodes_in_group("chickens"):
+		var chicken := node as Chicken
+		if chicken.state in [Chicken.State.FROZEN, Chicken.State.FLUNG] or chicken.is_hopping():
+			continue
+		if global_position.distance_to(chicken.global_position) <= FART_RADIUS:
+			chicken.stun(FART_DAZE)
 
 
 ## Returns false if every slot is full.

@@ -12,6 +12,9 @@ low-pass filter. Each sound is a short recipe in SOUNDS below, so a sound
 can be tuned by editing numbers and rebuilding. The output is the same
 every run (random noise uses fixed seeds).
 
+A few sounds are recordings rather than recipes, so this script leaves them
+alone: fart.wav is cut from a Freesound recording (see CREDITS.md).
+
 The music is a placeholder until the commissioned tracks arrive: short
 chiptune loops written as note lists in music.py. The game plays no music
 for now, so it's only built when asked for.

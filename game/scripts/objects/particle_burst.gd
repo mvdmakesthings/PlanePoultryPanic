@@ -43,6 +43,10 @@ const STYLES := {
 		"life": [0.2, 0.35], "animate": true, "height": 4.0, "flutter": 0.0, "above": true},
 	"sparkle": {"count": 4, "speed": [10.0, 25.0], "rise": [10.0, 25.0], "gravity": -20.0, "drag": 20.0,
 		"life": [0.45, 0.7], "animate": true, "height": 6.0, "flutter": 0.0, "above": true},
+	# Amanda's gas: a slow puff of dust that billows out and hangs. Spawn it
+	# just behind her with modulate set to a sickly green.
+	"gas": {"row": "dust", "count": 18, "speed": [24.0, 50.0], "rise": [2.0, 8.0], "gravity": -6.0,
+		"drag": 18.0, "life": [1.0, 1.4], "animate": true, "height": 5.0, "flutter": 1.0, "above": false},
 	"confetti": {"count": 16, "speed": [20.0, 50.0], "rise": [70.0, 110.0], "gravity": 160.0, "drag": 25.0,
 		"life": [1.1, 1.5], "animate": false, "height": 20.0, "flutter": 3.0, "above": true},
 }
