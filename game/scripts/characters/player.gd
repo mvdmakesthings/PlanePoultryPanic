@@ -332,11 +332,12 @@ func _fart_due() -> bool:
 	return true
 
 
-## A green puff behind her, and chickens close by reel from it. Frozen,
-## airborne or hopping chickens are left alone.
+## A green puff billowing out from behind her, and chickens close by reel
+## from it. Frozen, airborne or hopping chickens are left alone.
 func fart() -> void:
 	AudioManager.play("fart", global_position)
-	var cloud := ParticleBurst.spawn(get_parent(), "gas", global_position, -facing)
+	# A pixel up the screen, so the cloud sorts behind her, not over her.
+	var cloud := ParticleBurst.spawn(get_parent(), "gas", global_position + Vector2(0, -1))
 	if cloud:
 		cloud.modulate = GAS_TINT
 	FloatText.spawn(self, "Excuse me!")
