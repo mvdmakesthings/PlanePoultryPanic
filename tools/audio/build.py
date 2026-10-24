@@ -12,6 +12,9 @@ low-pass filter. Each sound is a short recipe in SOUNDS below, so a sound
 can be tuned by editing numbers and rebuilding. The output is the same
 every run (random noise uses fixed seeds).
 
+A few sounds are recordings rather than recipes, so this script leaves them
+alone: fart.wav is cut from a Freesound recording (see CREDITS.md).
+
 The music is a placeholder until the commissioned tracks arrive: short
 chiptune loops written as note lists in music.py. The game plays no music
 for now, so it's only built when asked for.
@@ -254,16 +257,6 @@ SOUNDS = {
                                 for f in (1319, 1319, 1568, 1319, 1175, 1047, 1175, 1319)],
                               cluck(71, 1.3),
                               gaps=[0.0, 0.14, 0.28, 0.42, 0.63, 0.77, 0.91, 1.05, 1.3]),
-    # Three snacks eaten quickly: a low wobbling buzz that sags, then a
-    # little squeak to finish.
-    "fart": lambda: mix(tone("square", 95, slide=-0.6, duty=0.35, attack=0.01, sustain=0.35,
-                             decay=0.2, vibrato_depth=0.25, vibrato_speed=22, lowpass=0.25,
-                             volume=0.55),
-                        tone("noise", 300, attack=0.01, sustain=0.3, decay=0.2, lowpass=0.1,
-                             volume=0.25, seed=72),
-                        tone("square", 240, slide=1.5, duty=0.3, attack=0.002, sustain=0.04,
-                             decay=0.06, lowpass=0.4, volume=0.25),
-                        gaps=[0.0, 0.0, 0.52]),
     # Menus
     "ui_move": lambda: tone("square", 880, duty=0.5, attack=0.001, sustain=0.015, decay=0.03,
                             volume=0.2),
