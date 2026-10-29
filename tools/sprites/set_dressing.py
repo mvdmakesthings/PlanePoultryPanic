@@ -649,6 +649,277 @@ def map_stand_sheet():
     return _strip([map_stand(f) for f in range(3)], STAND_W, STAND_H)
 
 
+# --- Wayfinding & airport furniture ---------------------------------------
+# Coin-op scale, info kiosk, wall clock, notice board,
+# overhead sign gantry, gate-number totem, ATM. All set dressing: solid
+# bases join nav_obstacles; the wall pieces are decorative sprites.
+
+# --- Coin-op luggage scale (16x24, 2 frames: needle twitch) ---------------
+
+SCALE_W, SCALE_H = 16, 24
+
+
+def luggage_scale(frame):
+    """frame 0: needle up; 1: needle nudged right under weight."""
+    g = _blank(SCALE_W, SCALE_H)
+    # Round dial head: light face, dark ring, cardinal ticks.
+    _rect(g, 3, 2, 12, 10, "p")
+    _rect(g, 3, 2, 12, 2, "W")
+    _rect(g, 3, 2, 3, 10, "W")
+    _rect(g, 10, 9, 12, 10, "w")
+    put(g, 3, 7, "O")          # twelve o'clock tick
+    put(g, 9, 11, "O")         # three
+    put(g, 10, 7, "O")         # six
+    put(g, 6, 3, "O")          # nine
+    # Needle: red, pivoting on the center dot.
+    cx, cy = (7, 6) if frame == 0 else (8, 7)
+    put(g, cy, cx, "O")
+    for dy in (-3, -2, -1):
+        put(g, cy + dy, cx, "R")
+    # Post down to the platform.
+    _rect(g, 6, 10, 9, 18, "w")
+    _rect(g, 6, 10, 6, 18, "W")
+    _rect(g, 9, 10, 9, 18, "T")
+    # Platform: suitcase pad on top, brass coin slot on the front.
+    _rect(g, 1, 19, 14, 23, "w")
+    _rect(g, 1, 19, 14, 20, "p")
+    _rect(g, 1, 19, 1, 23, "W")
+    _rect(g, 1, 23, 14, 23, "T")
+    _rect(g, 12, 21, 13, 21, "k")   # coin slot
+    put(g, 20, 12, "Y")             # slot lip catches the light
+    return _outline(g)
+
+
+def luggage_scale_sheet():
+    return _strip([luggage_scale(f) for f in range(2)], SCALE_W, SCALE_H)
+
+
+# --- Flight info kiosk (24x36, 2 frames: screen flicker) -------------------
+
+KIOSK_W, KIOSK_H = 24, 36
+
+
+def flight_kiosk(frame):
+    """A freestanding screen on a pedestal; rows swap brightness."""
+    g = _blank(KIOSK_W, KIOSK_H)
+    # Header band with a flight-strip arrow.
+    _rect(g, 3, 1, 20, 3, "B")
+    _rect(g, 3, 1, 20, 1, "b")
+    _text(g, 9, 2, ">", "C")
+    # Screen: dark bezel, blue glass, rows of departure strips.
+    _rect(g, 2, 4, 21, 16, "k")
+    _rect(g, 3, 5, 20, 15, "B")
+    widths = (8, 6, 9, 7, 8)
+    for i, wdt in enumerate(widths):
+        key = "y" if (i == 2 and frame == 1) else ("p" if (i + frame) % 3 else "W")
+        _rect(g, 4, 6 + i * 2, 3 + wdt, 6 + i * 2, key)
+    # Pedestal: narrow neck widening to a base plate.
+    _rect(g, 10, 17, 13, 20, "T")
+    _rect(g, 10, 17, 10, 20, "w")
+    _rect(g, 6, 21, 17, 33, "w")
+    _rect(g, 6, 21, 17, 21, "W")
+    _rect(g, 6, 21, 6, 33, "W")
+    _rect(g, 17, 21, 17, 33, "T")
+    _rect(g, 8, 29, 14, 30, "T")   # scuff band at kick height
+    _rect(g, 4, 34, 19, 35, "w")
+    _rect(g, 4, 34, 19, 34, "W")
+    _rect(g, 19, 34, 19, 35, "T")
+    return _outline(g)
+
+
+def flight_kiosk_sheet():
+    return _strip([flight_kiosk(f) for f in range(2)], KIOSK_W, KIOSK_H)
+
+
+# --- Wall clock (16x16, 4 frames: hour hand 12/3/6/9) ----------------------
+
+CLOCK_W, CLOCK_H = 16, 16
+
+
+def wall_clock(frame):
+    """An airport wall clock; the hour hand steps around the dial."""
+    g = _blank(CLOCK_W, CLOCK_H)
+    for y in range(CLOCK_H):
+        for x in range(CLOCK_W):
+            d = math.hypot(x + 0.5 - 8, y + 0.5 - 8)
+            if d < 7.5:
+                put(g, y, x, "O" if d > 6.2 else "p")
+    # Face shading: light from the top left, tick marks at the cardinals.
+    _rect(g, 6, 3, 8, 5, "W")
+    for y, x in ((2, 7), (13, 7), (7, 2), (7, 13)):
+        put(g, y, x, "O")
+    # Minute hand fixed at twelve; hour hand per frame.
+    _rect(g, 7, 4, 7, 6, "O")
+    put(g, 7, 7, "k")
+    hands = {0: ((5, 7), (6, 7)), 1: ((7, 8), (7, 9)),
+             2: ((8, 7), (9, 7)), 3: ((7, 5), (7, 4))}
+    for y, x in hands[frame]:
+        put(g, y, x, "O")
+    return g
+
+
+def wall_clock_sheet():
+    return _strip([wall_clock(f) for f in range(4)], CLOCK_W, CLOCK_H)
+
+
+# --- Notice board (32x16, 2 frames: two flyer layouts) ---------------------
+
+BOARD_W, BOARD_H = 32, 16
+
+
+def _pin(g, y, x):
+    put(g, y, x, "R")
+    put(g, y, x + 1, "r")
+
+
+def notice_board(frame):
+    """A cork board with pinned flyers; frame 1 is a different layout."""
+    g = _blank(BOARD_W, BOARD_H)
+    # Wood frame: lit top/left, shaded bottom/right.
+    _rect(g, 0, 0, BOARD_W - 1, BOARD_H - 1, "n")
+    _rect(g, 0, 0, BOARD_W - 1, 0, "a")
+    _rect(g, 0, 0, 0, BOARD_H - 1, "a")
+    _rect(g, 0, BOARD_H - 1, BOARD_W - 1, BOARD_H - 1, "D")
+    _rect(g, BOARD_W - 1, 0, BOARD_W - 1, BOARD_H - 1, "D")
+    # Cork, lightly textured.
+    _rect(g, 2, 2, BOARD_W - 3, BOARD_H - 3, "c")
+    for y in range(2, BOARD_H - 2):
+        for x in range(2, BOARD_W - 2):
+            if (x * 5 + y * 3) % 11 == 0:
+                put(g, y, x, "D")
+    if frame == 0:
+        # A typed notice with a red pin and a lost-chicken flyer.
+        _rect(g, 4, 3, 11, 10, "C")
+        _rect(g, 5, 4, 10, 4, "w")
+        _rect(g, 5, 6, 9, 6, "w")
+        _rect(g, 5, 8, 10, 8, "w")
+        _pin(g, 3, 7)
+        _rect(g, 15, 4, 24, 11, "Y")
+        _rect(g, 16, 5, 23, 5, "k")
+        _rect(g, 18, 7, 21, 9, "e")   # little chicken silhouette
+        put(g, 6, 19, "R")
+        put(g, 7, 17, "e")
+        _pin(g, 4, 19)
+    else:
+        _rect(g, 3, 3, 12, 9, "Y")
+        _rect(g, 4, 4, 11, 4, "k")
+        _rect(g, 4, 6, 10, 6, "k")
+        _pin(g, 3, 7)
+        _rect(g, 15, 3, 27, 12, "C")
+        _rect(g, 16, 4, 26, 4, "w")
+        _rect(g, 16, 6, 25, 6, "w")
+        _rect(g, 16, 8, 26, 8, "w")
+        _rect(g, 16, 10, 19, 10, "w")
+        _text(g, 21, 10, ">", "R")
+        _pin(g, 3, 20)
+    return g
+
+
+def notice_board_sheet():
+    return _strip([notice_board(f) for f in range(2)], BOARD_W, BOARD_H)
+
+
+# --- Carpet runner (48x16, one seamless tileable strip) ---------------------
+
+RUNNER_W, RUNNER_H = 48, 16
+
+
+GANTRY_W, GANTRY_H = 40, 16
+GANTRY_TEXT = ("GATES >", "SECURITY", "BAGGAGE")
+
+
+def sign_gantry(frame):
+    """A big blue sign hung from the ceiling on two short rods."""
+    g = _blank(GANTRY_W, GANTRY_H)
+    # Hanging rods.
+    for x in (6, 33):
+        _rect(g, x, 0, x + 1, 3, "w")
+        _rect(g, x, 0, x, 3, "W")
+    # Sign panel with a lit top edge and shadowed bottom.
+    _rect(g, 4, 3, 35, 12, "B")
+    _rect(g, 4, 3, 35, 3, "b")
+    _rect(g, 4, 12, 35, 12, "k")
+    _rect(g, 35, 3, 35, 12, "k")
+    _text(g, (GANTRY_W - _text_width(GANTRY_TEXT[frame])) // 2, 6,
+          GANTRY_TEXT[frame], "C")
+    return _outline(g)
+
+
+def sign_gantry_sheet():
+    return _strip([sign_gantry(f) for f in range(3)], GANTRY_W, GANTRY_H)
+
+
+# --- Gate-number totem (16x32, 4 frames: A7 / A11 / B4 / C13) --------------
+
+TOTEM_W, TOTEM_H = 16, 32
+TOTEM_CODES = ("A7", "A11", "B4", "C13")
+
+
+def gate_totem(frame):
+    """A pole with the gate number; points the way to that gate."""
+    g = _blank(TOTEM_W, TOTEM_H)
+    # Number panel: blue with a lit top edge.
+    _rect(g, 1, 1, 14, 11, "B")
+    _rect(g, 1, 1, 14, 1, "b")
+    _rect(g, 1, 11, 14, 11, "k")
+    _rect(g, 14, 1, 14, 11, "k")
+    code = TOTEM_CODES[frame]
+    _text(g, (TOTEM_W - _text_width(code)) // 2, 3, code, "F")
+    _text(g, (TOTEM_W - 3) // 2, 8, ">", "C")
+    # Pole.
+    _rect(g, 7, 12, 8, 27, "w")
+    _rect(g, 7, 12, 7, 27, "W")
+    _rect(g, 8, 12, 8, 27, "T")
+    # Round base plate, seen slightly from above.
+    _rect(g, 3, 28, 12, 29, "p")
+    _rect(g, 3, 28, 12, 28, "W")
+    _rect(g, 3, 30, 12, 31, "w")
+    _rect(g, 3, 31, 12, 31, "T")
+    return _outline(g)
+
+
+def gate_totem_sheet():
+    return _strip([gate_totem(f) for f in range(4)], TOTEM_W, TOTEM_H)
+
+
+# --- ATM kiosk (24x28, 2 frames: screen flicker) ----------------------------
+
+ATM_W, ATM_H = 24, 28
+
+
+def atm(frame):
+    """A bank-branded ATM: header, screen, keypad, cash slot."""
+    g = _blank(ATM_W, ATM_H)
+    # Body: light metal, shaded down the right side.
+    _rect(g, 3, 2, 20, 26, "W")
+    _rect(g, 3, 2, 3, 26, "p")
+    _rect(g, 20, 2, 20, 26, "T")
+    _rect(g, 3, 26, 20, 26, "T")
+    # Blue header band with the white ATM word.
+    _rect(g, 4, 3, 18, 8, "B")
+    _rect(g, 4, 3, 18, 3, "b")
+    _text(g, (ATM_W - _text_width("ATM")) // 2, 4, "ATM", "C")
+    # Screen and its two flicker states.
+    _rect(g, 4, 10, 14, 17, "k")
+    _rect(g, 5, 11, 13, 16, "B")
+    _rect(g, 6, 12, 11, 12, "p")
+    _rect(g, 6, 14, 9 if frame else 11, 14, "W")
+    put(g, 16, 6, "F" if frame == 0 else "Y")
+    # Card slot and cash dispenser.
+    _rect(g, 5, 19, 11, 20, "k")
+    _rect(g, 5, 19, 11, 19, "w")
+    _rect(g, 5, 22, 11, 23, "T")
+    # Keypad: three rows of three studs, right of the screen.
+    for y in (11, 13, 15):
+        for x in (15, 17, 19):
+            put(g, y, x, "O")
+    return _outline(g)
+
+
+def atm_sheet():
+    return _strip([atm(f) for f in range(2)], ATM_W, ATM_H)
+
+
 # --- Preview --------------------------------------------------------------
 
 def wall_preview(tiles_by_name):

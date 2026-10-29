@@ -35,6 +35,14 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/tiles_freezer.png" id="s7_secret"]
 [ext_resource type="PackedScene" path="res://scenes/objects/freezer_shelf.tscn" id="s8_secret"]
 [ext_resource type="Texture2D" path="res://assets/sprites/freezer_decor.png" id="s9_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/luggage_scale.tscn" id="90_scale"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flight_kiosk.tscn" id="91_kiosk"]
+[ext_resource type="PackedScene" path="res://scenes/objects/gate_totem.tscn" id="92_totem"]
+[ext_resource type="PackedScene" path="res://scenes/objects/atm.tscn" id="93_atm"]
+[ext_resource type="PackedScene" path="res://scenes/objects/seating.tscn" id="95_seat"]
+[ext_resource type="Texture2D" path="res://assets/sprites/wall_clock.png" id="98_clock"]
+[ext_resource type="Texture2D" path="res://assets/sprites/notice_board.png" id="99_board"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sign_gantry.png" id="9a_gantry"]
 
 [node name="Level03FoodCourt" type="Node2D"]
 script = ExtResource("1_r")
@@ -530,6 +538,46 @@ id = "arrival"
 position = Vector2(512, 340)
 id = "plaza"
 
+[node name="CourtKioskA" parent="Entities" instance=ExtResource("91_kiosk")]
+position = Vector2(156, 206)
+
+[node name="CourtKioskB" parent="Entities" instance=ExtResource("91_kiosk")]
+position = Vector2(788, 206)
+
+[node name="CourtAtm" parent="Entities" instance=ExtResource("93_atm")]
+position = Vector2(1000, 420)
+
+[node name="CourtScale" parent="Entities" instance=ExtResource("90_scale")]
+position = Vector2(1000, 340)
+
+[node name="GatesTotem" parent="Entities" instance=ExtResource("92_totem")]
+position = Vector2(480, 126)
+frame = 0
+
+[node name="CourtBinA" parent="Entities" instance=ExtResource("20_r")]
+position = Vector2(452, 564)
+
+[node name="CourtBinB" parent="Entities" instance=ExtResource("20_r")]
+position = Vector2(548, 564)
+
+[node name="CourtPlantA" parent="Entities" instance=ExtResource("22_r")]
+position = Vector2(92, 206)
+
+[node name="CourtPlantB" parent="Entities" instance=ExtResource("22_r")]
+position = Vector2(560, 590)
+
+[node name="CourtSeatsA" parent="Entities" instance=ExtResource("95_seat")]
+position = Vector2(296, 588)
+
+[node name="CourtSeatsB" parent="Entities" instance=ExtResource("95_seat")]
+position = Vector2(344, 588)
+
+[node name="CourtSeatsC" parent="Entities" instance=ExtResource("95_seat")]
+position = Vector2(700, 588)
+
+[node name="CourtSeatsD" parent="Entities" instance=ExtResource("95_seat")]
+position = Vector2(748, 588)
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="HUD" parent="UI" instance=ExtResource("24_r")]
@@ -574,4 +622,42 @@ position = Vector2(760, 32)
 texture = ExtResource("s4_secret")
 centered = false
 hframes = 4
+frame = 1
+
+[node name="CourtClockA" type="Sprite2D" parent="WallDecor"]
+position = Vector2(456, 33)
+texture = ExtResource("98_clock")
+centered = false
+hframes = 4
+
+[node name="CourtClockB" type="Sprite2D" parent="WallDecor"]
+position = Vector2(1008, 288)
+texture = ExtResource("98_clock")
+centered = false
+hframes = 4
+
+[node name="CourtNoticeA" type="Sprite2D" parent="WallDecor"]
+position = Vector2(160, 240)
+texture = ExtResource("99_board")
+centered = false
+hframes = 2
+
+[node name="CourtNoticeB" type="Sprite2D" parent="WallDecor"]
+position = Vector2(848, 240)
+texture = ExtResource("99_board")
+centered = false
+hframes = 2
+
+[node name="GatesGantry" type="Sprite2D" parent="WallDecor"]
+position = Vector2(472, 64)
+texture = ExtResource("9a_gantry")
+centered = false
+hframes = 3
+frame = 0
+
+[node name="SecurityGantry" type="Sprite2D" parent="WallDecor"]
+position = Vector2(96, 240)
+texture = ExtResource("9a_gantry")
+centered = false
+hframes = 3
 frame = 1
