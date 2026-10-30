@@ -36,6 +36,14 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/suitcase_fragile.png" id="s6_secret"]
 [ext_resource type="PackedScene" path="res://scenes/objects/captain_chicken.tscn" id="s7_secret"]
 [ext_resource type="Texture2D" path="res://assets/sprites/departure_board_gates_b.png" id="s8_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flight_kiosk.tscn" id="91_kiosk"]
+[ext_resource type="PackedScene" path="res://scenes/objects/gate_totem.tscn" id="92_totem"]
+[ext_resource type="PackedScene" path="res://scenes/objects/atm.tscn" id="93_atm"]
+[ext_resource type="PackedScene" path="res://scenes/objects/stanchion.tscn" id="96_stan"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trash_bin.tscn" id="97_bin"]
+[ext_resource type="Texture2D" path="res://assets/sprites/wall_clock.png" id="98_clock"]
+[ext_resource type="Texture2D" path="res://assets/sprites/notice_board.png" id="99_board"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sign_gantry.png" id="9a_gantry"]
 
 [node name="Level04Gates" type="Node2D"]
 script = ExtResource("1_r")
@@ -663,6 +671,84 @@ id = "gate_b"
 position = Vector2(1672, 236)
 id = "gate_c"
 
+[node name="AtmA" parent="Entities" instance=ExtResource("93_atm")]
+position = Vector2(120, 414)
+
+[node name="TotemA" parent="Entities" instance=ExtResource("92_totem")]
+position = Vector2(240, 414)
+frame = 0
+
+[node name="KioskA" parent="Entities" instance=ExtResource("91_kiosk")]
+position = Vector2(340, 414)
+
+[node name="BinA" parent="Entities" instance=ExtResource("97_bin")]
+position = Vector2(420, 414)
+
+[node name="PlantA" parent="Entities" instance=ExtResource("25_r")]
+position = Vector2(60, 414)
+
+[node name="QueueA1" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(204, 164)
+
+[node name="QueueA2" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(252, 164)
+
+[node name="QueueA3" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(300, 164)
+
+[node name="QueueA4" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(348, 164)
+
+[node name="KioskB" parent="Entities" instance=ExtResource("91_kiosk")]
+position = Vector2(840, 414)
+
+[node name="TotemB" parent="Entities" instance=ExtResource("92_totem")]
+position = Vector2(960, 414)
+frame = 1
+
+[node name="AtmB" parent="Entities" instance=ExtResource("93_atm")]
+position = Vector2(1080, 414)
+
+[node name="BinB" parent="Entities" instance=ExtResource("97_bin")]
+position = Vector2(1180, 414)
+
+[node name="QueueB1" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(908, 164)
+
+[node name="QueueB2" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(956, 164)
+
+[node name="QueueB3" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(1004, 164)
+
+[node name="QueueB4" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(1052, 164)
+
+[node name="KioskC" parent="Entities" instance=ExtResource("91_kiosk")]
+position = Vector2(1620, 414)
+
+[node name="TotemC" parent="Entities" instance=ExtResource("92_totem")]
+position = Vector2(1740, 414)
+frame = 2
+
+[node name="AtmC" parent="Entities" instance=ExtResource("93_atm")]
+position = Vector2(1860, 414)
+
+[node name="BinC" parent="Entities" instance=ExtResource("97_bin")]
+position = Vector2(1930, 414)
+
+[node name="QueueC1" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(1684, 164)
+
+[node name="QueueC2" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(1732, 164)
+
+[node name="QueueC3" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(1780, 164)
+
+[node name="QueueC4" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(1828, 164)
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="HUD" parent="UI" instance=ExtResource("27_r")]
@@ -687,3 +773,41 @@ texture = ExtResource("s6_secret")
 
 [node name="CaptainChicken" parent="Entities" instance=ExtResource("s7_secret")]
 position = Vector2(1846, 104)
+
+[node name="GateClockA" type="Sprite2D" parent="WallDecor"]
+position = Vector2(600, 320)
+texture = ExtResource("98_clock")
+centered = false
+hframes = 4
+
+[node name="GateClockB" type="Sprite2D" parent="WallDecor"]
+position = Vector2(1200, 320)
+texture = ExtResource("98_clock")
+centered = false
+hframes = 4
+
+[node name="GateNoticeA" type="Sprite2D" parent="WallDecor"]
+position = Vector2(700, 320)
+texture = ExtResource("99_board")
+centered = false
+hframes = 2
+
+[node name="GateNoticeB" type="Sprite2D" parent="WallDecor"]
+position = Vector2(1300, 320)
+texture = ExtResource("99_board")
+centered = false
+hframes = 2
+
+[node name="WalkwayGantry" type="Sprite2D" parent="WallDecor"]
+position = Vector2(876, 320)
+texture = ExtResource("9a_gantry")
+centered = false
+hframes = 3
+frame = 1
+
+[node name="FinalGantry" type="Sprite2D" parent="WallDecor"]
+position = Vector2(1868, 64)
+texture = ExtResource("9a_gantry")
+centered = false
+hframes = 3
+frame = 0

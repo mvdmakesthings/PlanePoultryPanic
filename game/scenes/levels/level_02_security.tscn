@@ -33,6 +33,14 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/secret_door.tscn" id="s3_secret"]
 [ext_resource type="PackedScene" path="res://scenes/objects/secret_stash.tscn" id="s4_secret"]
 [ext_resource type="Texture2D" path="res://assets/sprites/posters.png" id="s5_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/luggage_scale.tscn" id="90_scale"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flight_kiosk.tscn" id="91_kiosk"]
+[ext_resource type="PackedScene" path="res://scenes/objects/gate_totem.tscn" id="92_totem"]
+[ext_resource type="PackedScene" path="res://scenes/objects/atm.tscn" id="93_atm"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trash_bin.tscn" id="97_bin"]
+[ext_resource type="Texture2D" path="res://assets/sprites/wall_clock.png" id="98_clock"]
+[ext_resource type="Texture2D" path="res://assets/sprites/notice_board.png" id="99_board"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sign_gantry.png" id="9a_gantry"]
 
 [node name="Level02Security" type="Node2D"]
 script = ExtResource("1_r")
@@ -438,6 +446,40 @@ id = "screening"
 position = Vector2(830, 140)
 id = "corridor"
 
+[node name="ScreeningKiosk" parent="Entities" instance=ExtResource("91_kiosk")]
+position = Vector2(190, 94)
+
+[node name="HallKiosk" parent="Entities" instance=ExtResource("91_kiosk")]
+position = Vector2(700, 382)
+
+[node name="HallAtm" parent="Entities" instance=ExtResource("93_atm")]
+position = Vector2(1000, 320)
+
+[node name="ScreeningTotem" parent="Entities" instance=ExtResource("92_totem")]
+position = Vector2(468, 190)
+frame = 0
+
+[node name="PlazaScale" parent="Entities" instance=ExtResource("90_scale")]
+position = Vector2(700, 590)
+
+[node name="HallPlantA" parent="Entities" instance=ExtResource("25_r")]
+position = Vector2(348, 340)
+
+[node name="HallPlantB" parent="Entities" instance=ExtResource("25_r")]
+position = Vector2(652, 340)
+
+[node name="QueueBinA" parent="Entities" instance=ExtResource("97_bin")]
+position = Vector2(50, 454)
+
+[node name="QueueBinB" parent="Entities" instance=ExtResource("97_bin")]
+position = Vector2(958, 466)
+
+[node name="PlazaSeatsA" parent="Entities" instance=ExtResource("22_r")]
+position = Vector2(240, 560)
+
+[node name="PlazaSeatsB" parent="Entities" instance=ExtResource("22_r")]
+position = Vector2(288, 560)
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="HUD" parent="UI" instance=ExtResource("27_r")]
@@ -466,3 +508,34 @@ texture = ExtResource("s5_secret")
 centered = false
 hframes = 4
 frame = 2
+
+[node name="ScreeningClock" type="Sprite2D" parent="WallDecor"]
+position = Vector2(240, 33)
+texture = ExtResource("98_clock")
+centered = false
+hframes = 4
+
+[node name="QueueClock" type="Sprite2D" parent="WallDecor"]
+position = Vector2(160, 400)
+texture = ExtResource("98_clock")
+centered = false
+hframes = 4
+
+[node name="ScreeningNotice" type="Sprite2D" parent="WallDecor"]
+position = Vector2(120, 226)
+texture = ExtResource("99_board")
+centered = false
+hframes = 2
+
+[node name="ExitNotice" type="Sprite2D" parent="WallDecor"]
+position = Vector2(760, 226)
+texture = ExtResource("99_board")
+centered = false
+hframes = 2
+
+[node name="ScreeningGantry" type="Sprite2D" parent="WallDecor"]
+position = Vector2(332, 200)
+texture = ExtResource("9a_gantry")
+centered = false
+hframes = 3
+frame = 1
