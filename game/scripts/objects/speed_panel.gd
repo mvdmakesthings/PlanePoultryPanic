@@ -39,6 +39,10 @@ func can_interact(player: Player) -> bool:
 
 
 func interact(player: Player) -> void:
+	if not walkways[0].powered:
+		FloatText.spawn(player, "No power")
+		AudioManager.play("locked", base_point())
+		return
 	for walkway in walkways:
 		walkway.cycle_speed()
 	AudioManager.play("switch", base_point())
@@ -63,4 +67,5 @@ func _physics_process(_delta: float) -> void:
 
 func _draw() -> void:
 	if _show_prompt:
-		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "{interact} walkway speed")
+		var powered := walkways.is_empty() or walkways[0].powered
+		InteractPrompt.draw(self, SIZE.x / 2.0, -3.0, "{interact} walkway speed" if powered else "{interact} no power")

@@ -8,7 +8,7 @@ const ARM_DISTANCE := 14.0
 const SPARKLE := Color("ffffff")
 
 @export_enum("snack", "extinguisher", "skates", "energy_drink", "umbrella", "maintenance_key",
-		"boarding_pass") var item := "snack"
+		"boarding_pass", "fuse", "lever_handle", "staff_badge") var item := "snack"
 ## How many (snacks), or charges left (extinguisher).
 @export var count := 1
 ## Set when the player drops this; it then waits until they step away.

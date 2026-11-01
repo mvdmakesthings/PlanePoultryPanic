@@ -6,7 +6,7 @@ extends RefCounted
 ## count is how many (snacks stack 3 per slot, energy drinks 2); for the fire
 ## extinguisher it is the charges left, and each extinguisher takes a slot of
 ## its own, as do skates and the umbrella. Key items (boarding pass,
-## maintenance keys, map) never use slots.
+## maintenance keys and their variants, map) never use slots.
 
 signal changed
 
@@ -27,6 +27,9 @@ const ITEMS := {
 const KEY_ITEMS := {
 	"maintenance_key": {"name": "Maintenance key", "icon": "res://assets/sprites/item_maintenance_key.png"},
 	"boarding_pass": {"name": "Boarding pass", "icon": "res://assets/sprites/item_boarding_pass.png"},
+	"fuse": {"name": "Fuse", "icon": "res://assets/sprites/item_fuse.png"},
+	"lever_handle": {"name": "Lever handle", "icon": "res://assets/sprites/item_lever_handle.png"},
+	"staff_badge": {"name": "Staff badge", "icon": "res://assets/sprites/item_staff_badge.png"},
 }
 
 ## Each slot is {} when empty, or {"item": String, "count": int}.

@@ -79,7 +79,12 @@ func _setup() -> void:
 	music = "gates" if ResourceLoader.exists(AudioManager.MUSIC_DIR + "gates.wav") else "security"
 	hint_zones = HINT_ZONES
 	retry_hints = RETRY_HINTS
-	key_hints = {"maintenance_key": "A maintenance key! The vending\nmachine is up in Gate B"}
+	key_hints = {
+		"maintenance_key": "A maintenance key! The vending\nmachine is up in Gate B",
+		"fuse": "A fuse! The fuse box by the\nGate C walkways needs one",
+		"lever_handle": "A lever handle! It fits the\nsocket by the walkway panel",
+		"staff_badge": "A staff badge! STAFF ONLY doors\nnow let you through",
+	}
 	exit_door = $FinalGateDoor
 	clear_title = "GATE AREAS CLEARED!"
 	next_label = "ON TO GATE C13"
