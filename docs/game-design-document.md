@@ -157,6 +157,9 @@ Each secret room is entered by interacting with its door: the first time opens i
 |---|---|---|
 | Snack | Eat to heal a whole suitcase, or throw as a distraction. A thrown snack nobody has eaten can be picked back up. | Found in the food court, vending machines, and abandoned bags |
 | Fire extinguisher | Spray a cone of foam (about 4 tiles long), plus a burst right around the player's feet. The spray swings toward the nearest unfrozen chicken within 4 tiles, whichever way the player faces, so it works mid-chase, and the foam hangs for half a second, catching chickens that run into it. Chickens in it freeze in a block of ice for 4 seconds, and a mushroom patch in it is destroyed for good | 3 charges, then it's empty. Taken from red emergency cabinets on the walls. Frozen chickens can't peck, but the carousel still carries them and carts still flatten them. A frozen chicken is a block of ice: shove it with Interact and it slides further than a cart, flattening any chicken it crashes into. The player is drawn carrying the extinguisher while it has charges. |
+| Roller skates | Strap them on for 12 seconds of skating, then they're worn out. Skating tops out at 190 px/s, faster than running, but she speeds up, turns and stops slowly and keeps coasting when the stick is let go. She can't run while skating (stamina refills), and other items still work. Skating into a chicken at 110 px/s or more knocks it flying like a full-speed walkway: it tumbles, and hits anything solid hard enough to be knocked out. The wheels clatter, so chickens within about 2.5 tiles hear her. | One use. Found in Lost & Found in Arrivals and in Gate A. The player is drawn wearing them while they last. |
+| Energy drink | Drink it for 10 seconds of running that never drains stamina. When it wears off she crashes: stamina empties and running is locked until it refills to 30%, as if she'd run dry. She can't drink another while still buzzing. | Stacks 2 per slot. Found in Security, and vending machines drop one along with their snacks. Drinking doesn't heal; only snacks do. |
+| Umbrella | Hold Use to open it in front of her. While it's open she walks at 60 px/s, can't run, and keeps facing the way she was when she opened it, so she can back away from an Egg Shooter. Eggs coming at her from the front half pop harmlessly off the canopy. Pecks still land, and eggs from behind still sting. | Never used up. Found in Security's screening area beside the first egg-shooter patch, and in Gate B. The player is drawn holding it open. |
 
 More usable items may come out of prototyping, but every new item has to earn its slot. Fewer items that each do a lot fits the game better than many small ones.
 
@@ -165,6 +168,9 @@ More usable items may come out of prototyping, but every new item has to earn it
 |---|---|
 | Boarding pass | Found in the security bins in Level 2. Required to enter the Final Departure Gate. |
 | Maintenance key | Opens one locked door, closet, or vending machine, then it's used up. Found on maintenance carts and in staff areas. |
+| Fuse | Fits the empty fuse box beside the Gate B-C walkways' speed panel (Interact), and is used up. Until then those walkways have no power: the belts stand still and the panel is dark. Found in Gate B's south room, behind the shutter. |
+| Lever handle | Fits the empty socket beside the Gate A-B walkways' speed panel (Interact) and stays there. After that, Interact at the lever turns both walkways around. Turning a full-speed walkway under a chase carries the chickens back the other way and flings them off its new far end. Found in Gate A. |
+| Staff badge | Opens STAFF ONLY doors and is never used up. Level 4 has a pair, one in Gate B's back wall and one in Gate C's: with the badge, Interact at one steps through to the other, skipping the B-C corridor. Chickens don't follow. Found by Gate B's gate desk, near its roost. |
 | Airport map | Unlocks a terminal map on the pause screen that shows the current level, exits, and key-item locations. |
 
 ---
@@ -650,3 +656,5 @@ game/
 | 2026-10-24 | Amanda's idle, walk and run sprites are converted straight from your reference sheets (`tools/sprites/reference/`), not hand-drawn; her run uses 32x32 frames because the strides are too wide for 16 | You |
 | 2026-10-31 | Arrivals baggage claim gets a second carousel to fill the room | You |
 | 2026-10-31 | Each Arrivals carousel has four chutes, one in the middle of each side, so a chicken on the belt is caught quickly | You |
+| 2026-10-31 | New usable items: roller skates, energy drink and umbrella, each with its own trade-off (hard to steer, a crash afterward, slow and facing one way) | You (Proposed details) |
+| 2026-10-31 | Maintenance-key variants for Level 4: a fuse that powers the Gate B-C walkways, a lever handle that turns the Gate A-B walkways around, and a staff badge for a STAFF ONLY shortcut from Gate B to Gate C | You (Proposed details) |
