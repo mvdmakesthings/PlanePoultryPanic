@@ -658,3 +658,4 @@ game/
 | 2026-10-31 | Each Arrivals carousel has four chutes, one in the middle of each side, so a chicken on the belt is caught quickly | You |
 | 2026-10-31 | New usable items: roller skates, energy drink and umbrella, each with its own trade-off (hard to steer, a crash afterward, slow and facing one way) | You (Proposed details) |
 | 2026-10-31 | Maintenance-key variants for Level 4: a fuse that powers the Gate B-C walkways, a lever handle that turns the Gate A-B walkways around, and a staff badge for a STAFF ONLY shortcut from Gate B to Gate C | You (Proposed details) |
+| 2026-11-01 | Floor litter that looks like a pickup (chips, fries, wrappers, a shoe, a belt, a bottle, boarding passes) is taken out of the levels; only puddles, feathers, nests, footprints and spills stay | You |

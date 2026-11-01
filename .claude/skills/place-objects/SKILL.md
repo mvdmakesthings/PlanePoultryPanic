@@ -34,7 +34,10 @@ than a busy one, and open floor is where chases happen.
   over a walkway. They are the one kind of `WallDecor` that may sit over
   floor, and they need `z_index = 1` so characters walk under them.
 - **Litter** decals sit under `FloorLitter`; keep them out from under
-  furniture, where nobody sees them.
+  furniture, where nobody sees them. Never place a decal that looks like
+  something Amanda could pick up (a bag of chips, fries, a shoe, a bottle,
+  a key-like buckle, boarding passes): players walk over it expecting a
+  pickup. Puddles, feathers, nests, footprints and spills are fine.
 - **Art**: props are drawn in code in `tools/sprites/` (most furniture in
   `set_dressing.py`), registered in `tools/sprites/build.py`, and built
   with `python3 tools/sprites/build.py`. Follow `docs/art-style-guide.md`

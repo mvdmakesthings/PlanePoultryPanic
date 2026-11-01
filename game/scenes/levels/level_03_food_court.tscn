@@ -102,11 +102,6 @@ script = ExtResource("5_r")
 
 [node name="FloorLitter" type="Node2D" parent="."]
 
-[node name="Litter1" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(300, 280)
-texture = ExtResource("6_r")
-hframes = 4
-
 [node name="Litter2" type="Sprite2D" parent="FloorLitter"]
 position = Vector2(380, 420)
 texture = ExtResource("6_r")
@@ -118,17 +113,6 @@ position = Vector2(700, 300)
 texture = ExtResource("6_r")
 hframes = 4
 frame = 2
-
-[node name="Litter4" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(650, 450)
-texture = ExtResource("6_r")
-hframes = 4
-frame = 3
-
-[node name="Litter5" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(520, 380)
-texture = ExtResource("6_r")
-hframes = 4
 
 [node name="Litter6" type="Sprite2D" parent="FloorLitter"]
 position = Vector2(180, 520)
@@ -142,17 +126,6 @@ texture = ExtResource("6_r")
 hframes = 4
 frame = 2
 
-[node name="Litter8" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(260, 140)
-texture = ExtResource("6_r")
-hframes = 4
-frame = 3
-
-[node name="Litter9" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(760, 140)
-texture = ExtResource("6_r")
-hframes = 4
-
 [node name="Litter10" type="Sprite2D" parent="FloorLitter"]
 position = Vector2(120, 330)
 texture = ExtResource("6_r")
@@ -165,22 +138,11 @@ texture = ExtResource("6_r")
 hframes = 4
 frame = 2
 
-[node name="Litter12" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(470, 560)
-texture = ExtResource("6_r")
-hframes = 4
-frame = 3
-
 [node name="Litter13" type="Sprite2D" parent="FloorLitter"]
 position = Vector2(60, 80)
 texture = ExtResource("6_r")
 hframes = 4
 frame = 1
-
-[node name="Litter14" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(600, 120)
-texture = ExtResource("6_r")
-hframes = 4
 
 [node name="Feathers1" type="Sprite2D" parent="FloorLitter"]
 position = Vector2(560, 210)

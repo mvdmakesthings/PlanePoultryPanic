@@ -112,34 +112,10 @@ position = Vector2(744, 140)
 texture = ExtResource("6_r")
 hframes = 4
 
-[node name="Litter2" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(300, 380)
-texture = ExtResource("6_r")
-hframes = 4
-frame = 1
-
-[node name="Litter3" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(560, 140)
-texture = ExtResource("6_r")
-hframes = 4
-frame = 2
-
-[node name="Litter4" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(900, 520)
-texture = ExtResource("6_r")
-hframes = 4
-frame = 3
-
 [node name="Litter5" type="Sprite2D" parent="FloorLitter"]
 position = Vector2(470, 70)
 texture = ExtResource("6_r")
 hframes = 4
-
-[node name="Litter6" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(640, 560)
-texture = ExtResource("6_r")
-hframes = 4
-frame = 1
 
 [node name="Litter7" type="Sprite2D" parent="FloorLitter"]
 position = Vector2(820, 500)
