@@ -2,8 +2,9 @@ class_name Player
 extends CharacterBody2D
 ## The stranded passenger: 8-directional movement, stamina-limited running,
 ## luggage-icon health with invincibility frames, and a six-slot inventory.
-## Space uses the selected item (throw a snack, spray the extinguisher), Q
-## and R switch slots, E eats a snack, and G drops the selected item. While
+## Space uses the selected item (throw a snack, spray the extinguisher, put
+## on skates, drink an energy drink; held, it opens the umbrella), Q and R
+## switch slots, E eats a snack, and G drops the selected item. While
 ## carrying a suitcase overhead, Space throws it and F puts it down.
 
 ## Health is counted in quarter suitcases (see SUITCASE).
@@ -69,6 +70,23 @@ const SAY_REPEAT := 20.0
 const CHASING_STATES: Array[Chicken.State] = [Chicken.State.PURSUE, Chicken.State.WINDUP, Chicken.State.BESIEGE]
 ## How often she counts the chickens after her.
 const CHASER_CHECK_TIME := 0.25
+## Gear drawn over her: the open umbrella and worn skates, one frame per
+## direction (down, up, right, left).
+const UMBRELLA_SHEET := preload("res://assets/sprites/player_umbrella.png")
+const SKATES_SHEET := preload("res://assets/sprites/player_skates.png")
+## Where the open umbrella sits for each direction, relative to her feet.
+const UMBRELLA_OFFSETS := {
+	"down": Vector2(0, -16), "up": Vector2(0, -26), "right": Vector2(4, -16), "left": Vector2(-4, -16),
+}
+## How far away chickens hear her skate wheels clatter, and how often.
+const SKATE_NOISE_RANGE := 40.0
+const SKATE_NOISE_TIME := 0.3
+## A chicken this close to her skates gets knocked flying.
+const SKATE_HIT_RADIUS := 9.0
+## A chicken she skated into isn't knocked again for this long.
+const SKATE_HIT_COOLDOWN := 1.0
+## The fast music that plays while an energy drink lasts.
+const BUZZ_MUSIC := "buzz"
 
 @export var walk_speed := 100.0
 @export var run_speed := 150.0
@@ -87,6 +105,17 @@ const CHASER_CHECK_TIME := 0.25
 @export var invincibility_time := 1.5
 @export var knockback_strength := 160.0
 @export var knockback_decay := 800.0
+## Roller skates: how long a pair lasts, top speed, and how quickly she
+## speeds up, turns and stops on them (px/s per second).
+@export var skate_time := 12.0
+@export var skate_speed := 190.0
+@export var skate_accel := 300.0
+## Skating into a chicken at least this fast knocks it flying.
+@export var skate_hit_speed := 110.0
+## Energy drink: seconds of running that never drains stamina.
+@export var buzz_time := 10.0
+## Walking speed with the umbrella open; running isn't possible then.
+@export var umbrella_speed := 60.0
 
 ## Current and maximum health, in quarter suitcases.
 var health: int
@@ -116,6 +145,14 @@ var hidden_in: HidingSpot = null
 var is_hidden: bool:
 	get:
 		return hidden_in != null
+## True while Use is held with the umbrella selected.
+var umbrella_open := false
+var is_skating: bool:
+	get:
+		return _skate_left > 0.0
+var is_buzzing: bool:
+	get:
+		return _buzz_left > 0.0
 
 var _invincible_timer := 0.0
 var _exhausted := false
@@ -136,6 +173,19 @@ var _last_said := -INF
 var _chasers := 0
 var _chased_by_crowd := false
 var _chaser_check_in := 0.0
+## Seconds of skating and of energy-drink buzz left.
+var _skate_left := 0.0
+var _buzz_left := 0.0
+## The music that was playing before the energy drink, to go back to.
+var _music_before_buzz := ""
+## Her own gliding velocity on skates, without the carousel or knockback.
+var _skate_velocity := Vector2.ZERO
+var _skate_noise_in := 0.0
+## Chicken instance id -> when she last skated into it (seconds), for
+## SKATE_HIT_COOLDOWN.
+var _skate_hits := {}
+var _umbrella: Sprite2D
+var _skates: Sprite2D
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -167,6 +217,9 @@ func _ready() -> void:
 	_hair.hframes = HAIR_LEVELS
 	_hair.vframes = SpriteSheets.DIRECTIONS.size()
 	_sprite.add_child(_hair)
+	_umbrella = _gear_sprite(UMBRELLA_SHEET)
+	_skates = _gear_sprite(SKATES_SHEET)
+	_skates.position = Vector2(0, -2)
 	_sprite.frame_changed.connect(_update_hair)
 	_sprite.frame_changed.connect(_play_footstep)
 	_sprite.animation_changed.connect(_update_hair)
@@ -183,18 +236,35 @@ func _physics_process(delta: float) -> void:
 		interact_target = _nearest_interactable()
 		return
 	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	if input != Vector2.ZERO:
+	umbrella_open = carrying == null and inventory.selected_item() == "umbrella" \
+		and Input.is_action_pressed("use_item")
+	# The open umbrella keeps facing where it was opened, so she can back off.
+	if input != Vector2.ZERO and not umbrella_open:
 		facing = input.normalized()
 
+	var skating := is_skating and carrying == null and not umbrella_open
 	var running := Input.is_action_pressed("run") and input != Vector2.ZERO and not _exhausted \
-		and carrying == null
+		and carrying == null and not umbrella_open and not skating
 	_update_stamina(running, delta)
+	_update_buzz(delta)
 
 	_knockback = _knockback.move_toward(Vector2.ZERO, knockback_decay * delta)
-	var speed := carry_speed if carrying else run_speed if running else walk_speed
-	velocity = input * speed + _knockback
+	var speed := carry_speed if carrying else umbrella_speed if umbrella_open \
+		else run_speed if running else walk_speed
+	if skating:
+		# Skates speed up, turn and stop slowly, and coast when let go.
+		_skate_velocity = _skate_velocity.move_toward(input * skate_speed, skate_accel * delta)
+	else:
+		_skate_velocity = input * speed
+	velocity = _skate_velocity + _knockback
 	velocity += Carousel.push_for(get_tree(), global_position)
 	move_and_slide()
+	if skating:
+		# Glancing off a wall keeps only the speed along it.
+		for i in get_slide_collision_count():
+			_skate_velocity = _skate_velocity.slide(get_slide_collision(i).get_normal())
+	_update_skates(delta, skating)
+	_update_gear()
 
 	# Both hands are full while carrying, so nothing else can be used.
 	interact_target = null if carrying else _nearest_interactable()
@@ -296,13 +366,61 @@ func add_snack() -> bool:
 	return pick_up("snack", 1) == 0
 
 
-## Uses the selected item: throw a snack or spray the extinguisher.
+## Uses the selected item: throw a snack, spray the extinguisher, put on
+## skates or drink an energy drink. The umbrella opens while Use is held
+## (see _physics_process).
 func use_item() -> void:
 	match inventory.selected_item():
 		"snack":
 			throw_snack()
 		"extinguisher":
 			spray()
+		"skates":
+			put_on_skates()
+		"energy_drink":
+			drink()
+
+
+## Straps on a pair of skates for skate_time seconds; they're used up.
+func put_on_skates() -> void:
+	var index := inventory.slot_with("skates")
+	if index < 0 or is_skating:
+		return
+	inventory.take_from(index)
+	RunStats.item_used()
+	_skate_left = skate_time
+	_skate_velocity = velocity
+	AudioManager.play("switch")
+	FloatText.spawn(self, "Skates on!")
+
+
+## Drinks an energy drink: buzz_time seconds of running that never tires
+## her, then a crash.
+func drink() -> void:
+	var index := inventory.slot_with("energy_drink")
+	if index < 0:
+		return
+	if is_buzzing:
+		FloatText.spawn(self, "Still buzzing")
+		return
+	inventory.take_from(index)
+	RunStats.item_used()
+	AudioManager.play("eat")
+	_start_action("eat")
+	_buzz_left = buzz_time
+	_exhausted = false
+	stamina = max_stamina
+	stamina_changed.emit(stamina, max_stamina)
+	FloatText.spawn(self, "Buzzing!")
+	if AudioManager.music_playing() != BUZZ_MUSIC:
+		_music_before_buzz = AudioManager.music_playing()
+	AudioManager.play_music(BUZZ_MUSIC)
+
+
+## True if the open umbrella catches an egg flying in this direction:
+## anything coming at her front.
+func umbrella_blocks(egg_direction: Vector2) -> bool:
+	return umbrella_open and egg_direction.dot(facing) < 0.0
 
 
 func throw_snack() -> void:
@@ -536,7 +654,7 @@ func freeze() -> void:
 
 func _update_stamina(running: bool, delta: float) -> void:
 	var previous := stamina
-	if running:
+	if running and not is_buzzing:
 		stamina = maxf(stamina - stamina_drain * delta, 0.0)
 		if stamina == 0.0:
 			_exhausted = true
@@ -546,6 +664,82 @@ func _update_stamina(running: bool, delta: float) -> void:
 			_exhausted = false
 	if stamina != previous:
 		stamina_changed.emit(stamina, max_stamina)
+
+
+## Counts down the energy drink; when it wears off she crashes, as if she'd
+## run dry.
+func _update_buzz(delta: float) -> void:
+	if not is_buzzing:
+		return
+	_buzz_left -= delta
+	if is_buzzing:
+		return
+	stamina = 0.0
+	_exhausted = true
+	stamina_changed.emit(stamina, max_stamina)
+	FloatText.spawn(self, "Crash...")
+	# Only if nothing else (a cleared level, say) has changed the music since.
+	if AudioManager.music_playing() == BUZZ_MUSIC:
+		if _music_before_buzz != "":
+			AudioManager.play_music(_music_before_buzz)
+		else:
+			AudioManager.stop_music()
+
+
+## Counts down the skates. While gliding fast she knocks chickens flying,
+## and the wheels clatter loud enough for chickens nearby to hear.
+func _update_skates(delta: float, skating: bool) -> void:
+	if not is_skating:
+		return
+	_skate_left -= delta
+	if not is_skating:
+		FloatText.spawn(self, "Worn out")
+		return
+	if not skating:
+		return
+	var speed := _skate_velocity.length()
+	if speed > walk_speed * 0.5:
+		_skate_noise_in -= delta
+		if _skate_noise_in <= 0.0:
+			_skate_noise_in = SKATE_NOISE_TIME
+			Chicken.make_noise(get_tree(), global_position, SKATE_NOISE_RANGE)
+			ParticleBurst.spawn(get_parent(), "dust", global_position, -_skate_velocity.normalized())
+	if speed < skate_hit_speed:
+		return
+	var now := Time.get_ticks_msec() / 1000.0
+	for node in get_tree().get_nodes_in_group("chickens"):
+		var chicken := node as Chicken
+		if chicken.is_flung() or chicken.is_hopping() or chicken.state == Chicken.State.FROZEN \
+				or now - float(_skate_hits.get(chicken.get_instance_id(), -INF)) < SKATE_HIT_COOLDOWN:
+			continue
+		if global_position.distance_to(chicken.global_position) <= SKATE_HIT_RADIUS:
+			_skate_hits[chicken.get_instance_id()] = now
+			chicken.fling(_skate_velocity.normalized() * speed)
+			# Bowling one over costs her some speed.
+			_skate_velocity *= 0.7
+			Juice.shake(1.5)
+
+
+## Shows the open umbrella and worn skates for the way she's facing.
+func _update_gear() -> void:
+	var direction := SpriteSheets.direction_name(facing)
+	var row := SpriteSheets.DIRECTIONS.find(direction)
+	_umbrella.visible = umbrella_open
+	_umbrella.frame = row
+	_umbrella.position = UMBRELLA_OFFSETS[direction]
+	# Facing away, the canopy is beyond her, behind her head.
+	_umbrella.show_behind_parent = direction == "up"
+	_skates.visible = is_skating
+	_skates.frame = row
+
+
+func _gear_sprite(sheet: Texture2D) -> Sprite2D:
+	var sprite := Sprite2D.new()
+	sprite.texture = sheet
+	sprite.hframes = SpriteSheets.DIRECTIONS.size()
+	sprite.visible = false
+	add_child(sprite)
+	return sprite
 
 
 ## Plays an action (throw, eat, hurt) over walking and idling for a moment.
@@ -561,7 +755,8 @@ func _update_animation(input: Vector2, running: bool) -> void:
 		_action_left -= get_physics_process_delta_time()
 		return
 	var animation := "idle"
-	if input != Vector2.ZERO:
+	# On skates she stands and glides rather than taking steps.
+	if input != Vector2.ZERO and not (is_skating and carrying == null and not umbrella_open):
 		animation = "run" if running else "walk"
 	# Carry the extinguisher in hand while it's the selected item.
 	if inventory.selected_item() == "extinguisher" and carrying == null:

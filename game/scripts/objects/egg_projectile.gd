@@ -50,8 +50,14 @@ func _physics_process(delta: float) -> void:
 			return
 
 	var player := get_tree().get_first_node_in_group("player") as Player
-	if player and not player.is_dead and not player.is_hidden \
-			and global_position.distance_to(player.global_position) < 7.0:
+	if player == null or player.is_dead or player.is_hidden:
+		return
+	var distance := global_position.distance_to(player.global_position)
+	# An open umbrella catches eggs coming at her front, a little way out.
+	if distance < 12.0 and player.umbrella_blocks(direction):
+		_splat()
+		return
+	if distance < 7.0:
 		player.take_damage(damage, global_position - direction * 8.0)
 		_splat()
 

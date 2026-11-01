@@ -34,6 +34,8 @@ const FLING_ZONE := 8.0
 @export var east := true
 @export var speed: Speed = Speed.NORMAL
 @export var fling_speed := 200.0
+## False while it has no power (see FuseBox): the belt stands still.
+@export var powered := true
 
 var _phase := 0.0
 var _rails: Array[RID] = []
@@ -62,7 +64,7 @@ func direction() -> Vector2:
 
 
 func belt_speed() -> float:
-	return SPEEDS[speed]
+	return SPEEDS[speed] if powered else 0.0
 
 
 ## The handrails of every walkway. They're waist high: they block walking
@@ -88,7 +90,7 @@ func cycle_speed() -> void:
 func _physics_process(delta: float) -> void:
 	_phase += belt_speed() * delta / PIXELS_PER_FRAME
 	queue_redraw()
-	if speed != Speed.FULL:
+	if speed != Speed.FULL or not powered:
 		return
 	var r := belt_rect()
 	var zone_x := r.end.x - FLING_ZONE if east else r.position.x

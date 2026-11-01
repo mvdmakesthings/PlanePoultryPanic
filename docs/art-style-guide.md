@@ -331,7 +331,7 @@ Dust is mid-gray `#8b9bb4` with white highlights so it shows on both light tile 
 
 **`seating.png`**: one 48x24 row of three airport seats facing the viewer. A solid floor prop; its base is about 44x8.
 
-**`floor_litter.png`**: four 16x16 floor decals: feathers, a pecked bag of chips, a cracked egg, chicken footprints. Drawn flat under everything, no collision.
+**`floor_litter.png`**: four 16x16 floor decals: feathers, a pecked bag of chips, a cracked egg, chicken footprints. Drawn flat under everything, no collision. Levels don't place the bag of chips: it reads as a snack Amanda can pick up.
 
 **`map_stand.png`**: three 16x28 frames of the "YOU ARE HERE" airport map on a post that marks a checkpoint: switched off, then lit with a tiny floor plan whose red dot blinks (alternate frames 1 and 2 at about 2 FPS). A solid floor prop; its base is about 8x4.
 
@@ -370,7 +370,7 @@ Made by `tools/sprites/security.py`.
 
 **`pass_gate.png`**: four 48x32 frames of the boarding-pass gate set into the back wall, laid out like `security_door.png`: a FOOD COURT sign over glass paddle gates and a pass reader (locked with a red light, unlocked green, paddles folding back, open). The corridor beyond is warm wood, a hint of the Food Court.
 
-**`security_litter.png`**: four 16x16 floor decals: a spilled screening bin, a lost shoe, a pecked-through belt, a confiscated water bottle.
+**`security_litter.png`**: four 16x16 floor decals: a spilled screening bin, a lost shoe, a pecked-through belt, a confiscated water bottle. Only the spilled bin is placed in levels: the shoe, belt and bottle read as items Amanda can pick up (skates, a key, an energy drink).
 
 ### Food Court (Level 3)
 Made by `tools/sprites/foodcourt.py`.
@@ -385,7 +385,7 @@ Made by `tools/sprites/foodcourt.py`.
 
 **`trash_bin.png`**: one 12x16 overflowing trash bin. A solid floor prop.
 
-**`food_litter.png`**: four 16x16 floor decals: spilled fries, a soda puddle with its cup, a dropped tray, a burger wrapper.
+**`food_litter.png`**: four 16x16 floor decals: spilled fries, a soda puddle with its cup, a dropped tray, a burger wrapper. Levels don't place the fries or the wrapper: they read as snacks.
 
 **`gates_door.png`**: four 48x32 frames of the door to the gates, laid out like `security_door.png` (closed, closed, opening, open): the boarding gate's glass doors under an ALL GATES sign.
 
@@ -404,7 +404,7 @@ Made by `tools/sprites/gates.py`. The palette key `t` is the gate teal `#193c3e`
 
 **`final_gate_door.png`**: four 48x32 frames of the door to GATE C13, laid out like `security_door.png` (closed, closed, opening, open).
 
-**`gates_litter.png`**: four 16x16 floor decals: a nest with an egg, scattered boarding passes, a pecked neck pillow, a spilled coffee.
+**`gates_litter.png`**: four 16x16 floor decals: a nest with an egg, scattered boarding passes, a pecked neck pillow, a spilled coffee. Levels don't place the boarding passes: they read as the boarding pass.
 
 ### Opening Cutscene
 Made by `tools/sprites/opening.py`. The scene (`game/scenes/cutscenes/opening.tscn`) also reuses the player and chicken sheets, `seating.png`, `potted_plant.png`, `suitcase.png`, `item_snack.png`, `floor_litter.png`, and `tiles_arrivals.png` for the floor. The departure board and the PA panel are drawn by the game in the menus' departure-board style, not from a sheet.
@@ -473,6 +473,23 @@ Made by `tools/sprites/easter_eggs.py` (see the Secrets section of the GDD). The
 **`stowaway_captain.png`**: laid out like `stowaway.png`, with the chicken wearing the captain's hat. The ending uses it when every secret was found.
 
 **`departure_board_gates_b.png`**: Gate B's board, laid out like the other boards: HOME (DLAY / 4EVR), RUNWAY 2 (MUSH / ROOM), GATE C13 (LAST CALL).
+
+### Gear and Key-Item Variants
+Drawn in `tools/sprites/gear.py`.
+
+**`item_skates.png`**, **`item_energy_drink.png`**, **`item_umbrella.png`**: pickup and HUD icons: a 12x10 red high-top roller skate, a 7x12 green can with a yellow bolt, and a 12x12 open red-and-white umbrella.
+
+**`item_fuse.png`**, **`item_lever_handle.png`**, **`item_staff_badge.png`**: key items for the HUD's key-item row: a 10x6 glass fuse with brass caps, a 12x8 steel lever with a red knob, and a 10x12 ID card on a clip.
+
+**`player_umbrella.png`**: the open umbrella Amanda holds like a shield, 20x16 frames, one per direction (down, up, right, left). Facing toward or away from the viewer the canopy points straight at the camera, so it reads as an octagon of red and white wedges (from inside, shaded, with ribs, when facing away); side on it's a dome. The game draws it over her, or behind her facing up.
+
+**`player_skates.png`**: skates on her feet, 12x5 frames in the same direction order.
+
+**`fuse_box.png`**: a 12x14 wall box laid out like `speed_panel.png`, 2 frames (empty with a red light, fuse fitted with a green light).
+
+**`lever_socket.png`**: a 12x14 wall plate, 3 frames (empty, lever up, lever down).
+
+**`staff_door.png`**: a 16x32 STAFF ONLY door for the wall face, 2 frames (badge reader red, green). Unlike the crooked-sign secret door, its sign hangs straight.
 
 ### Import Settings (Godot)
 - Texture filter: Nearest

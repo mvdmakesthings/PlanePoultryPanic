@@ -3,9 +3,10 @@ extends RefCounted
 ## The player's six item slots plus a separate row of key items.
 ##
 ## Each slot holds one kind of item and a count. For stackable items the
-## count is how many (snacks stack 3 per slot); for the fire extinguisher it
-## is the charges left, and each extinguisher takes a slot of its own. Key
-## items (boarding pass, maintenance keys, map) never use slots.
+## count is how many (snacks stack 3 per slot, energy drinks 2); for the fire
+## extinguisher it is the charges left, and each extinguisher takes a slot of
+## its own, as do skates and the umbrella. Key items (boarding pass,
+## maintenance keys and their variants, map) never use slots.
 
 signal changed
 
@@ -16,6 +17,9 @@ const SLOT_COUNT := 6
 const ITEMS := {
 	"snack": {"stack": 3, "icon": "res://assets/sprites/item_snack.png"},
 	"extinguisher": {"stack": 1, "icon": "res://assets/sprites/item_extinguisher.png"},
+	"skates": {"stack": 1, "icon": "res://assets/sprites/item_skates.png"},
+	"energy_drink": {"stack": 2, "icon": "res://assets/sprites/item_energy_drink.png"},
+	"umbrella": {"stack": 1, "icon": "res://assets/sprites/item_umbrella.png"},
 }
 
 ## Key items: held in their own row, never in a slot. "name" is what the
@@ -23,6 +27,9 @@ const ITEMS := {
 const KEY_ITEMS := {
 	"maintenance_key": {"name": "Maintenance key", "icon": "res://assets/sprites/item_maintenance_key.png"},
 	"boarding_pass": {"name": "Boarding pass", "icon": "res://assets/sprites/item_boarding_pass.png"},
+	"fuse": {"name": "Fuse", "icon": "res://assets/sprites/item_fuse.png"},
+	"lever_handle": {"name": "Lever handle", "icon": "res://assets/sprites/item_lever_handle.png"},
+	"staff_badge": {"name": "Staff badge", "icon": "res://assets/sprites/item_staff_badge.png"},
 }
 
 ## Each slot is {} when empty, or {"item": String, "count": int}.

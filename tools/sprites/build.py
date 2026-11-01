@@ -22,6 +22,7 @@ import ending
 import foodcourt
 import gate
 import gates
+import gear
 import items
 import mushrooms
 import opening
@@ -161,6 +162,17 @@ IMAGES = [
     ("captain_hat.png", easter_eggs.captain_hat),
     ("captain_chicken.png", easter_eggs.captain_chicken_sheet),
     ("stowaway_captain.png", easter_eggs.stowaway_captain_sheet),
+    ("item_skates.png", gear.skates),
+    ("item_energy_drink.png", gear.energy_drink),
+    ("item_umbrella.png", gear.umbrella),
+    ("item_fuse.png", gear.fuse),
+    ("item_lever_handle.png", gear.lever_handle),
+    ("item_staff_badge.png", gear.staff_badge),
+    ("player_umbrella.png", gear.player_umbrella_sheet),
+    ("player_skates.png", gear.player_skates_sheet),
+    ("fuse_box.png", gear.fuse_box_sheet),
+    ("lever_socket.png", gear.lever_socket_sheet),
+    ("staff_door.png", gear.staff_door_sheet),
 ]
 
 
