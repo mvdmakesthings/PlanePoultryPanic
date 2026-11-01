@@ -24,7 +24,8 @@ TOP_BANDS = [".", ".", "O", "C", "W", "w", "n*", "m*", "m*", "m*", "m*", "v", "O
 BOTTOM_BANDS = ["w", "w", "T", "p", "O", "n*", "m*", "m*", "m*", "v", "C", "W", "w", "T", "T", "O"]
 
 PIECES = ("top_left", "top", "top_right", "left", "island", "right",
-          "bottom_left", "bottom", "bottom_right", "chute")
+          "bottom_left", "bottom", "bottom_right", "chute",
+          "chute_right", "chute_bottom", "chute_left")
 
 # The baggage chute: a dark opening in the back rim with rubber flaps,
 # drawn over a "top" piece. "." keeps the belt underneath.
@@ -46,6 +47,17 @@ CHUTE = [
     "................",
     "................",
 ]
+
+
+# The same opening turned to face out of the other belt runs, as
+# {piece: (belt it sits on, overlay pixel at (x, y))}. The back rim is
+# the outside edge of each run: right for "right", the front skirt for
+# "bottom", left for "left".
+SIDE_CHUTES = {
+    "chute_right": ("right", lambda x, y: CHUTE[15 - x][y]),
+    "chute_bottom": ("bottom", lambda x, y: CHUTE[15 - y][x]),
+    "chute_left": ("left", lambda x, y: CHUTE[x][y]),
+}
 
 
 def band(bands, idx, s, frame, direction):
@@ -117,6 +129,10 @@ def piece_grid(piece, frame):
             elif piece == "chute":
                 over = CHUTE[y][x]
                 row += over if over != "." else straight("top", x, y, frame)
+            elif piece in SIDE_CHUTES:
+                belt, overlay = SIDE_CHUTES[piece]
+                over = overlay(x, y)
+                row += over if over != "." else straight(belt, x, y, frame)
             elif piece in ("top", "bottom", "left", "right"):
                 row += straight(piece, x, y, frame)
             else:

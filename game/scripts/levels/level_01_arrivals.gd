@@ -45,9 +45,13 @@ const MAP: Array[String] = [
 	"#==========##............................................#",
 	"##########################################################",
 ]
-## The baggage carousel, in tiles, and which column of its back belt has the chute.
-const CAROUSEL_RECT := Rect2i(22, 21, 14, 6)
-const CHUTE_COLUMN := 6
+## The baggage carousels, in tiles, each with a chute midway along every
+## side, so a chicken on the belt soon rides into one (see
+## LevelBuilder.paint_carousel() for the chutes format).
+const CAROUSELS := [
+	{"rect": Rect2i(22, 21, 14, 6), "chutes": {"top": 6, "right": 2, "bottom": 7, "left": 3}},
+	{"rect": Rect2i(41, 21, 12, 6), "chutes": {"top": 5, "right": 2, "bottom": 6, "left": 3}},
+]
 
 ## Tutorial hints. While the player stands in a zone (in tiles), its hint
 ## shows at the top of the screen. Buttons in braces match the player's bindings.
@@ -58,7 +62,8 @@ const HINT_ZONES := [
 	{"zone": Rect2i(20, 4, 11, 8), "text": "Chickens chase you on sight.\n{use_item} throws a snack to\ndistract them"},
 	{"zone": Rect2i(31, 4, 10, 8), "text": "{interact} shoves a luggage cart.\nA rolling cart flattens chickens"},
 	{"zone": Rect2i(36, 12, 4, 7), "text": "Baggage Claim. Security\nis through the door ahead"},
-	{"zone": Rect2i(19, 18, 20, 12), "text": "The belt carries chickens\ninto the chute. Lure one\nonto it with a snack!"},
+	{"zone": Rect2i(19, 18, 20, 12), "text": "The belt carries chickens\ninto the chutes. Lure one\nonto it with a snack!"},
+	{"zone": Rect2i(40, 18, 15, 9), "text": "The belt carries chickens\ninto the chutes. Lure one\nonto it with a snack!"},
 	{"zone": Rect2i(39, 27, 7, 6), "text": "{interact} lifts a suitcase.\n{use_item} throws it at a chicken"},
 	{"zone": Rect2i(13, 27, 6, 7), "text": "A staff room. Maybe\nthere's a key in here"},
 ]
@@ -91,5 +96,6 @@ func _setup() -> void:
 
 
 func _build() -> void:
-	LevelBuilder.paint_carousel(_props, CAROUSEL_RECT, CHUTE_COLUMN)
-	LevelBuilder.add_carousel(self, CAROUSEL_RECT, CHUTE_COLUMN)
+	for carousel: Dictionary in CAROUSELS:
+		LevelBuilder.paint_carousel(_props, carousel.rect, carousel.chutes)
+		LevelBuilder.add_carousel(self, carousel.rect, carousel.chutes)

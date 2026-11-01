@@ -343,6 +343,7 @@ Dust is mid-gray `#8b9bb4` with white highlights so it shows on both light tile 
 | 3-5 | `left`, `island`, `right` |
 | 6-8 | `bottom_left`, `bottom`, `bottom_right` |
 | 9 | `chute`: a `top` piece with the baggage chute opening and rubber flaps |
+| 10-12 | `chute_right`, `chute_bottom`, `chute_left`: the same chute opening turned to face out of a `right`, `bottom` or `left` piece |
 
 Build any size of carousel (at least 2x2 tiles) as a rectangle: corners at the corners, `top` and `bottom` along the long edges, `left` and `right` along the short edges, and `island` filling the middle. The bottom pieces include the front skirt, so the carousel looks raised off the floor. Draw the carousel on a tile layer above the floor, since the outside of each corner is transparent.
 

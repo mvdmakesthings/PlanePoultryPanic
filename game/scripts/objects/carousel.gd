@@ -2,7 +2,7 @@ class_name Carousel
 extends Node2D
 ## Gameplay for a baggage carousel. The ring around the raised island is a
 ## clockwise belt that carries anything standing or lying on it. Chickens
-## carried into the chute are defeated; the player can't fit through it.
+## carried into a chute are defeated; the player can't fit through one.
 ##
 ## The room paints the tiles; this node only knows the carousel's shape.
 
@@ -13,18 +13,23 @@ extends Node2D
 var outer: Rect2
 ## The raised center island. Solid; the belt runs around it.
 var island: Rect2
-## The chute opening on the back belt.
-var chute: Rect2
+## The chute openings in the belt.
+var chutes: Array[Rect2] = []
 
 
 func _ready() -> void:
 	add_to_group("conveyors")
 
 
-func setup(outer_rect: Rect2, island_rect: Rect2, chute_rect: Rect2) -> void:
+func setup(outer_rect: Rect2, island_rect: Rect2, chute_rects: Array[Rect2]) -> void:
 	outer = outer_rect
 	island = island_rect
-	chute = chute_rect
+	chutes = chute_rects
+
+
+## True if the position is inside one of this carousel's chutes.
+func in_chute(pos: Vector2) -> bool:
+	return chutes.any(func(hole: Rect2) -> bool: return hole.has_point(pos))
 
 
 ## Belt velocity at a world position, or zero off the belt.
@@ -51,9 +56,9 @@ static func push_for(tree: SceneTree, pos: Vector2) -> Vector2:
 	return total
 
 
-## True if the position is inside any carousel's chute.
+## True if the position is inside any carousel's chutes.
 static func in_any_chute(tree: SceneTree, pos: Vector2) -> bool:
 	for node in tree.get_nodes_in_group("conveyors"):
-		if node is Carousel and (node as Carousel).chute.has_point(pos):
+		if node is Carousel and (node as Carousel).in_chute(pos):
 			return true
 	return false
