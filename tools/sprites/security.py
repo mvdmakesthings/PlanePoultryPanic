@@ -478,11 +478,17 @@ def _litter(kind):
         put(g, 13, 7, "Y")
         g = _outline(g)
     elif kind == "shoe":
-        _rect(g, 4, 8, 11, 10, "m")
-        _rect(g, 9, 6, 11, 8, "m")
-        _rect(g, 4, 10, 11, 10, "v")
-        put(g, 8, 5, "n")
-        put(g, 9, 6, "n")
+        # A red sneaker kicked off in the queue: white sole and toe cap,
+        # white laces, a dark ankle opening at the heel.
+        _rect(g, 3, 5, 6, 8, "R")
+        _rect(g, 7, 6, 10, 8, "R")
+        _rect(g, 11, 7, 12, 8, "C")
+        _rect(g, 3, 6, 3, 8, "r")
+        put(g, 5, 4, "kk")
+        put(g, 6, 7, "CRC")
+        put(g, 7, 8, "CRC")
+        _rect(g, 2, 9, 13, 9, "C")
+        _rect(g, 2, 10, 13, 10, "w")
         g = _outline(g)
     elif kind == "belt":
         # A leather belt, pecked through, buckle shining.
