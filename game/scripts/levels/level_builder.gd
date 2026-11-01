@@ -29,7 +29,10 @@ const CAROUSEL_ROWS := {
 	"top_left": 0, "top": 1, "top_right": 2,
 	"left": 3, "island": 4, "right": 5,
 	"bottom_left": 6, "bottom": 7, "bottom_right": 8, "chute": 9,
+	"chute_right": 10, "chute_bottom": 11, "chute_left": 12,
 }
+## Which carousel.png piece shows a chute on each side of the belt.
+const CHUTE_PIECES := {"top": "chute", "right": "chute_right", "bottom": "chute_bottom", "left": "chute_left"}
 ## Blocks only the player (physics layer 4), so chickens can fall through.
 const PLAYER_BLOCKER_LAYER := 8
 ## Walls and furniture join this group so the navigation mesh routes around them.
@@ -63,9 +66,10 @@ static func build_tile_set(tiles: Texture2D = TILES) -> TileSet:
 	return tile_set
 
 
-## Paints a carousel's tiles. rect is in tiles; chute_column is which tile
-## column of the back belt holds the chute, counted from the left edge.
-static func paint_carousel(layer: TileMapLayer, rect: Rect2i, chute_column: int) -> void:
+## Paints a carousel's tiles. rect is in tiles; chutes maps a side ("top",
+## "right", "bottom" or "left") to the tile along that side holding its
+## chute, counted from the rect's left edge (top, bottom) or top edge (sides).
+static func paint_carousel(layer: TileMapLayer, rect: Rect2i, chutes: Dictionary) -> void:
 	for y in range(rect.position.y, rect.end.y):
 		for x in range(rect.position.x, rect.end.x):
 			var vertical := "top" if y == rect.position.y else "bottom" if y == rect.end.y - 1 else ""
@@ -75,26 +79,40 @@ static func paint_carousel(layer: TileMapLayer, rect: Rect2i, chute_column: int)
 				piece = vertical + "_" + horizontal
 			elif vertical != "" or horizontal != "":
 				piece = vertical + horizontal
-			if piece == "top" and x == rect.position.x + chute_column:
-				piece = "chute"
+				var along := x - rect.position.x if vertical != "" else y - rect.position.y
+				if chutes.get(piece, -1) == along:
+					piece = CHUTE_PIECES[piece]
 			layer.set_cell(Vector2i(x, y), CAROUSEL_SOURCE, Vector2i(0, CAROUSEL_ROWS[piece]))
 
 
 ## Adds a carousel's collision and belt to parent. The belt ring is
-## walkable; only the raised island is solid. Pixel offsets match the
-## carousel tile art (see tools/sprites/carousel.py).
-static func add_carousel(parent: Node, rect: Rect2i, chute_column: int) -> Carousel:
+## walkable; only the raised island is solid. chutes is as for
+## paint_carousel(). Pixel offsets match the carousel tile art (see
+## tools/sprites/carousel.py).
+static func add_carousel(parent: Node, rect: Rect2i, chutes: Dictionary) -> Carousel:
 	var c := Rect2(rect.position * TILE, rect.size * TILE)
 	var outer := Rect2(c.position + Vector2(2, 2), c.size - Vector2(4, 3))
 	var island := Rect2(c.position + Vector2(12, 12), c.size - Vector2(24, 23))
-	var chute_x := c.position.x + chute_column * TILE
-	var chute := Rect2(chute_x + 2, c.position.y + 2, TILE - 4, 10)
 	add_wall(parent, island)
-	# The player bumps into the chute instead of riding into it.
-	add_wall(parent, chute.grow(1), PLAYER_BLOCKER_LAYER)
+	# Each chute covers the outer part of its belt run, between the rim and the island.
+	var holes: Array[Rect2] = []
+	for side: String in chutes:
+		var along: float = chutes[side] * TILE
+		match side:
+			"top":
+				holes.append(Rect2(c.position.x + along + 2, c.position.y + 2, TILE - 4, 10))
+			"bottom":
+				holes.append(Rect2(c.position.x + along + 2, c.end.y - 11, TILE - 4, 10))
+			"left":
+				holes.append(Rect2(c.position.x + 2, c.position.y + along + 2, 10, TILE - 4))
+			"right":
+				holes.append(Rect2(c.end.x - 12, c.position.y + along + 2, 10, TILE - 4))
+	for hole in holes:
+		# The player bumps into a chute instead of riding into it.
+		add_wall(parent, hole.grow(1), PLAYER_BLOCKER_LAYER)
 
 	var carousel := Carousel.new()
-	carousel.setup(outer, island, chute)
+	carousel.setup(outer, island, holes)
 	parent.add_child(carousel)
 	# The belt's motor hums wherever the carousel is.
 	AudioManager.play_loop("carousel_hum", carousel, c.get_center())

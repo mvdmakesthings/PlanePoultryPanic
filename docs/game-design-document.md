@@ -172,7 +172,7 @@ More usable items may come out of prototyping, but every new item has to earn it
 ## Chickens
 
 ### How Chickens Are Defeated
-The player can't attack directly. A chicken is defeated when it's caught by airport machinery (the baggage carousel's chute, moving walkways at speed, closing security gates), flattened by a luggage cart the player shoves, hit by a suitcase the player throws, or crushed when a totem collapses on top of it. A defeated chicken bursts into a comic puff of feathers, squawks, and is gone. No blood or gore, ever.
+The player can't attack directly. A chicken is defeated when it's caught by airport machinery (the baggage carousel's chutes, moving walkways at speed, closing security gates), flattened by a luggage cart the player shoves, hit by a suitcase the player throws, or crushed when a totem collapses on top of it. A defeated chicken bursts into a comic puff of feathers, squawks, and is gone. No blood or gore, ever.
 
 Fire extinguisher spray and distractions don't defeat chickens. They control them. That's what keeps the **Pacifist** run possible: get through without defeating a single chicken.
 
@@ -239,7 +239,7 @@ Behavior priority, highest first:
 ### Machinery and Hazards
 | Element | Effect |
 |---|---|
-| Baggage carousel | The belt around the solid center island is walkable and carries anything on it clockwise (chickens, snacks, the player). Chickens carried into the chute are defeated; the player can't fit through it. Chickens never walk into the chute on purpose, so the trick is getting one distracted on the belt, for example eating a snack thrown there. |
+| Baggage carousel | The belt around the solid center island is walkable and carries anything on it clockwise (chickens, snacks, the player). Each carousel has a chute in the middle of every side (four in all), so anything on the belt reaches one within a few seconds. Chickens carried into a chute are defeated; the player can't fit through one. Chickens never walk into the chute on purpose, so the trick is getting one distracted on the belt, for example eating a snack thrown there. |
 | Moving walkway | A two-tile belt between handrails, entered and left only at its ends, that carries the player, chickens and snacks east or west at 20 (slow), 45 (normal) or 110 (full) px/s, so walking with it is faster and against it slower. A speed panel on the wall steps it through the three speeds. At full speed a chicken riding off the far end is flung at 200 px/s and tumbles; hitting anything solid while still going 90 px/s or faster knocks it out (and any chicken it hits). Slower, it lands dazed. The player is never flung. |
 | Security scanner and gates | Barriers to route around: X-ray machines and metal-detector arches (which beep as the player walks through) line the scanner lanes. A roll-down shutter closes a lane when its wall switch is flipped; a chicken under it as it slams down is defeated, and chickens path around it while it's shut. |
 | Mushroom patch | Powers up chickens that eat there, then regrows after 15 seconds. Spraying it with the fire extinguisher (one charge) kills the patch for good. Left alone, it spreads (see below). |
@@ -648,3 +648,5 @@ game/
 | 2026-10-24 | Chicken personality: squabbles over shared snacks, tripping when juked, looking around (or a rage tantrum) after losing Amanda | You (Proposed details) |
 | 2026-10-24 | Amanda reacts out loud to big moments (a crowd chasing her, escaping, a totem forming, hiding, a chicken tripping), at most one line every 5 seconds | You (Proposed details) |
 | 2026-10-24 | Amanda's idle, walk and run sprites are converted straight from your reference sheets (`tools/sprites/reference/`), not hand-drawn; her run uses 32x32 frames because the strides are too wide for 16 | You |
+| 2026-10-31 | Arrivals baggage claim gets a second carousel to fill the room | You |
+| 2026-10-31 | Each Arrivals carousel has four chutes, one in the middle of each side, so a chicken on the belt is caught quickly | You |

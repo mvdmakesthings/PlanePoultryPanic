@@ -28,7 +28,7 @@ func _ready() -> void:
 	_floor.tile_set = tile_set
 	_props.tile_set = tile_set
 	_paint_floor_and_walls()
-	LevelBuilder.paint_carousel(_props, CAROUSEL_RECT, CHUTE_COLUMN)
+	LevelBuilder.paint_carousel(_props, CAROUSEL_RECT, {"top": CHUTE_COLUMN})
 	_build_collision()
 	LevelBuilder.build_navigation(self, Rect2(Vector2.ZERO, Vector2(ROOM * TILE)))
 	_gate.player_entered.connect(_on_gate_entered)
@@ -81,7 +81,7 @@ func _build_collision() -> void:
 	_add_wall(Rect2(0, room_px.y - TILE, room_px.x, TILE))
 	_add_wall(Rect2(0, 0, TILE, room_px.y))
 	_add_wall(Rect2(room_px.x - TILE, 0, TILE, room_px.y))
-	LevelBuilder.add_carousel(self, CAROUSEL_RECT, CHUTE_COLUMN)
+	LevelBuilder.add_carousel(self, CAROUSEL_RECT, {"top": CHUTE_COLUMN})
 
 
 func _add_wall(rect: Rect2) -> void:

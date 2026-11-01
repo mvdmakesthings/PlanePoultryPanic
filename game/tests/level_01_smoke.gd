@@ -50,7 +50,8 @@ func _layout_tests() -> void:
 		_check(AudioServer.get_bus_index(bus) >= 0, "the %s audio bus exists" % bus)
 	_check(AudioManager.music_playing() == "arrivals", "Level 1 plays the Arrivals music")
 	var hums := AudioManager.playing_loops()
-	_check(hums.size() == 1 and hums[0].bus == "Ambience", "the carousel hums on the Ambience bus")
+	_check(hums.size() == preload("res://scripts/levels/level_01_arrivals.gd").CAROUSELS.size() and hums.all(func(hum): return hum.bus == "Ambience"),
+		"each carousel hums on the Ambience bus")
 	for sound in ["step", "pickup", "key", "throw", "eat", "hurt", "peck", "splat", "poof",
 			"cluck", "spray", "shove", "locked", "unlock", "door", "closet", "death",
 			"checkpoint", "level_clear", "ui_move", "ui_confirm", "ui_back"]:

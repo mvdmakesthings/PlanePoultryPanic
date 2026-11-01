@@ -27,6 +27,12 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/captain_hat.png" id="s3_secret"]
 [ext_resource type="PackedScene" path="res://scenes/objects/pilot_cap.tscn" id="s4_secret"]
 [ext_resource type="PackedScene" path="res://scenes/objects/secret_door.tscn" id="s5_secret"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flight_kiosk.tscn" id="91_kiosk"]
+[ext_resource type="PackedScene" path="res://scenes/objects/gate_totem.tscn" id="92_totem"]
+[ext_resource type="PackedScene" path="res://scenes/objects/atm.tscn" id="93_atm"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trash_bin.tscn" id="97_bin"]
+[ext_resource type="Texture2D" path="res://assets/sprites/wall_clock.png" id="98_clock"]
+[ext_resource type="Texture2D" path="res://assets/sprites/notice_board.png" id="99_board"]
 
 [node name="Level05FinalGate" type="Node2D"]
 script = ExtResource("1_r")
@@ -104,12 +110,12 @@ hframes = 4
 frame = 2
 
 [node name="Litter4" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(860, 360)
+position = Vector2(880, 340)
 texture = ExtResource("5_r")
 hframes = 4
 
 [node name="Litter5" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(380, 380)
+position = Vector2(400, 370)
 texture = ExtResource("5_r")
 hframes = 4
 frame = 3
@@ -341,7 +347,7 @@ position = Vector2(84, 146)
 position = Vector2(290, 260)
 
 [node name="Seats4" parent="Entities" instance=ExtResource("16_r")]
-position = Vector2(290, 300)
+position = Vector2(298, 300)
 
 [node name="GateDesk" parent="Entities" instance=ExtResource("17_r")]
 position = Vector2(376, 100)
@@ -383,6 +389,30 @@ position = Vector2(872, 120)
 id = "escape"
 automatic = false
 
+[node name="FinalTotem" parent="Entities" instance=ExtResource("92_totem")]
+position = Vector2(314, 160)
+
+[node name="ArenaKiosk" parent="Entities" instance=ExtResource("91_kiosk")]
+position = Vector2(720, 398)
+
+[node name="LoungeKiosk" parent="Entities" instance=ExtResource("91_kiosk")]
+position = Vector2(136, 96)
+
+[node name="ArenaAtm" parent="Entities" instance=ExtResource("93_atm")]
+position = Vector2(982, 200)
+
+[node name="ArenaBin" parent="Entities" instance=ExtResource("97_bin")]
+position = Vector2(966, 340)
+
+[node name="LoungeBin" parent="Entities" instance=ExtResource("97_bin")]
+position = Vector2(23, 140)
+
+[node name="LoungeSeatC" parent="Entities" instance=ExtResource("16_r")]
+position = Vector2(40, 196)
+
+[node name="LoungeSeatD" parent="Entities" instance=ExtResource("16_r")]
+position = Vector2(40, 340)
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="HUD" parent="UI" instance=ExtResource("21_r")]
@@ -397,3 +427,23 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("22_r")
 
+[node name="ArenaClock" type="Sprite2D" parent="WallDecor"]
+position = Vector2(820, 33)
+texture = ExtResource("98_clock")
+centered = false
+hframes = 4
+
+[node name="LoungeNotice" type="Sprite2D" parent="WallDecor"]
+position = Vector2(260, 40)
+texture = ExtResource("99_board")
+centered = false
+hframes = 2
+
+[node name="ArenaNotice" type="Sprite2D" parent="WallDecor"]
+position = Vector2(660, 33)
+texture = ExtResource("99_board")
+centered = false
+hframes = 2
+
+[node name="Sprite2D" parent="Entities/FinalTotem" index="0"]
+frame = 3
