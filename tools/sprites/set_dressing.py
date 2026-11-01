@@ -849,10 +849,10 @@ def sign_gantry_sheet():
     return _strip([sign_gantry(f) for f in range(3)], GANTRY_W, GANTRY_H)
 
 
-# --- Gate-number totem (16x32, 4 frames: A7 / A11 / B4 / C13) --------------
+# --- Gate-number totem (16x32, 4 frames: A1 / A2 / B4 / C13) --------------
 
 TOTEM_W, TOTEM_H = 16, 32
-TOTEM_CODES = ("A7", "A11", "B4", "C13")
+TOTEM_CODES = ("A1", "A2", "B4", "C13")
 
 
 def gate_totem(frame):

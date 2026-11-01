@@ -30,7 +30,6 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/posters.png" id="s7_secret"]
 [ext_resource type="PackedScene" path="res://scenes/objects/luggage_scale.tscn" id="90_scale"]
 [ext_resource type="PackedScene" path="res://scenes/objects/flight_kiosk.tscn" id="91_kiosk"]
-[ext_resource type="PackedScene" path="res://scenes/objects/gate_totem.tscn" id="92_totem"]
 [ext_resource type="PackedScene" path="res://scenes/objects/atm.tscn" id="93_atm"]
 [ext_resource type="PackedScene" path="res://scenes/objects/trash_bin.tscn" id="97_bin"]
 [ext_resource type="Texture2D" path="res://assets/sprites/wall_clock.png" id="98_clock"]
@@ -184,7 +183,7 @@ hframes = 4
 frame = 1
 
 [node name="Litter10" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(150, 300)
+position = Vector2(120, 326)
 texture = ExtResource("19_litter")
 hframes = 4
 
@@ -194,7 +193,7 @@ texture = ExtResource("19_litter")
 hframes = 4
 
 [node name="Litter12" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(780, 90)
+position = Vector2(780, 140)
 texture = ExtResource("19_litter")
 hframes = 4
 frame = 2
@@ -305,7 +304,7 @@ position = Vector2(310, 300)
 position = Vector2(470, 470)
 
 [node name="BaggageChicken3" parent="Entities" instance=ExtResource("3_chicken")]
-position = Vector2(760, 330)
+position = Vector2(760, 300)
 
 [node name="BaggageChicken4" parent="Entities" instance=ExtResource("3_chicken")]
 position = Vector2(290, 500)
@@ -346,7 +345,7 @@ position = Vector2(896, 272)
 variety = 1
 
 [node name="LostFoundPlant" parent="Entities" instance=ExtResource("9_plant")]
-position = Vector2(700, 80)
+position = Vector2(696, 80)
 
 [node name="MaintenanceCart" parent="Entities" instance=ExtResource("11_janitor")]
 position = Vector2(76, 474)
@@ -381,20 +380,16 @@ position = Vector2(132, 462)
 id = "staff_room"
 
 [node name="FlightKioskHall" parent="Entities" instance=ExtResource("91_kiosk")]
-position = Vector2(300, 264)
+position = Vector2(392, 264)
 
 [node name="FlightKioskGate" parent="Entities" instance=ExtResource("91_kiosk")]
 position = Vector2(756, 190)
 
 [node name="CurrencyAtm" parent="Entities" instance=ExtResource("93_atm")]
-position = Vector2(896, 310)
+position = Vector2(902, 310)
 
 [node name="BaggageScale" parent="Entities" instance=ExtResource("90_scale")]
 position = Vector2(600, 440)
-
-[node name="GateTotemArrivals" parent="Entities" instance=ExtResource("92_totem")]
-position = Vector2(544, 262)
-frame = 0
 
 [node name="ArrivalsSeatsA" parent="Entities" instance=ExtResource("18_seating")]
 position = Vector2(752, 96)
@@ -435,7 +430,7 @@ rides_belt = true
 prompt = "{interact} grab bag"
 
 [node name="FuelDrum" parent="Entities" instance=ExtResource("s6_secret")]
-position = Vector2(168, 520)
+position = Vector2(170, 520)
 
 [node name="MushroomPoster" type="Sprite2D" parent="WallDecor"]
 position = Vector2(140, 416)
@@ -443,21 +438,22 @@ texture = ExtResource("s7_secret")
 centered = false
 hframes = 4
 frame = 0
+metadata/placement_ok = true
 
 [node name="ArrivalsClock" type="Sprite2D" parent="WallDecor"]
-position = Vector2(248, 33)
+position = Vector2(272, 34)
 texture = ExtResource("98_clock")
 centered = false
 hframes = 4
 
 [node name="ClaimsClock" type="Sprite2D" parent="WallDecor"]
-position = Vector2(688, 196)
+position = Vector2(740, 226)
 texture = ExtResource("98_clock")
 centered = false
 hframes = 4
 
 [node name="StaffNoticeBoard" type="Sprite2D" parent="WallDecor"]
-position = Vector2(176, 448)
+position = Vector2(36, 420)
 texture = ExtResource("99_board")
 centered = false
 hframes = 2
@@ -474,3 +470,4 @@ texture = ExtResource("9a_gantry")
 centered = false
 hframes = 3
 frame = 1
+z_index = 1

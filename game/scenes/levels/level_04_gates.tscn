@@ -164,7 +164,7 @@ texture = ExtResource("6_r")
 hframes = 4
 
 [node name="Litter2" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(330, 380)
+position = Vector2(300, 360)
 texture = ExtResource("6_r")
 hframes = 4
 frame = 1
@@ -205,7 +205,7 @@ hframes = 4
 frame = 3
 
 [node name="Litter9" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(1700, 140)
+position = Vector2(1700, 184)
 texture = ExtResource("6_r")
 hframes = 4
 
@@ -228,12 +228,12 @@ hframes = 4
 frame = 3
 
 [node name="Litter13" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(1960, 260)
+position = Vector2(1990, 320)
 texture = ExtResource("6_r")
 hframes = 4
 
 [node name="Litter14" type="Sprite2D" parent="FloorLitter"]
-position = Vector2(1150, 160)
+position = Vector2(1180, 200)
 texture = ExtResource("6_r")
 hframes = 4
 frame = 3
@@ -675,8 +675,7 @@ id = "gate_c"
 position = Vector2(120, 414)
 
 [node name="TotemA" parent="Entities" instance=ExtResource("92_totem")]
-position = Vector2(240, 414)
-frame = 0
+position = Vector2(216, 92)
 
 [node name="KioskA" parent="Entities" instance=ExtResource("91_kiosk")]
 position = Vector2(340, 414)
@@ -700,11 +699,10 @@ position = Vector2(300, 164)
 position = Vector2(348, 164)
 
 [node name="KioskB" parent="Entities" instance=ExtResource("91_kiosk")]
-position = Vector2(840, 414)
+position = Vector2(1130, 414)
 
 [node name="TotemB" parent="Entities" instance=ExtResource("92_totem")]
-position = Vector2(960, 414)
-frame = 1
+position = Vector2(1016, 92)
 
 [node name="AtmB" parent="Entities" instance=ExtResource("93_atm")]
 position = Vector2(1080, 414)
@@ -713,23 +711,19 @@ position = Vector2(1080, 414)
 position = Vector2(1180, 414)
 
 [node name="QueueB1" parent="Entities" instance=ExtResource("96_stan")]
-position = Vector2(908, 164)
-
-[node name="QueueB2" parent="Entities" instance=ExtResource("96_stan")]
-position = Vector2(956, 164)
-
-[node name="QueueB3" parent="Entities" instance=ExtResource("96_stan")]
 position = Vector2(1004, 164)
 
-[node name="QueueB4" parent="Entities" instance=ExtResource("96_stan")]
+[node name="QueueB2" parent="Entities" instance=ExtResource("96_stan")]
 position = Vector2(1052, 164)
 
-[node name="KioskC" parent="Entities" instance=ExtResource("91_kiosk")]
-position = Vector2(1620, 414)
+[node name="QueueB3" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(1100, 164)
+
+[node name="QueueB4" parent="Entities" instance=ExtResource("96_stan")]
+position = Vector2(1148, 164)
 
 [node name="TotemC" parent="Entities" instance=ExtResource("92_totem")]
-position = Vector2(1740, 414)
-frame = 2
+position = Vector2(1942, 96)
 
 [node name="AtmC" parent="Entities" instance=ExtResource("93_atm")]
 position = Vector2(1860, 414)
@@ -738,16 +732,13 @@ position = Vector2(1860, 414)
 position = Vector2(1930, 414)
 
 [node name="QueueC1" parent="Entities" instance=ExtResource("96_stan")]
-position = Vector2(1684, 164)
+position = Vector2(1804, 164)
 
 [node name="QueueC2" parent="Entities" instance=ExtResource("96_stan")]
-position = Vector2(1732, 164)
+position = Vector2(1852, 164)
 
 [node name="QueueC3" parent="Entities" instance=ExtResource("96_stan")]
-position = Vector2(1780, 164)
-
-[node name="QueueC4" parent="Entities" instance=ExtResource("96_stan")]
-position = Vector2(1828, 164)
+position = Vector2(1900, 164)
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -775,7 +766,7 @@ texture = ExtResource("s6_secret")
 position = Vector2(1846, 104)
 
 [node name="GateClockA" type="Sprite2D" parent="WallDecor"]
-position = Vector2(600, 320)
+position = Vector2(588, 140)
 texture = ExtResource("98_clock")
 centered = false
 hframes = 4
@@ -787,13 +778,13 @@ centered = false
 hframes = 4
 
 [node name="GateNoticeA" type="Sprite2D" parent="WallDecor"]
-position = Vector2(700, 320)
+position = Vector2(700, 136)
 texture = ExtResource("99_board")
 centered = false
 hframes = 2
 
 [node name="GateNoticeB" type="Sprite2D" parent="WallDecor"]
-position = Vector2(1300, 320)
+position = Vector2(1232, 320)
 texture = ExtResource("99_board")
 centered = false
 hframes = 2
@@ -805,9 +796,11 @@ centered = false
 hframes = 3
 frame = 1
 
-[node name="FinalGantry" type="Sprite2D" parent="WallDecor"]
-position = Vector2(1868, 64)
-texture = ExtResource("9a_gantry")
-centered = false
-hframes = 3
+[node name="Sprite2D" parent="Entities/TotemA" index="0"]
 frame = 0
+
+[node name="Sprite2D" parent="Entities/TotemB" index="0"]
+frame = 2
+
+[node name="Sprite2D" parent="Entities/TotemC" index="0"]
+frame = 3
