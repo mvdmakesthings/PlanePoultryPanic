@@ -534,3 +534,11 @@ centered = false
 hframes = 3
 frame = 1
 z_index = 1
+
+[node name="ScreeningUmbrella" parent="Entities" instance=ExtResource("17_r")]
+position = Vector2(640, 175)
+item = "umbrella"
+
+[node name="HallEnergyDrink" parent="Entities" instance=ExtResource("17_r")]
+position = Vector2(780, 340)
+item = "energy_drink"

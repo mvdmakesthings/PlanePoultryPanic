@@ -471,3 +471,7 @@ centered = false
 hframes = 3
 frame = 1
 z_index = 1
+
+[node name="LostFoundSkates" parent="Entities" instance=ExtResource("4_pickup")]
+position = Vector2(860, 150)
+item = "skates"
