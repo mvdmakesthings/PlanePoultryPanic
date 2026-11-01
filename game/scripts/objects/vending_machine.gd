@@ -1,9 +1,9 @@
 class_name VendingMachine
 extends StaticBody2D
 ## A snack machine on the floor. Interact in front of it with a maintenance
-## key to break it open (the key is used up): it drops its snacks on the
-## floor in front. Its base is solid. Position this node at the middle of
-## its base.
+## key to break it open (the key is used up): it drops its snacks, and an
+## energy drink, on the floor in front. Its base is solid. Position this
+## node at the middle of its base.
 
 const SHADOW_COLOR := Color(0.094, 0.078, 0.145, 0.4)
 const PICKUP_SCENE := preload("res://scenes/objects/item_pickup.tscn")
@@ -11,6 +11,8 @@ const PICKUP_SCENE := preload("res://scenes/objects/item_pickup.tscn")
 @export var key_item := "maintenance_key"
 ## How many snacks it drops.
 @export_range(1, 6) var snacks := 3
+## How many energy drinks it drops along with the snacks.
+@export_range(0, 2) var drinks := 1
 @export var reach := 22.0
 
 var is_locked := true
@@ -57,10 +59,12 @@ func unlock(quiet := false) -> void:
 	AudioManager.play("vend", global_position)
 	Juice.shake(1.0)
 	ParticleBurst.spawn(get_parent(), "sparkle", global_position, Vector2.DOWN, 0, 14.0)
-	for i in snacks:
+	var total := snacks + drinks
+	for i in total:
 		var pickup := PICKUP_SCENE.instantiate() as ItemPickup
+		pickup.item = "snack" if i < snacks else "energy_drink"
 		# Spread out in a little arc in front of the flap.
-		var spread := (i - (snacks - 1) / 2.0) * 10.0
+		var spread := (i - (total - 1) / 2.0) * 10.0
 		pickup.position = position + Vector2(spread, 14 + absf(spread) * 0.3)
 		get_parent().add_child.call_deferred(pickup)
 

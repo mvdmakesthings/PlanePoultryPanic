@@ -14,8 +14,9 @@ extends Node
 ## ones are written to the save again when they change, so quitting and
 ## choosing Continue can't undo a hit.
 ##
-## Items are snacks and extinguishers; key items don't count. A snack is
-## used when it's thrown or eaten, an extinguisher once it's empty.
+## Items are what goes in the six slots; key items don't count. A snack is
+## used when it's thrown or eaten, an extinguisher once it's empty, skates
+## when put on and an energy drink when drunk. The umbrella is never used up.
 ## Dropping an item takes it off the collected count, so picking it up
 ## again doesn't count twice. A chicken has spotted Amanda once it chases
 ## her, including when another chicken alerted it.
@@ -158,8 +159,8 @@ func item_collected(count := 1) -> void:
 	collected += count
 
 
-## Called by the player on throwing or eating a snack, or emptying an
-## extinguisher.
+## Called by the player on throwing or eating a snack, emptying an
+## extinguisher, putting on skates or drinking an energy drink.
 func item_used() -> void:
 	used += 1
 
@@ -203,14 +204,14 @@ func _on_player_died() -> void:
 	persist()
 
 
-## Snacks count one each, an extinguisher one whatever its charges.
+## Stacking items (snacks, energy drinks) count one each; the rest one
+## whatever their count, so an extinguisher is one whatever its charges.
 static func _item_count(slots: Array) -> int:
 	var count := 0
 	for slot: Dictionary in slots:
-		if slot.get("item", "") == "snack":
-			count += int(slot["count"])
-		elif slot.get("item", "") == "extinguisher":
-			count += 1
+		if slot.is_empty():
+			continue
+		count += int(slot["count"]) if Inventory.ITEMS[slot["item"]]["stack"] > 1 else 1
 	return count
 
 
