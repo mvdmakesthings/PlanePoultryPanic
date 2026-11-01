@@ -85,6 +85,8 @@ const SKATE_NOISE_TIME := 0.3
 const SKATE_HIT_RADIUS := 9.0
 ## A chicken she skated into isn't knocked again for this long.
 const SKATE_HIT_COOLDOWN := 1.0
+## The fast music that plays while an energy drink lasts.
+const BUZZ_MUSIC := "buzz"
 
 @export var walk_speed := 100.0
 @export var run_speed := 150.0
@@ -174,6 +176,8 @@ var _chaser_check_in := 0.0
 ## Seconds of skating and of energy-drink buzz left.
 var _skate_left := 0.0
 var _buzz_left := 0.0
+## The music that was playing before the energy drink, to go back to.
+var _music_before_buzz := ""
 ## Her own gliding velocity on skates, without the carousel or knockback.
 var _skate_velocity := Vector2.ZERO
 var _skate_noise_in := 0.0
@@ -408,6 +412,9 @@ func drink() -> void:
 	stamina = max_stamina
 	stamina_changed.emit(stamina, max_stamina)
 	FloatText.spawn(self, "Buzzing!")
+	if AudioManager.music_playing() != BUZZ_MUSIC:
+		_music_before_buzz = AudioManager.music_playing()
+	AudioManager.play_music(BUZZ_MUSIC)
 
 
 ## True if the open umbrella catches an egg flying in this direction:
@@ -671,6 +678,12 @@ func _update_buzz(delta: float) -> void:
 	_exhausted = true
 	stamina_changed.emit(stamina, max_stamina)
 	FloatText.spawn(self, "Crash...")
+	# Only if nothing else (a cleared level, say) has changed the music since.
+	if AudioManager.music_playing() == BUZZ_MUSIC:
+		if _music_before_buzz != "":
+			AudioManager.play_music(_music_before_buzz)
+		else:
+			AudioManager.stop_music()
 
 
 ## Counts down the skates. While gliding fast she knocks chickens flying,

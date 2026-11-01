@@ -1,5 +1,6 @@
 extends Node
-## Smoke test for the gear and maintenance-key variants: the energy drink,
+## Smoke test for the gear and maintenance-key variants: the energy drink
+## (and its music),
 ## umbrella and roller skates, the fuse box, lever socket and staff doors
 ## in the Gate Areas, vending machines dropping a drink, and where each
 ## pickup is placed. Quits with a non-zero exit code on failure. Run from
@@ -73,6 +74,7 @@ func _energy_drink_test() -> void:
 	_tap("use_item")
 	await get_tree().physics_frame
 	_check(player.is_buzzing and player.inventory.count_of("energy_drink") == 1, "Use drinks one")
+	_check(AudioManager.music_playing() == "buzz", "fast buzz music plays while she's buzzing")
 	await _hold(["run", "move_right"], 3.0)
 	_check(player.stamina == player.max_stamina, "running while buzzing never drains stamina")
 	_tap("use_item")
@@ -83,6 +85,7 @@ func _energy_drink_test() -> void:
 	await get_tree().physics_frame
 	_check(not player.is_buzzing and player.stamina < 5.0 and player._exhausted,
 		"when it wears off she crashes with no stamina")
+	_check(AudioManager.music_playing() != "buzz", "the buzz music stops when she crashes")
 	level.queue_free()
 
 

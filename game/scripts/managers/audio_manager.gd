@@ -59,7 +59,7 @@ const SOUNDS := {
 	"fart": {"db": 1.0, "pitch": 0.08, "duck": [-8.0, 0.6]},
 }
 ## Per-track trims (dB) so every loop plays at about the same loudness.
-const MUSIC := {"arrivals": -1.7, "boss": -1.4, "gates": -0.3, "security": -0.2, "victory": 0.0}
+const MUSIC := {"arrivals": -1.7, "boss": -1.4, "buzz": -2.2, "gates": -0.3, "security": -0.2, "victory": 0.0}
 ## Seconds to crossfade between tracks, to fade a track in from silence,
 ## and to fade one out when the music stops.
 const CROSSFADE_TIME := 1.2
