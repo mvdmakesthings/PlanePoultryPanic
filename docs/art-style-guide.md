@@ -474,6 +474,23 @@ Made by `tools/sprites/easter_eggs.py` (see the Secrets section of the GDD). The
 
 **`departure_board_gates_b.png`**: Gate B's board, laid out like the other boards: HOME (DLAY / 4EVR), RUNWAY 2 (MUSH / ROOM), GATE C13 (LAST CALL).
 
+### Gear and Key-Item Variants
+Drawn in `tools/sprites/gear.py`.
+
+**`item_skates.png`**, **`item_energy_drink.png`**, **`item_umbrella.png`**: pickup and HUD icons: a 12x10 red high-top roller skate, a 7x12 green can with a yellow bolt, and a 12x12 open red-and-white umbrella.
+
+**`item_fuse.png`**, **`item_lever_handle.png`**, **`item_staff_badge.png`**: key items for the HUD's key-item row: a 10x6 glass fuse with brass caps, a 12x8 steel lever with a red knob, and a 10x12 ID card on a clip.
+
+**`player_umbrella.png`**: the open umbrella Amanda holds, 20x16 frames, one per direction (down, up, right, left). The game draws it over her, or behind her facing up.
+
+**`player_skates.png`**: skates on her feet, 12x5 frames in the same direction order.
+
+**`fuse_box.png`**: a 12x14 wall box laid out like `speed_panel.png`, 2 frames (empty with a red light, fuse fitted with a green light).
+
+**`lever_socket.png`**: a 12x14 wall plate, 3 frames (empty, lever up, lever down).
+
+**`staff_door.png`**: a 16x32 STAFF ONLY door for the wall face, 2 frames (badge reader red, green). Unlike the crooked-sign secret door, its sign hangs straight.
+
 ### Import Settings (Godot)
 - Texture filter: Nearest
 - No mipmaps
