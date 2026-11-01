@@ -764,7 +764,7 @@ def wall_clock_sheet():
 
 # --- Notice board (32x16, 2 frames: two flyer layouts) ---------------------
 
-BOARD_W, BOARD_H = 32, 16
+NOTICE_W, NOTICE_H = 32, 16
 
 
 def _pin(g, y, x):
@@ -774,17 +774,17 @@ def _pin(g, y, x):
 
 def notice_board(frame):
     """A cork board with pinned flyers; frame 1 is a different layout."""
-    g = _blank(BOARD_W, BOARD_H)
+    g = _blank(NOTICE_W, NOTICE_H)
     # Wood frame: lit top/left, shaded bottom/right.
-    _rect(g, 0, 0, BOARD_W - 1, BOARD_H - 1, "n")
-    _rect(g, 0, 0, BOARD_W - 1, 0, "a")
-    _rect(g, 0, 0, 0, BOARD_H - 1, "a")
-    _rect(g, 0, BOARD_H - 1, BOARD_W - 1, BOARD_H - 1, "D")
-    _rect(g, BOARD_W - 1, 0, BOARD_W - 1, BOARD_H - 1, "D")
+    _rect(g, 0, 0, NOTICE_W - 1, NOTICE_H - 1, "n")
+    _rect(g, 0, 0, NOTICE_W - 1, 0, "a")
+    _rect(g, 0, 0, 0, NOTICE_H - 1, "a")
+    _rect(g, 0, NOTICE_H - 1, NOTICE_W - 1, NOTICE_H - 1, "D")
+    _rect(g, NOTICE_W - 1, 0, NOTICE_W - 1, NOTICE_H - 1, "D")
     # Cork, lightly textured.
-    _rect(g, 2, 2, BOARD_W - 3, BOARD_H - 3, "c")
-    for y in range(2, BOARD_H - 2):
-        for x in range(2, BOARD_W - 2):
+    _rect(g, 2, 2, NOTICE_W - 3, NOTICE_H - 3, "c")
+    for y in range(2, NOTICE_H - 2):
+        for x in range(2, NOTICE_W - 2):
             if (x * 5 + y * 3) % 11 == 0:
                 put(g, y, x, "D")
     if frame == 0:
@@ -816,7 +816,7 @@ def notice_board(frame):
 
 
 def notice_board_sheet():
-    return _strip([notice_board(f) for f in range(2)], BOARD_W, BOARD_H)
+    return _strip([notice_board(f) for f in range(2)], NOTICE_W, NOTICE_H)
 
 
 # --- Carpet runner (48x16, one seamless tileable strip) ---------------------
