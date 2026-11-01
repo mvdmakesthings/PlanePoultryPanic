@@ -481,7 +481,7 @@ Drawn in `tools/sprites/gear.py`.
 
 **`item_fuse.png`**, **`item_lever_handle.png`**, **`item_staff_badge.png`**: key items for the HUD's key-item row: a 10x6 glass fuse with brass caps, a 12x8 steel lever with a red knob, and a 10x12 ID card on a clip.
 
-**`player_umbrella.png`**: the open umbrella Amanda holds, 20x16 frames, one per direction (down, up, right, left). The game draws it over her, or behind her facing up.
+**`player_umbrella.png`**: the open umbrella Amanda holds like a shield, 20x16 frames, one per direction (down, up, right, left). Facing toward or away from the viewer the canopy points straight at the camera, so it reads as an octagon of red and white wedges (from inside, shaded, with ribs, when facing away); side on it's a dome. The game draws it over her, or behind her facing up.
 
 **`player_skates.png`**: skates on her feet, 12x5 frames in the same direction order.
 

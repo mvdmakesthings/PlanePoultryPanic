@@ -6,7 +6,7 @@
 - item_fuse.png: a 10x6 glass fuse with brass caps, a key item.
 - item_lever_handle.png: a 12x8 lever handle with a red knob, a key item.
 - item_staff_badge.png: a 10x12 staff badge on a clip, a key item.
-- player_umbrella.png: the open umbrella held in front of Amanda, 20x16
+- player_umbrella.png: the open umbrella Amanda holds like a shield, 20x16
   frames, one per direction (down, up, right, left).
 - player_skates.png: skates on Amanda's feet, 12x5 frames, one per
   direction (down, up, right, left).
@@ -16,6 +16,8 @@
 - staff_door.png: a 16x32 STAFF ONLY door for the wall face, 2 frames
   (badge reader red, green).
 """
+import math
+
 from set_dressing import _blank, _outline, _rect, _strip
 from palette import put, to_image
 
@@ -116,34 +118,48 @@ def staff_badge():
 UMBRELLA_W, UMBRELLA_H = 20, 16
 
 
-def _canopy_front(g, cx, top, half, rows):
-    """A dome of alternating red and white panels, seen from the front."""
-    for i in range(rows):
-        w = half if i > 1 else half - (2 - i) * 3
-        for x in range(cx - w, cx + w):
-            put(g, top + i, x, "R" if ((x - cx + 20) // 3) % 2 == 0 else "C")
-    # Scalloped rim between the rib tips.
-    for x in range(cx - half, cx + half):
-        if ((x - cx + 20) % 3) == 1:
-            put(g, top + rows, x, "r")
+def _canopy_octagon(g, inside):
+    """The canopy pointed straight at the viewer like a shield: an octagon
+    of eight red and white wedges around the tip. From inside (facing
+    away) the panels are shaded and the ribs show."""
+    cx, cy = 9.5, 7.5
+    for y in range(UMBRELLA_H):
+        for x in range(2, 18):
+            dx, dy = x - cx, y - cy
+            # Octagon: inside the square, with the corners cut off.
+            if abs(dx) + abs(dy) > 10.5:
+                continue
+            sector = int(((math.atan2(dy, dx) + math.pi) / (2 * math.pi)) * 8 + 0.5) % 8
+            red = sector % 2 == 0
+            if inside:
+                put(g, y, x, "r" if red else "c")
+            else:
+                put(g, y, x, "R" if red else "C")
+            # The scalloped rim between the rib tips.
+            if abs(dx) + abs(dy) > 9.5 or abs(dx) > 7 or abs(dy) > 7:
+                put(g, y, x, "r" if not inside else "m")
+    if inside:
+        # Ribs running out from the shaft to the eight corners.
+        for i in range(8):
+            a = i * math.pi / 4
+            for r in range(1, 8):
+                x, y = int(round(cx + math.cos(a) * r)), int(round(cy + math.sin(a) * r))
+                if g[y][x] not in ".":
+                    put(g, y, x, "w")
+    put(g, 7, 9, "w" if not inside else "W")
+    put(g, 7, 10, "w" if not inside else "W")
+    put(g, 8, 9, "w" if not inside else "W")
+    put(g, 8, 10, "w" if not inside else "W")
 
 
 def player_umbrella(direction):
     g = _blank(UMBRELLA_W, UMBRELLA_H)
     if direction == "down":
-        # Facing us: the dome hides her chest and the handle drops below it.
-        _canopy_front(g, 10, 1, 9, 7)
-        put(g, 0, 10, "w")
-        _rect(g, 10, 9, 10, 13, "w")
-        put(g, 14, 9, "w")
+        # Facing us: the canopy points our way like a shield, hiding her.
+        _canopy_octagon(g, inside=False)
     elif direction == "up":
-        # Facing away: the dome is beyond her, seen from inside, darker.
-        _canopy_front(g, 10, 1, 9, 6)
-        for y in range(2, 7):
-            for x in range(UMBRELLA_W):
-                if g[y][x] == "C":
-                    put(g, y, x, "c")
-        _rect(g, 10, 7, 10, 9, "w")
+        # Facing away: the canopy is beyond her, seen from inside.
+        _canopy_octagon(g, inside=True)
     else:
         # Side on: a tall dome bulging out ahead of her, its rim facing her
         # and the handle running back to her hand.
